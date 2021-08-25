@@ -1,1 +1,9 @@
-AMP/[Oo]bj/
+/AMP/[Oo]bj/
+/AMP/obj/
+/AMP/.vs/
+obj/
+.vs/
+AMP/bin/Debug/ArientMusicPlayer.pdb
+AMP/bin/Debug/Log.txt
+AMP/bin/Debug/en/
+AMP/bin/Debug/ArientMusicPlayer.exe
