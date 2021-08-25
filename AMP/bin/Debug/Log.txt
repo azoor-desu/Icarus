@@ -1,0 +1,133 @@
+[8/25/2021 7:03:14 PM] BASS Initialized!
+[8/25/2021 7:03:17 PM] Program Exiting, freeing memory!
+[8/25/2021 7:03:17 PM] BASS released from memory!
+[8/25/2021 7:03:17 PM] Program Exited.
+[8/25/2021 7:03:45 PM] BASS Initialized!
+[8/25/2021 7:03:55 PM] Program Exiting, freeing memory!
+[8/25/2021 7:03:55 PM] BASS released from memory!
+[8/25/2021 7:03:55 PM] Program Exited.
+[8/25/2021 7:04:29 PM] BASS Initialized!
+[8/25/2021 7:04:32 PM] Program Exiting, freeing memory!
+[8/25/2021 7:04:32 PM] BASS released from memory!
+[8/25/2021 7:04:32 PM] Program Exited.
+[8/25/2021 7:04:49 PM] BASS Initialized!
+[8/25/2021 7:04:50 PM] Program Exiting, freeing memory!
+[8/25/2021 7:04:50 PM] BASS released from memory!
+[8/25/2021 7:04:50 PM] Program Exited.
+[8/25/2021 7:05:55 PM] BASS Initialized!
+[8/25/2021 7:05:57 PM] Program Exiting, freeing memory!
+[8/25/2021 7:05:57 PM] BASS released from memory!
+[8/25/2021 7:05:57 PM] Program Exited.
+[8/25/2021 7:06:03 PM] BASS Initialized!
+[8/25/2021 7:06:04 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 7:06:05 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 7:06:06 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 7:06:07 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 7:06:08 PM] Program Exiting, freeing memory!
+[8/25/2021 7:06:08 PM] BASS released from memory!
+[8/25/2021 7:06:08 PM] Program Exited.
+[8/25/2021 7:06:33 PM] BASS Initialized!
+[8/25/2021 7:06:36 PM] Program Exiting, freeing memory!
+[8/25/2021 7:06:36 PM] BASS released from memory!
+[8/25/2021 7:06:36 PM] Program Exited.
+[8/25/2021 7:40:11 PM] BASS Initialized!
+[8/25/2021 7:40:13 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 7:40:14 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 7:40:15 PM] Program Exiting, freeing memory!
+[8/25/2021 7:40:15 PM] BASS released from memory!
+[8/25/2021 7:40:15 PM] Program Exited.
+[8/25/2021 7:40:22 PM] BASS Initialized!
+[8/25/2021 7:40:25 PM] Program Exiting, freeing memory!
+[8/25/2021 7:40:25 PM] BASS released from memory!
+[8/25/2021 7:40:25 PM] Program Exited.
+[8/25/2021 8:16:55 PM] BASS Initialized!
+[8/25/2021 8:16:58 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 8:16:59 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 8:17:00 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 8:17:01 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 8:17:02 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 8:17:05 PM] sssssssAAAAAAAAAAAAAAA
+[8/25/2021 8:17:10 PM] Program Exiting, freeing memory!
+[8/25/2021 8:17:10 PM] BASS released from memory!
+[8/25/2021 8:17:10 PM] Program Exited.
+[8/25/2021 8:18:23 PM] BASS Initialized!
+[8/25/2021 8:18:33 PM] Program Exiting, freeing memory!
+[8/25/2021 8:18:33 PM] BASS released from memory!
+[8/25/2021 8:18:33 PM] Program Exited.
+[8/25/2021 8:21:23 PM] BASS Initialized!
+[8/25/2021 8:21:39 PM] Program Exiting, freeing memory!
+[8/25/2021 8:21:39 PM] BASS released from memory!
+[8/25/2021 8:21:39 PM] Program Exited.
+[8/25/2021 8:21:54 PM] BASS Initialized!
+[8/25/2021 8:22:01 PM] Program Exiting, freeing memory!
+[8/25/2021 8:22:01 PM] BASS released from memory!
+[8/25/2021 8:22:01 PM] Program Exited.
+[8/25/2021 8:23:02 PM] BASS Initialized!
+[8/25/2021 8:23:25 PM] Program Exiting, freeing memory!
+[8/25/2021 8:23:25 PM] BASS released from memory!
+[8/25/2021 8:23:25 PM] Program Exited.
+[8/25/2021 8:23:31 PM] BASS Initialized!
+[8/25/2021 8:24:05 PM] Playback Stopped!
+[8/25/2021 8:24:06 PM] Loading Music file, doing BASS_StreamCreateFile.
+[8/25/2021 8:24:06 PM] Playback Started!
+[8/25/2021 8:24:10 PM] Loading Music file, doing BASS_StreamCreateFile.
+[8/25/2021 8:24:10 PM] Playback Started!
+[8/25/2021 8:24:15 PM] Channel Paused!
+[8/25/2021 8:24:15 PM] Playback Stopped!
+[8/25/2021 8:24:35 PM] Loading Music file, doing BASS_StreamCreateFile.
+[8/25/2021 8:24:35 PM] Playback Started!
+[8/25/2021 8:24:43 PM] Loading Music file, doing BASS_StreamCreateFile.
+[8/25/2021 8:24:43 PM] Playback Started!
+[8/25/2021 8:24:58 PM] Playback Stopped!
+[8/25/2021 8:34:07 PM] BASS Initialized!
+[8/25/2021 8:34:10 PM] Program Exiting, freeing memory!
+[8/25/2021 8:34:10 PM] BASS released from memory!
+[8/25/2021 8:34:10 PM] Program Exited.
+[8/25/2021 8:36:48 PM] BASS Initialized!
+[8/25/2021 8:36:52 PM] Program Exiting, freeing memory!
+[8/25/2021 8:36:52 PM] BASS released from memory!
+[8/25/2021 8:36:52 PM] Program Exited.
+[8/25/2021 8:45:43 PM] BASS Initialized!
+[8/25/2021 8:45:51 PM] Program Exiting, freeing memory!
+[8/25/2021 8:45:51 PM] BASS released from memory!
+[8/25/2021 8:45:51 PM] Program Exited.
+[8/25/2021 8:46:44 PM] BASS Initialized!
+[8/25/2021 8:46:47 PM] Program Exiting, freeing memory!
+[8/25/2021 8:46:47 PM] BASS released from memory!
+[8/25/2021 8:46:47 PM] Program Exited.
+[8/25/2021 8:47:02 PM] BASS Initialized!
+[8/25/2021 8:47:10 PM] Playback Stopped!
+[8/25/2021 8:51:20 PM] BASS Initialized!
+[8/25/2021 8:51:29 PM] Program Exiting, freeing memory!
+[8/25/2021 8:51:29 PM] BASS released from memory!
+[8/25/2021 8:51:29 PM] Program Exited.
+[8/25/2021 8:51:31 PM] BASS Initialized!
+[8/25/2021 8:51:32 PM] Program Exiting, freeing memory!
+[8/25/2021 8:51:32 PM] BASS released from memory!
+[8/25/2021 8:51:32 PM] Program Exited.
+[8/25/2021 8:54:01 PM] BASS Initialized!
+[8/25/2021 8:54:56 PM] BASS Initialized!
+[8/25/2021 8:54:58 PM] Program Exiting, freeing memory!
+[8/25/2021 8:54:58 PM] BASS released from memory!
+[8/25/2021 8:54:58 PM] Program Exited.
+[8/25/2021 8:56:35 PM] BASS Initialized!
+[8/25/2021 8:56:43 PM] Program Exiting, freeing memory!
+[8/25/2021 8:56:43 PM] BASS released from memory!
+[8/25/2021 8:56:43 PM] Program Exited.
+[8/25/2021 9:01:04 PM] BASS Initialized!
+[8/25/2021 9:01:07 PM] Program Exiting, freeing memory!
+[8/25/2021 9:01:07 PM] BASS released from memory!
+[8/25/2021 9:01:07 PM] Program Exited.
+[8/25/2021 9:04:45 PM] BASS Initialized!
+[8/25/2021 9:05:05 PM] BASS Initialized!
+[8/25/2021 9:05:10 PM] Program Exiting, freeing memory!
+[8/25/2021 9:05:10 PM] BASS released from memory!
+[8/25/2021 9:05:10 PM] Program Exited.
+[8/25/2021 9:05:42 PM] BASS Initialized!
+[8/25/2021 9:05:47 PM] Program Exiting, freeing memory!
+[8/25/2021 9:05:47 PM] BASS released from memory!
+[8/25/2021 9:05:47 PM] Program Exited.
+[8/25/2021 9:06:07 PM] BASS Initialized!
+[8/25/2021 9:06:24 PM] Program Exiting, freeing memory!
+[8/25/2021 9:06:24 PM] BASS released from memory!
+[8/25/2021 9:06:24 PM] Program Exited.

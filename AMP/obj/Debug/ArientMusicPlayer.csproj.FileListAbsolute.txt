@@ -1,0 +1,15 @@
+C:\WORK\APP\ArientMusicPlayer\bin\Debug\ArientMusicPlayer.exe.config
+C:\WORK\APP\ArientMusicPlayer\bin\Debug\ArientMusicPlayer.exe
+C:\WORK\APP\ArientMusicPlayer\bin\Debug\ArientMusicPlayer.pdb
+C:\WORK\APP\ArientMusicPlayer\bin\Debug\Bass.Net.xml
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.csproj.AssemblyReference.cache
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.Properties.Resources.resources
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.csproj.GenerateResource.cache
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.csproj.CoreCompileInputs.cache
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.csproj.CopyComplete
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.exe
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.pdb
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.ArientWindow.resources
+C:\WORK\APP\ArientMusicPlayer\bin\Debug\en\ArientMusicPlayer.resources.dll
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\ArientMusicPlayer.ArientWindow.en.resources
+C:\WORK\APP\ArientMusicPlayer\obj\Debug\en\ArientMusicPlayer.resources.dll
