@@ -163,7 +163,7 @@ namespace ArientMusicPlayer {
 
         //Load a list of Files to be used as the Internal Playlist.
         public void LoadInternalPlaylist() {
-            FileManager.ImportPlaylist("C:\\Users\\Azoor\\Downloads\\Local files.m3u8", ref internalPlaylist);
+            FileManager.ImportPlaylist("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8", ref internalPlaylist);
             internalPlaylistIndex = 0;
             arientWindow.UpdatePlaylistWindow(internalPlaylist.ToArray());
         }
