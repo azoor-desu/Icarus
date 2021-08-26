@@ -30,15 +30,28 @@ namespace ArientMusicPlayer
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			System.Windows.Forms.ColumnHeader entryName;
+			System.Windows.Forms.ColumnHeader entryTitle;
 			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
-            "THIS IS NAME",
-            "WOOHOO"}, -1);
+            "1",
+            "A SONG NAME",
+            "BEST LIT HITS",
+            "YA BOI JACKSON",
+            "4:20",
+            "MP3"}, -1);
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ArientWindow));
 			this.btnPlay = new System.Windows.Forms.Button();
 			this.btnPause = new System.Windows.Forms.Button();
 			this.btnStop = new System.Windows.Forms.Button();
 			this.playlistListView = new System.Windows.Forms.ListView();
+			this.playlistContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.playlistMenuItemPlayItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuItemAddToPlaylist = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.playlistMenuItemFileInfo = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuItemFileLocation = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			this.playlistMenuItemRemoveFrmPlaylist = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuItemDeleteFromDisk = new System.Windows.Forms.ToolStripMenuItem();
 			this.songName = new System.Windows.Forms.TextBox();
 			this.btnExitApp = new System.Windows.Forms.Button();
 			this.btnPrev = new System.Windows.Forms.Button();
@@ -53,27 +66,23 @@ namespace ArientMusicPlayer
 			this.trayiconToolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
 			this.btnMinimize = new System.Windows.Forms.Button();
 			this.menuPanel = new System.Windows.Forms.Panel();
-			this.playlistContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.playlistMenuItemPlayItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.playlistMenuItemAddToPlaylist = new System.Windows.Forms.ToolStripMenuItem();
-			this.playlistMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-			this.playlistMenuItemFileInfo = new System.Windows.Forms.ToolStripMenuItem();
-			this.playlistMenuItemFileLocation = new System.Windows.Forms.ToolStripMenuItem();
-			this.playlistMenuSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-			this.playlistMenuItemRemoveFrmPlaylist = new System.Windows.Forms.ToolStripMenuItem();
-			this.playlistMenuItemDeleteFromDisk = new System.Windows.Forms.ToolStripMenuItem();
-			entryName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entryID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entryAlbum = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entryArtist = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entrySongLength = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entryFileFormat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			entryTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.playlistContextMenuStrip.SuspendLayout();
 			this.menuStrip.SuspendLayout();
 			this.menuContextMenuStrip.SuspendLayout();
 			this.trayContextMenuStrip.SuspendLayout();
 			this.menuPanel.SuspendLayout();
-			this.playlistContextMenuStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// entryName
+			// entryTitle
 			// 
-			entryName.Text = "Name";
-			entryName.Width = 200;
+			entryTitle.Text = "Title";
+			entryTitle.Width = 97;
 			// 
 			// btnPlay
 			// 
@@ -104,23 +113,87 @@ namespace ArientMusicPlayer
 			// 
 			// playlistListView
 			// 
-			this.playlistListView.AllowColumnReorder = true;
-			this.playlistListView.AutoArrange = false;
+			this.playlistListView.AllowDrop = true;
 			this.playlistListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            entryName});
+            this.entryID,
+            entryTitle,
+            this.entryAlbum,
+            this.entryArtist,
+            this.entrySongLength,
+            this.entryFileFormat});
+			this.playlistListView.ContextMenuStrip = this.playlistContextMenuStrip;
 			this.playlistListView.FullRowSelect = true;
-			this.playlistListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.playlistListView.HideSelection = false;
 			this.playlistListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1});
-			this.playlistListView.Location = new System.Drawing.Point(541, 69);
+			this.playlistListView.Location = new System.Drawing.Point(411, 69);
 			this.playlistListView.Name = "playlistListView";
 			this.playlistListView.ShowGroups = false;
-			this.playlistListView.Size = new System.Drawing.Size(226, 258);
+			this.playlistListView.Size = new System.Drawing.Size(390, 258);
 			this.playlistListView.TabIndex = 5;
 			this.playlistListView.TabStop = false;
 			this.playlistListView.UseCompatibleStateImageBehavior = false;
 			this.playlistListView.View = System.Windows.Forms.View.Details;
+			// 
+			// playlistContextMenuStrip
+			// 
+			this.playlistContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.playlistMenuItemPlayItem,
+            this.playlistMenuItemAddToPlaylist,
+            this.playlistMenuSeparator1,
+            this.playlistMenuItemFileInfo,
+            this.playlistMenuItemFileLocation,
+            this.playlistMenuSeparator2,
+            this.playlistMenuItemRemoveFrmPlaylist,
+            this.playlistMenuItemDeleteFromDisk});
+			this.playlistContextMenuStrip.Name = "playlistContextMenuStrip";
+			this.playlistContextMenuStrip.Size = new System.Drawing.Size(187, 148);
+			// 
+			// playlistMenuItemPlayItem
+			// 
+			this.playlistMenuItemPlayItem.Name = "playlistMenuItemPlayItem";
+			this.playlistMenuItemPlayItem.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemPlayItem.Text = "Play File";
+			// 
+			// playlistMenuItemAddToPlaylist
+			// 
+			this.playlistMenuItemAddToPlaylist.Name = "playlistMenuItemAddToPlaylist";
+			this.playlistMenuItemAddToPlaylist.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemAddToPlaylist.Text = "Add to Playlist";
+			// 
+			// playlistMenuSeparator1
+			// 
+			this.playlistMenuSeparator1.Name = "playlistMenuSeparator1";
+			this.playlistMenuSeparator1.Size = new System.Drawing.Size(183, 6);
+			// 
+			// playlistMenuItemFileInfo
+			// 
+			this.playlistMenuItemFileInfo.Name = "playlistMenuItemFileInfo";
+			this.playlistMenuItemFileInfo.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemFileInfo.Text = "File Info";
+			// 
+			// playlistMenuItemFileLocation
+			// 
+			this.playlistMenuItemFileLocation.Name = "playlistMenuItemFileLocation";
+			this.playlistMenuItemFileLocation.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemFileLocation.Text = "Open File Location";
+			// 
+			// playlistMenuSeparator2
+			// 
+			this.playlistMenuSeparator2.Name = "playlistMenuSeparator2";
+			this.playlistMenuSeparator2.Size = new System.Drawing.Size(183, 6);
+			// 
+			// playlistMenuItemRemoveFrmPlaylist
+			// 
+			this.playlistMenuItemRemoveFrmPlaylist.Name = "playlistMenuItemRemoveFrmPlaylist";
+			this.playlistMenuItemRemoveFrmPlaylist.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemRemoveFrmPlaylist.Text = "Remove from Playlist";
+			// 
+			// playlistMenuItemDeleteFromDisk
+			// 
+			this.playlistMenuItemDeleteFromDisk.Name = "playlistMenuItemDeleteFromDisk";
+			this.playlistMenuItemDeleteFromDisk.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemDeleteFromDisk.Text = "Delete File";
 			// 
 			// songName
 			// 
@@ -175,6 +248,7 @@ namespace ArientMusicPlayer
             this.menuToolStripMenuItemOptions,
             this.menuToolStripMenuItemExit});
 			this.menuContextMenuStrip.Name = "trayContextMenuStrip";
+			this.menuContextMenuStrip.OwnerItem = this.menuStripMenuLabel;
 			this.menuContextMenuStrip.Size = new System.Drawing.Size(117, 48);
 			// 
 			// menuToolStripMenuItemOptions
@@ -238,65 +312,29 @@ namespace ArientMusicPlayer
 			this.menuPanel.Size = new System.Drawing.Size(813, 24);
 			this.menuPanel.TabIndex = 14;
 			// 
-			// playlistContextMenuStrip
+			// entryID
 			// 
-			this.playlistContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.playlistMenuItemPlayItem,
-            this.playlistMenuItemAddToPlaylist,
-            this.playlistMenuSeparator1,
-            this.playlistMenuItemFileInfo,
-            this.playlistMenuItemFileLocation,
-            this.playlistMenuSeparator2,
-            this.playlistMenuItemRemoveFrmPlaylist,
-            this.playlistMenuItemDeleteFromDisk});
-			this.playlistContextMenuStrip.Name = "playlistContextMenuStrip";
-			this.playlistContextMenuStrip.Size = new System.Drawing.Size(187, 148);
+			this.entryID.Text = "No.";
+			this.entryID.Width = 31;
 			// 
-			// playlistMenuItemPlayItem
+			// entryAlbum
 			// 
-			this.playlistMenuItemPlayItem.Name = "playlistMenuItemPlayItem";
-			this.playlistMenuItemPlayItem.Size = new System.Drawing.Size(186, 22);
-			this.playlistMenuItemPlayItem.Text = "Play File";
+			this.entryAlbum.Text = "Album";
+			this.entryAlbum.Width = 71;
 			// 
-			// playlistMenuItemAddToPlaylist
+			// entryArtist
 			// 
-			this.playlistMenuItemAddToPlaylist.Name = "playlistMenuItemAddToPlaylist";
-			this.playlistMenuItemAddToPlaylist.Size = new System.Drawing.Size(186, 22);
-			this.playlistMenuItemAddToPlaylist.Text = "Add to Playlist";
+			this.entryArtist.Text = "Artists";
+			this.entryArtist.Width = 69;
 			// 
-			// playlistMenuSeparator1
+			// entrySongLength
 			// 
-			this.playlistMenuSeparator1.Name = "playlistMenuSeparator1";
-			this.playlistMenuSeparator1.Size = new System.Drawing.Size(183, 6);
+			this.entrySongLength.Text = "Length";
+			this.entrySongLength.Width = 48;
 			// 
-			// playlistMenuItemFileInfo
+			// entryFileFormat
 			// 
-			this.playlistMenuItemFileInfo.Name = "playlistMenuItemFileInfo";
-			this.playlistMenuItemFileInfo.Size = new System.Drawing.Size(186, 22);
-			this.playlistMenuItemFileInfo.Text = "File Info";
-			// 
-			// playlistMenuItemFileLocation
-			// 
-			this.playlistMenuItemFileLocation.Name = "playlistMenuItemFileLocation";
-			this.playlistMenuItemFileLocation.Size = new System.Drawing.Size(186, 22);
-			this.playlistMenuItemFileLocation.Text = "Open File Location";
-			// 
-			// playlistMenuSeparator2
-			// 
-			this.playlistMenuSeparator2.Name = "playlistMenuSeparator2";
-			this.playlistMenuSeparator2.Size = new System.Drawing.Size(183, 6);
-			// 
-			// playlistMenuItemRemoveFrmPlaylist
-			// 
-			this.playlistMenuItemRemoveFrmPlaylist.Name = "playlistMenuItemRemoveFrmPlaylist";
-			this.playlistMenuItemRemoveFrmPlaylist.Size = new System.Drawing.Size(186, 22);
-			this.playlistMenuItemRemoveFrmPlaylist.Text = "Remove from Playlist";
-			// 
-			// playlistMenuItemDeleteFromDisk
-			// 
-			this.playlistMenuItemDeleteFromDisk.Name = "playlistMenuItemDeleteFromDisk";
-			this.playlistMenuItemDeleteFromDisk.Size = new System.Drawing.Size(186, 22);
-			this.playlistMenuItemDeleteFromDisk.Text = "Delete File";
+			this.entryFileFormat.Text = "Format";
 			// 
 			// ArientWindow
 			// 
@@ -317,12 +355,12 @@ namespace ArientMusicPlayer
 			this.MainMenuStrip = this.menuStrip;
 			this.Name = "ArientWindow";
 			this.Text = "Arient Music Player";
+			this.playlistContextMenuStrip.ResumeLayout(false);
 			this.menuStrip.ResumeLayout(false);
 			this.menuStrip.PerformLayout();
 			this.menuContextMenuStrip.ResumeLayout(false);
 			this.trayContextMenuStrip.ResumeLayout(false);
 			this.menuPanel.ResumeLayout(false);
-			this.playlistContextMenuStrip.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -358,6 +396,11 @@ namespace ArientMusicPlayer
 		private System.Windows.Forms.ContextMenuStrip menuContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItemOptions;
 		private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItemExit;
+		private System.Windows.Forms.ColumnHeader entryID;
+		private System.Windows.Forms.ColumnHeader entryAlbum;
+		private System.Windows.Forms.ColumnHeader entryArtist;
+		private System.Windows.Forms.ColumnHeader entrySongLength;
+		private System.Windows.Forms.ColumnHeader entryFileFormat;
 	}
 }
 

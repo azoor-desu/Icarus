@@ -78,21 +78,16 @@ namespace ArientMusicPlayer {
 						}
 		}
 
-		
+
 		#endregion
 
 		#region Playlist Display
 
+		ListViewItem listViewItem;
 		public void UpdatePlaylistWindow(string[] fileNames) {
-			
+			playlistListView.Items.Clear();
 			foreach (string name in fileNames) {
-				//listViewItem.Name = name;
-				ListViewItem listViewItem = new ListViewItem(name);
-				playlistListView.Items.Add(listViewItem);
-			}
-
-			for (int i = 0; i < 100; i++) {
-				ListViewItem listViewItem = new ListViewItem("Dustin Biebere - Bebe\nMy Hart weel go on || ALLAH IS GREATEST");
+				listViewItem = new ListViewItem(name);
 				playlistListView.Items.Add(listViewItem);
 			}
 		}

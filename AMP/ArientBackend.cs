@@ -23,7 +23,7 @@ namespace ArientMusicPlayer {
                 Logging.Debug("BASS Initialized!");
             }
 
-            LoadInternalPlaylist(null);
+            LoadInternalPlaylist();
         }
 
 
@@ -93,7 +93,7 @@ namespace ArientMusicPlayer {
 
                 if (!Bass.BASS_ChannelStop(currentChannel)) {
                     Logging.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
-                }                
+                }
                 if (!Bass.BASS_StreamFree(currentChannel)) {
                     Logging.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
                 }
@@ -162,22 +162,12 @@ namespace ArientMusicPlayer {
         int internalPlaylistIndex = 0;
 
         //Load a list of Files to be used as the Internal Playlist.
-        public void LoadInternalPlaylist(List <string> _playlist) {
-
-            internalPlaylist.Clear();
+        public void LoadInternalPlaylist() {
+            FileManager.ImportPlaylist("C:\\Users\\Azoor\\Downloads\\Local files.m3u8", ref internalPlaylist);
             internalPlaylistIndex = 0;
-
-            internalPlaylist.Add("Z:\\Music\\Houshou Marine - シアワセうさぎ・ぺこみこマリン.mp3");
-            internalPlaylist.Add("Z:\\Music\\Kano - DAYBREAK FRONTLINE.mp3");
-
-            if (_playlist != null) {
-                foreach (string music in _playlist) {
-                    internalPlaylist.Add(music);
-                }
-            }
-
             arientWindow.UpdatePlaylistWindow(internalPlaylist.ToArray());
         }
+
 
         #endregion
 
@@ -186,7 +176,7 @@ namespace ArientMusicPlayer {
         public bool settingMinToTray = true;
 
 
-		#endregion
+        #endregion
 
-	}
+    }
 }
