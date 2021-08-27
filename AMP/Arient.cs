@@ -146,20 +146,9 @@ namespace ArientMusicPlayer {
         }
 
         public static void NextTrack() {
-            //Do BASS_ChannelPause and BASS_StreamFree,
-            //change the internalPlaylistIndex,
+            //Stop playback, change the internalPlaylistIndex,
             //then run StartPlayback()
-            if (currentChannel != 0) {
-
-                if (!Bass.BASS_ChannelStop(currentChannel)) {
-                    Logger.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
-                    return;
-                }
-                if (!Bass.BASS_StreamFree(currentChannel)) {
-                    Logger.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
-                    return;
-                }
-            }
+            StopPlayback();
 
             //Clamp the max index.
             internalPlaylist.currentSongIndex++;
@@ -167,25 +156,13 @@ namespace ArientMusicPlayer {
                 internalPlaylist.currentSongIndex = 0;
             }
 
-            currentChannel = 0;
             StartPlayback();
         }
 
         public static void PrevTrack() {
-            //Do BASS_ChannelPause and BASS_StreamFree,
-            //change the internalPlaylistIndex,
-            //then run StartPlayback()
-            if (currentChannel != 0) {
-
-                if (!Bass.BASS_ChannelStop(currentChannel)) {
-                    Logger.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
-                    return;
-                }
-                if (!Bass.BASS_StreamFree(currentChannel)) {
-                    Logger.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
-                    return;
-                }
-            }
+            //Stop playback, change the internalPlaylistIndex,
+            //then run StartPlayback()stIndex,
+            StopPlayback();
 
             //Clamp the min index.
             internalPlaylist.currentSongIndex--;
@@ -194,7 +171,6 @@ namespace ArientMusicPlayer {
             }
 
             StartPlayback();
-            currentChannel = 0;
         }
 
         #endregion
