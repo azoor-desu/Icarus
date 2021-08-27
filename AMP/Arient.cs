@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
 using Un4seen.Bass;
+using Un4seen.Bass.AddOn.Tags;
 
 namespace ArientMusicPlayer {
     //Contains the entry point. Not really used lol.
@@ -10,7 +11,6 @@ namespace ArientMusicPlayer {
 
         //references for all component instances.
         public static ArientWindow arientWindow;
-        //public static Arient arientBackend; //this object
 
         //Entry Point. Loads: ArientWindow Components > ArientBackend.Initialize > ArientBackend.LoadSettings
         #region Main/Exit
@@ -25,25 +25,19 @@ namespace ArientMusicPlayer {
             InitializeArientBackend();
             LoadSettings();
             Application.Run(arientWindow);
+            UnloadBASS();
         }
 
-        //Is only here for OnProcessExit to reference.
-        public static void ExitApplication() {
-            Logging.Debug("Program Exiting, freeing memory!");
+        //Free BASS stuff before stopping the app completely.
+        static void UnloadBASS() {
+            Logger.Debug("Program Exiting, freeing memory!");
             // free BASS
             if (Bass.BASS_Free()) {
-                Logging.Debug("BASS released from memory!");
+                Logger.Debug("BASS released from memory!");
             } else {
-                Logging.Debug("Error freeing BASS: " + Bass.BASS_ErrorGetCode());
+                Logger.Debug("Error freeing BASS: " + Bass.BASS_ErrorGetCode());
             }
-            Logging.Debug("Program Exited.");
-
-            Application.Exit();
-        }
-
-        //OnExit. Hopefully it works when user does EndTask lol.
-        static void OnProcessExit(object sender, EventArgs e) {
-            ExitApplication();
+            Logger.Debug("Program Exited.");
         }
 
         #endregion
@@ -51,23 +45,23 @@ namespace ArientMusicPlayer {
 
         //====================START OF BACKEND FEATURES====================
 
-        public static List<string> internalPlaylist = new List<string>();
-
         #region Startup
         //Initialization BASS.
         static void InitializeArientBackend() {
 
             // init BASS using the default output device
             if (!Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero)) {
-                Logging.Debug("Error During Initialization of BASS: " + Bass.BASS_ErrorGetCode());
+                Logger.Debug("Error During Initialization of BASS: " + Bass.BASS_ErrorGetCode());
             } else {
-                Logging.Debug("BASS Initialized!");
+                Logger.Debug("BASS Initialized!");
             }
         }
 
         //Loading of saved settings + TESTING stuff.
         static void LoadSettings() {
-            LoadInternalPlaylist();
+            internalPlaylist = FileManager.ImportPlaylist("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8");
+            internalPlaylistIndex = 0;
+            arientWindow.UpdatePlaylistWindow();
         }
 
         #endregion
@@ -90,21 +84,21 @@ namespace ArientMusicPlayer {
 
             if (currentChannel == 0) {
                 //No channels created yet, create a channel and play it.
-                Logging.Debug("Loading Music file, doing BASS_StreamCreateFile.");
-                currentChannel = Bass.BASS_StreamCreateFile(internalPlaylist[internalPlaylistIndex], 0, 0, BASSFlag.BASS_DEFAULT);
+                Logger.Debug("Loading Music file, doing BASS_StreamCreateFile.");
+                currentChannel = Bass.BASS_StreamCreateFile(internalPlaylist.songs[internalPlaylistIndex].filename, 0, 0, BASSFlag.BASS_DEFAULT);
             }
 
             if (currentChannel == 0) {
                 //If after creating a channel and channel still 0, log an error.
-                Logging.Error("Error During creating channel: " + Bass.BASS_ErrorGetCode());
+                Logger.Error("Error During creating channel: " + Bass.BASS_ErrorGetCode());
             } else {
                 //Stream successfully created, play the audio!
                 if (Bass.BASS_ChannelPlay(currentChannel, false)) {
                     isPlaying = true;
-                    Logging.Debug("Playback Started!");
+                    Logger.Debug("Playback Started!");
                 } else {
                     //If there's an Error playing, Log the error.
-                    Logging.Error("Error starting Playback: " + Bass.BASS_ErrorGetCode());
+                    Logger.Error("Error starting Playback: " + Bass.BASS_ErrorGetCode());
                 }
             }
         }
@@ -114,10 +108,10 @@ namespace ArientMusicPlayer {
             //do BASS_ChannelPause.
             if (currentChannel != 0) {
                 if (Bass.BASS_ChannelPause(currentChannel)) {
-                    Logging.Debug("Channel Paused!");
+                    Logger.Debug("Channel Paused!");
                     isPlaying = false;
                 } else {
-                    Logging.Error("Error during pausing playback: " + Bass.BASS_ErrorGetCode());
+                    Logger.Error("Error during pausing playback: " + Bass.BASS_ErrorGetCode());
                 }
             }
         }
@@ -137,13 +131,13 @@ namespace ArientMusicPlayer {
             if (currentChannel != 0) {
 
                 if (!Bass.BASS_ChannelStop(currentChannel)) {
-                    Logging.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
+                    Logger.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
                 }
                 if (!Bass.BASS_StreamFree(currentChannel)) {
-                    Logging.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
+                    Logger.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
                 }
             }
-            Logging.Debug("Playback Stopped!");
+            Logger.Debug("Playback Stopped!");
             isPlaying = false;
             currentChannel = 0;
         }
@@ -155,18 +149,18 @@ namespace ArientMusicPlayer {
             if (currentChannel != 0) {
 
                 if (!Bass.BASS_ChannelStop(currentChannel)) {
-                    Logging.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
+                    Logger.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
                     return;
                 }
                 if (!Bass.BASS_StreamFree(currentChannel)) {
-                    Logging.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
+                    Logger.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
                     return;
                 }
             }
 
             //Clamp the max index.
             internalPlaylistIndex++;
-            if (internalPlaylistIndex > internalPlaylist.Count - 1) {
+            if (internalPlaylistIndex > internalPlaylist.songs.Length - 1) {
                 internalPlaylistIndex = 0;
             }
 
@@ -181,11 +175,11 @@ namespace ArientMusicPlayer {
             if (currentChannel != 0) {
 
                 if (!Bass.BASS_ChannelStop(currentChannel)) {
-                    Logging.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
+                    Logger.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
                     return;
                 }
                 if (!Bass.BASS_StreamFree(currentChannel)) {
-                    Logging.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
+                    Logger.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
                     return;
                 }
             }
@@ -193,26 +187,57 @@ namespace ArientMusicPlayer {
             //Clamp the min index.
             internalPlaylistIndex--;
             if (internalPlaylistIndex < 0) {
-                internalPlaylistIndex = internalPlaylist.Count - 1;
+                internalPlaylistIndex = internalPlaylist.songs.Length - 1;
             }
 
-            currentChannel = 0;
             StartPlayback();
+            currentChannel = 0;
         }
 
         #endregion
 
         #region Playlist Controls
 
-        static int internalPlaylistIndex = 0;
+        public class Playlist {
 
-        //Load a list of Files to be used as the Internal Playlist.
-        public static void LoadInternalPlaylist() {
-            FileManager.ImportPlaylist("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8", ref internalPlaylist);
-            internalPlaylistIndex = 0;
-            arientWindow.UpdatePlaylistWindow();
+			#region Constructors
+			public Playlist() { //WARNING: Need to manually set TAG_INFO.
+              
+            }
+
+            public Playlist(int length, bool createEmptyTags = false) {
+                SetSongLength(length, createEmptyTags);
+            }
+			#endregion
+
+			public string name;
+            public TAG_INFO[] songs;
+
+            //Helper Methods for managing TAG_INFO songs.
+
+            public void SetSongLength(int length, bool createEmptyTags) {
+                songs = new TAG_INFO[length]; //set the length
+                if (createEmptyTags) {
+                    for (int i = 0; i < length; i++) { //loop length and do NEW.
+                        songs[i] = new TAG_INFO();
+                    }
+                }
+            }
+
+            public void AddSong(string path) {
+                //Create new array with length +1 and copy all old data to it.
+                TAG_INFO[] newArray = new TAG_INFO[songs.Length + 1];
+                for (int i = 0; i < songs.Length; i++) {
+                    newArray[i] = songs[i];
+                }
+                //Add new song to end of array.
+                newArray[newArray.Length - 1] = FileManager.GetTag(path);
+                songs = newArray;
+            }
         }
 
+        static int internalPlaylistIndex = 0;
+        public static Playlist internalPlaylist = new Playlist();
 
         #endregion
 
@@ -226,8 +251,7 @@ namespace ArientMusicPlayer {
 
     }
 
-
-    public static class Logging {
+    public static class Logger {
 
         public static readonly DateTime dateTime = DateTime.Now;
 

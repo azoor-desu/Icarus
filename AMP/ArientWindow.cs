@@ -80,13 +80,12 @@ namespace ArientMusicPlayer {
 
 		ListViewItem listViewItem;
 		public void UpdatePlaylistWindow() {
-			//playlistListView.Items.Clear();
-			for (int i = 0; i < Arient.internalPlaylist.Count; i++) {
+			playlistListView.Items.Clear();
+			for (int i = 0; i < Arient.internalPlaylist.songs.Length; i++) {
 				listViewItem = new ListViewItem(i.ToString());
-				listViewItem.SubItems.Add(Arient.internalPlaylist[i]);
-				listViewItem.SubItems.Add("FILLER");
-				listViewItem.SubItems.Add("FILLER");
-				listViewItem.SubItems.Add("FILLER");
+				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].title);
+				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].album);
+				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].artist);
 				listViewItem.SubItems.Add("FILLER");
 				listViewItem.SubItems.Add("FILLER");
 				playlistListView.Items.Add(listViewItem);
@@ -156,7 +155,7 @@ namespace ArientMusicPlayer {
 		}
 
 		private void UniversalExitApp(object sender, EventArgs e) {
-			Arient.ExitApplication();
+			Application.Exit();
 		}
 
 		#endregion

@@ -31,6 +31,13 @@ namespace ArientMusicPlayer
 		{
 			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.ColumnHeader entryTitle;
+			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
+            "1",
+            "TITLE",
+            "ALBUM",
+            "ARTIST",
+            "LEN",
+            "MP3"}, -1);
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ArientWindow));
 			this.btnPlay = new System.Windows.Forms.Button();
 			this.btnPause = new System.Windows.Forms.Button();
@@ -75,7 +82,7 @@ namespace ArientMusicPlayer
 			// entryTitle
 			// 
 			entryTitle.Text = "Title";
-			entryTitle.Width = 97;
+			entryTitle.Width = 108;
 			// 
 			// btnPlay
 			// 
@@ -117,6 +124,8 @@ namespace ArientMusicPlayer
 			this.playlistListView.ContextMenuStrip = this.playlistContextMenuStrip;
 			this.playlistListView.FullRowSelect = true;
 			this.playlistListView.HideSelection = false;
+			this.playlistListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem1});
 			this.playlistListView.Location = new System.Drawing.Point(404, 69);
 			this.playlistListView.Name = "playlistListView";
 			this.playlistListView.ShowGroups = false;
