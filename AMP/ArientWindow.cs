@@ -4,12 +4,10 @@ using System.Runtime.InteropServices;
 
 
 namespace ArientMusicPlayer {
-	
+
 	//handles things realated to the Window itself (Updating text, displaying stuff)
 	//AKA FRONTEND
 	public partial class ArientWindow : Form {
-
-        ArientBackend arientBackend;
 
 		public const int WM_NCLBUTTONDOWN = 0xA1;
 		public const int HT_CAPTION = 0x2;
@@ -23,7 +21,6 @@ namespace ArientMusicPlayer {
 		public ArientWindow() {
 			InitializeComponent();
 			InitializeExtraComponents();
-			arientBackend = new ArientBackend(this);
 		}
 
 		//Contains all the Events for buttons and Mouse actions
@@ -50,32 +47,32 @@ namespace ArientMusicPlayer {
 		#region Music Player Interface Buttons
 		private void btnPlay_Click(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
-				arientBackend.TogglePlayPause();
+				Arient.arientBackend.TogglePlayPause();
 			}
 		}
 
 		private void btnPause_Click(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
-				arientBackend.PausePlayback();
+				Arient.arientBackend.PausePlayback();
 			}
 		}
 
 		private void btnStop_Click(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
-				arientBackend.StopPlayback();
+				Arient.arientBackend.StopPlayback();
 			}
 		}
 
 		private void btnPrev_Click(object sender, MouseEventArgs e) {
-					if (e.Button == MouseButtons.Left) {
-						arientBackend.PrevTrack();
-					}
+			if (e.Button == MouseButtons.Left) {
+				Arient.arientBackend.PrevTrack();
+			}
 		}
 
 		private void btnNext_Click(object sender, MouseEventArgs e) {
-						if (e.Button == MouseButtons.Left) {
-							arientBackend.NextTrack();
-						}
+			if (e.Button == MouseButtons.Left) {
+				Arient.arientBackend.NextTrack();
+			}
 		}
 
 
@@ -84,10 +81,16 @@ namespace ArientMusicPlayer {
 		#region Playlist Display
 
 		ListViewItem listViewItem;
-		public void UpdatePlaylistWindow(string[] fileNames) {
-			playlistListView.Items.Clear();
-			foreach (string name in fileNames) {
-				listViewItem = new ListViewItem(name);
+		public void UpdatePlaylistWindow() {
+			//playlistListView.Items.Clear();
+			for (int i = 0; i < Arient.arientBackend.internalPlaylist.Count; i++) {
+				listViewItem = new ListViewItem(i.ToString());
+				listViewItem.SubItems.Add(Arient.arientBackend.internalPlaylist[i]);
+				listViewItem.SubItems.Add("FILLER");
+				listViewItem.SubItems.Add("FILLER");
+				listViewItem.SubItems.Add("FILLER");
+				listViewItem.SubItems.Add("FILLER");
+				listViewItem.SubItems.Add("FILLER");
 				playlistListView.Items.Add(listViewItem);
 			}
 		}
@@ -99,7 +102,7 @@ namespace ArientMusicPlayer {
 			//Handles Holding Down and Double Clicking.
 			if (e.Clicks == 1) {
 				UniversalDragWindowAction(sender, e);
-			} else if (e.Clicks == 2){
+			} else if (e.Clicks == 2) {
 				UniversalMaximize(sender, e);
 			}
 		}
@@ -123,7 +126,7 @@ namespace ArientMusicPlayer {
 		private void btnMinimize_Click(object sender, MouseEventArgs e) {
 
 			WindowState = FormWindowState.Minimized;
-			if (arientBackend.settingMinToTray) {
+			if (Arient.arientBackend.settingMinToTray) {
 				//Pressing Minimize minimizes to tray.
 				Hide();
 				ShowInTaskbar = false;
@@ -155,7 +158,7 @@ namespace ArientMusicPlayer {
 		}
 
 		private void UniversalExitApp(object sender, EventArgs e) {
-			MainEntryPoint.ExitApplication();
+			Arient.ExitApplication();
 		}
 
 		#endregion

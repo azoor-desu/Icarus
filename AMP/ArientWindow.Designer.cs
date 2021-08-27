@@ -31,18 +31,16 @@ namespace ArientMusicPlayer
 		{
 			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.ColumnHeader entryTitle;
-			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
-            "1",
-            "A SONG NAME",
-            "BEST LIT HITS",
-            "YA BOI JACKSON",
-            "4:20",
-            "MP3"}, -1);
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ArientWindow));
 			this.btnPlay = new System.Windows.Forms.Button();
 			this.btnPause = new System.Windows.Forms.Button();
 			this.btnStop = new System.Windows.Forms.Button();
 			this.playlistListView = new System.Windows.Forms.ListView();
+			this.entryID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entryAlbum = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entryArtist = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entrySongLength = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.entryFileFormat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.playlistContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.playlistMenuItemPlayItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.playlistMenuItemAddToPlaylist = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,11 +64,6 @@ namespace ArientMusicPlayer
 			this.trayiconToolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
 			this.btnMinimize = new System.Windows.Forms.Button();
 			this.menuPanel = new System.Windows.Forms.Panel();
-			this.entryID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.entryAlbum = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.entryArtist = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.entrySongLength = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.entryFileFormat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			entryTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.playlistContextMenuStrip.SuspendLayout();
 			this.menuStrip.SuspendLayout();
@@ -86,7 +79,7 @@ namespace ArientMusicPlayer
 			// 
 			// btnPlay
 			// 
-			this.btnPlay.Location = new System.Drawing.Point(76, 69);
+			this.btnPlay.Location = new System.Drawing.Point(42, 69);
 			this.btnPlay.Name = "btnPlay";
 			this.btnPlay.Size = new System.Drawing.Size(105, 42);
 			this.btnPlay.TabIndex = 0;
@@ -95,7 +88,7 @@ namespace ArientMusicPlayer
 			// 
 			// btnPause
 			// 
-			this.btnPause.Location = new System.Drawing.Point(187, 69);
+			this.btnPause.Location = new System.Drawing.Point(153, 69);
 			this.btnPause.Name = "btnPause";
 			this.btnPause.Size = new System.Drawing.Size(111, 42);
 			this.btnPause.TabIndex = 3;
@@ -104,7 +97,7 @@ namespace ArientMusicPlayer
 			// 
 			// btnStop
 			// 
-			this.btnStop.Location = new System.Drawing.Point(304, 69);
+			this.btnStop.Location = new System.Drawing.Point(270, 69);
 			this.btnStop.Name = "btnStop";
 			this.btnStop.Size = new System.Drawing.Size(113, 42);
 			this.btnStop.TabIndex = 4;
@@ -124,16 +117,38 @@ namespace ArientMusicPlayer
 			this.playlistListView.ContextMenuStrip = this.playlistContextMenuStrip;
 			this.playlistListView.FullRowSelect = true;
 			this.playlistListView.HideSelection = false;
-			this.playlistListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
-			this.playlistListView.Location = new System.Drawing.Point(411, 69);
+			this.playlistListView.Location = new System.Drawing.Point(404, 69);
 			this.playlistListView.Name = "playlistListView";
 			this.playlistListView.ShowGroups = false;
-			this.playlistListView.Size = new System.Drawing.Size(390, 258);
+			this.playlistListView.Size = new System.Drawing.Size(397, 258);
 			this.playlistListView.TabIndex = 5;
 			this.playlistListView.TabStop = false;
 			this.playlistListView.UseCompatibleStateImageBehavior = false;
 			this.playlistListView.View = System.Windows.Forms.View.Details;
+			// 
+			// entryID
+			// 
+			this.entryID.Text = "No.";
+			this.entryID.Width = 31;
+			// 
+			// entryAlbum
+			// 
+			this.entryAlbum.Text = "Album";
+			this.entryAlbum.Width = 71;
+			// 
+			// entryArtist
+			// 
+			this.entryArtist.Text = "Artists";
+			this.entryArtist.Width = 69;
+			// 
+			// entrySongLength
+			// 
+			this.entrySongLength.Text = "Length";
+			this.entrySongLength.Width = 48;
+			// 
+			// entryFileFormat
+			// 
+			this.entryFileFormat.Text = "Format";
 			// 
 			// playlistContextMenuStrip
 			// 
@@ -197,7 +212,7 @@ namespace ArientMusicPlayer
 			// 
 			// songName
 			// 
-			this.songName.Location = new System.Drawing.Point(76, 307);
+			this.songName.Location = new System.Drawing.Point(42, 307);
 			this.songName.Name = "songName";
 			this.songName.Size = new System.Drawing.Size(329, 20);
 			this.songName.TabIndex = 6;
@@ -213,7 +228,7 @@ namespace ArientMusicPlayer
 			// 
 			// btnPrev
 			// 
-			this.btnPrev.Location = new System.Drawing.Point(76, 117);
+			this.btnPrev.Location = new System.Drawing.Point(42, 117);
 			this.btnPrev.Name = "btnPrev";
 			this.btnPrev.Size = new System.Drawing.Size(40, 47);
 			this.btnPrev.TabIndex = 9;
@@ -222,7 +237,7 @@ namespace ArientMusicPlayer
 			// 
 			// btnNext
 			// 
-			this.btnNext.Location = new System.Drawing.Point(141, 117);
+			this.btnNext.Location = new System.Drawing.Point(107, 117);
 			this.btnNext.Name = "btnNext";
 			this.btnNext.Size = new System.Drawing.Size(40, 47);
 			this.btnNext.TabIndex = 10;
@@ -311,30 +326,6 @@ namespace ArientMusicPlayer
 			this.menuPanel.Name = "menuPanel";
 			this.menuPanel.Size = new System.Drawing.Size(813, 24);
 			this.menuPanel.TabIndex = 14;
-			// 
-			// entryID
-			// 
-			this.entryID.Text = "No.";
-			this.entryID.Width = 31;
-			// 
-			// entryAlbum
-			// 
-			this.entryAlbum.Text = "Album";
-			this.entryAlbum.Width = 71;
-			// 
-			// entryArtist
-			// 
-			this.entryArtist.Text = "Artists";
-			this.entryArtist.Width = 69;
-			// 
-			// entrySongLength
-			// 
-			this.entrySongLength.Text = "Length";
-			this.entrySongLength.Width = 48;
-			// 
-			// entryFileFormat
-			// 
-			this.entryFileFormat.Text = "Format";
 			// 
 			// ArientWindow
 			// 
