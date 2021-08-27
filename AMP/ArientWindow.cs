@@ -47,35 +47,33 @@ namespace ArientMusicPlayer {
 		#region Music Player Interface Buttons
 		private void btnPlay_Click(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
-				Arient.arientBackend.TogglePlayPause();
+				Arient.TogglePlayPause();
 			}
 		}
 
 		private void btnPause_Click(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
-				Arient.arientBackend.PausePlayback();
+				Arient.PausePlayback();
 			}
 		}
 
 		private void btnStop_Click(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
-				Arient.arientBackend.StopPlayback();
+				Arient.StopPlayback();
 			}
 		}
 
 		private void btnPrev_Click(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
-				Arient.arientBackend.PrevTrack();
+				Arient.PrevTrack();
 			}
 		}
 
 		private void btnNext_Click(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
-				Arient.arientBackend.NextTrack();
+				Arient.NextTrack();
 			}
 		}
-
-
 		#endregion
 
 		#region Playlist Display
@@ -83,9 +81,9 @@ namespace ArientMusicPlayer {
 		ListViewItem listViewItem;
 		public void UpdatePlaylistWindow() {
 			//playlistListView.Items.Clear();
-			for (int i = 0; i < Arient.arientBackend.internalPlaylist.Count; i++) {
+			for (int i = 0; i < Arient.internalPlaylist.Count; i++) {
 				listViewItem = new ListViewItem(i.ToString());
-				listViewItem.SubItems.Add(Arient.arientBackend.internalPlaylist[i]);
+				listViewItem.SubItems.Add(Arient.internalPlaylist[i]);
 				listViewItem.SubItems.Add("FILLER");
 				listViewItem.SubItems.Add("FILLER");
 				listViewItem.SubItems.Add("FILLER");
@@ -126,7 +124,7 @@ namespace ArientMusicPlayer {
 		private void btnMinimize_Click(object sender, MouseEventArgs e) {
 
 			WindowState = FormWindowState.Minimized;
-			if (Arient.arientBackend.settingMinToTray) {
+			if (Arient.settingMinToTray) {
 				//Pressing Minimize minimizes to tray.
 				Hide();
 				ShowInTaskbar = false;
@@ -197,6 +195,4 @@ namespace ArientMusicPlayer {
 		#endregion
 
 	}
-
-
 }

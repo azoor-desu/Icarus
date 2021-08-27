@@ -6,11 +6,11 @@ using Un4seen.Bass;
 
 namespace ArientMusicPlayer {
     //Contains the entry point. Not really used lol.
-    public class Arient {
+    public static class Arient {
 
         //references for all component instances.
         public static ArientWindow arientWindow;
-        public static Arient arientBackend; //this object
+        //public static Arient arientBackend; //this object
 
         //Entry Point. Loads: ArientWindow Components > ArientBackend.Initialize > ArientBackend.LoadSettings
         #region Main/Exit
@@ -21,9 +21,9 @@ namespace ArientMusicPlayer {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             arientWindow = new ArientWindow();
-            arientBackend = new Arient();
-            arientBackend.InitializeArientBackend();
-            arientBackend.LoadSettings();
+            //arientBackend = new Arient();
+            InitializeArientBackend();
+            LoadSettings();
             Application.Run(arientWindow);
         }
 
@@ -51,33 +51,33 @@ namespace ArientMusicPlayer {
 
         //====================START OF BACKEND FEATURES====================
 
-        public List<string> internalPlaylist = new List<string>();
+        public static List<string> internalPlaylist = new List<string>();
 
-		#region Startup
-		//Initialization BASS.
-		void InitializeArientBackend() {
+        #region Startup
+        //Initialization BASS.
+        static void InitializeArientBackend() {
 
             // init BASS using the default output device
             if (!Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero)) {
                 Logging.Debug("Error During Initialization of BASS: " + Bass.BASS_ErrorGetCode());
             } else {
                 Logging.Debug("BASS Initialized!");
-            } 
+            }
         }
 
         //Loading of saved settings + TESTING stuff.
-        void LoadSettings() {
+        static void LoadSettings() {
             LoadInternalPlaylist();
         }
 
-		#endregion
+        #endregion
 
-		#region Playback Controls
+        #region Playback Controls
 
-		int currentChannel = 0;
-        bool isPlaying;
+        static int currentChannel = 0;
+        static bool isPlaying;
 
-        public void StartPlayback() {
+        public static void StartPlayback() {
 
             // create a stream channel from a file
 
@@ -109,7 +109,7 @@ namespace ArientMusicPlayer {
             }
         }
 
-        public void PausePlayback() {
+        public static void PausePlayback() {
 
             //do BASS_ChannelPause.
             if (currentChannel != 0) {
@@ -122,7 +122,7 @@ namespace ArientMusicPlayer {
             }
         }
 
-        public void TogglePlayPause() {
+        public static void TogglePlayPause() {
 
             if (!isPlaying) {
                 StartPlayback();
@@ -131,7 +131,7 @@ namespace ArientMusicPlayer {
             }
         }
 
-        public void StopPlayback() {
+        public static void StopPlayback() {
 
             //Do BASS_ChannelStop and BASS_StreamFree
             if (currentChannel != 0) {
@@ -148,7 +148,7 @@ namespace ArientMusicPlayer {
             currentChannel = 0;
         }
 
-        public void NextTrack() {
+        public static void NextTrack() {
             //Do BASS_ChannelPause and BASS_StreamFree,
             //change the internalPlaylistIndex,
             //then run StartPlayback()
@@ -174,7 +174,7 @@ namespace ArientMusicPlayer {
             StartPlayback();
         }
 
-        public void PrevTrack() {
+        public static void PrevTrack() {
             //Do BASS_ChannelPause and BASS_StreamFree,
             //change the internalPlaylistIndex,
             //then run StartPlayback()
@@ -204,10 +204,10 @@ namespace ArientMusicPlayer {
 
         #region Playlist Controls
 
-        int internalPlaylistIndex = 0;
+        static int internalPlaylistIndex = 0;
 
         //Load a list of Files to be used as the Internal Playlist.
-        public void LoadInternalPlaylist() {
+        public static void LoadInternalPlaylist() {
             FileManager.ImportPlaylist("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8", ref internalPlaylist);
             internalPlaylistIndex = 0;
             arientWindow.UpdatePlaylistWindow();
@@ -218,7 +218,7 @@ namespace ArientMusicPlayer {
 
         #region Settings Management
         //Load in settings from some savefile.
-        public bool settingMinToTray = true;
+        public static bool settingMinToTray = true;
 
 
         #endregion
@@ -231,7 +231,7 @@ namespace ArientMusicPlayer {
 
         public static readonly DateTime dateTime = DateTime.Now;
 
-        static string currentSession = DateTime.Now.ToString().Replace("/","-").Replace(":",".").Replace(" ", "_");
+        static string currentSession = DateTime.Now.ToString().Replace("/", "-").Replace(":", ".").Replace(" ", "_");
 
         public static void Debug(string lines) {
             //Write the string to a file.append mode is enabled so that the log
