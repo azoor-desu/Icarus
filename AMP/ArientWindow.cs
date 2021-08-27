@@ -86,8 +86,8 @@ namespace ArientMusicPlayer {
 				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].title);
 				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].album);
 				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].artist);
-				listViewItem.SubItems.Add("FILLER");
-				listViewItem.SubItems.Add("FILLER");
+				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].duration.ToString());
+				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].channelinfo.ctype.ToString());
 				playlistListView.Items.Add(listViewItem);
 			}
 		}

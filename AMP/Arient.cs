@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Tags;
+using System.Threading.Tasks;
 
 namespace ArientMusicPlayer {
     //Contains the entry point. Not really used lol.
@@ -23,7 +24,8 @@ namespace ArientMusicPlayer {
             arientWindow = new ArientWindow();
             //arientBackend = new Arient();
             InitializeArientBackend();
-            LoadSettings();
+            LoadSettingsAsync(); //Ignore the green squiggly;
+                                 //that behaviour is what i need lol
             Application.Run(arientWindow);
             UnloadBASS();
         }
@@ -58,9 +60,10 @@ namespace ArientMusicPlayer {
         }
 
         //Loading of saved settings + TESTING stuff.
-        static void LoadSettings() {
-            internalPlaylist = FileManager.ImportPlaylist("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8");
-            internalPlaylistIndex = 0;
+        static async Task LoadSettingsAsync() {
+			//internalPlaylist = await FileManager.ImportPlaylist("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"); //for IO tasks
+            internalPlaylist = await Task.Run(() => FileManager.ImportPlaylist("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
+            internalPlaylist.currentSongIndex = 0;
             arientWindow.UpdatePlaylistWindow();
         }
 
@@ -85,7 +88,7 @@ namespace ArientMusicPlayer {
             if (currentChannel == 0) {
                 //No channels created yet, create a channel and play it.
                 Logger.Debug("Loading Music file, doing BASS_StreamCreateFile.");
-                currentChannel = Bass.BASS_StreamCreateFile(internalPlaylist.songs[internalPlaylistIndex].filename, 0, 0, BASSFlag.BASS_DEFAULT);
+                currentChannel = Bass.BASS_StreamCreateFile(internalPlaylist.songs[internalPlaylist.currentSongIndex].filename, 0, 0, BASSFlag.BASS_DEFAULT);
             }
 
             if (currentChannel == 0) {
@@ -159,9 +162,9 @@ namespace ArientMusicPlayer {
             }
 
             //Clamp the max index.
-            internalPlaylistIndex++;
-            if (internalPlaylistIndex > internalPlaylist.songs.Length - 1) {
-                internalPlaylistIndex = 0;
+            internalPlaylist.currentSongIndex++;
+            if (internalPlaylist.currentSongIndex > internalPlaylist.songs.Length - 1) {
+                internalPlaylist.currentSongIndex = 0;
             }
 
             currentChannel = 0;
@@ -185,9 +188,9 @@ namespace ArientMusicPlayer {
             }
 
             //Clamp the min index.
-            internalPlaylistIndex--;
-            if (internalPlaylistIndex < 0) {
-                internalPlaylistIndex = internalPlaylist.songs.Length - 1;
+            internalPlaylist.currentSongIndex--;
+            if (internalPlaylist.currentSongIndex < 0) {
+                internalPlaylist.currentSongIndex = internalPlaylist.songs.Length - 1;
             }
 
             StartPlayback();
@@ -211,6 +214,10 @@ namespace ArientMusicPlayer {
 			#endregion
 
 			public string name;
+            public int currentSongIndex = 0;
+            public bool shuffle = false;
+            public bool repeatPlaylist = true;
+            public bool loaded = false;
             public TAG_INFO[] songs;
 
             //Helper Methods for managing TAG_INFO songs.
@@ -236,7 +243,6 @@ namespace ArientMusicPlayer {
             }
         }
 
-        static int internalPlaylistIndex = 0;
         public static Playlist internalPlaylist = new Playlist();
 
         #endregion

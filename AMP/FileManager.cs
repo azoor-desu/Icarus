@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Un4seen.Bass.AddOn.Tags;
+using System.Threading.Tasks;
 
 namespace ArientMusicPlayer {
 	public class FileManager {
@@ -8,6 +9,11 @@ namespace ArientMusicPlayer {
 
 		//Loads in a Playlist file from disk and overwrites a passed-as-reference Playlist.
 		public static Arient.Playlist ImportPlaylist(string pathofile) {
+
+			//await Task.Yield(); //for use with an async method.
+			//Put this at top of the method to force the whole thing to be an async method.
+			//usage is: internalPlaylist = await ImportPlaylist(); << must be in another async method.
+
 			List<string> temp = new List<string>();
 
 			if (File.Exists(pathofile)) {
@@ -28,25 +34,24 @@ namespace ArientMusicPlayer {
 				//temp now holds all (hopefully) valid filepaths. Transfer them into a new Playlist Object!
 
 				if (temp.Count != 0) { //If ther isn't any valid filepaths, Log an error and return null.
-					
+
 					//Create a new Playlist, loop through the new TAG_INFO in Playlist, and write the TAGS.
 
-					Arient.Playlist tempPlaylist = new Arient.Playlist(temp.Count,true);
+					Arient.Playlist tempPlaylist = new Arient.Playlist(temp.Count, true);
 					for (int i = 0; i < tempPlaylist.songs.Length; i++) {
 						tempPlaylist.songs[i] = GetTag(temp[i]);
 					}
 					//Add the name of the file to the name var in tempPlaylist
 					tempPlaylist.name = Path.GetFileName(pathofile).Split('.')[1];
 					return tempPlaylist;
-				} else  {
+				} else {
 					Logger.Error("Loading Playlist: No valid songs found in playlist! " + pathofile);
-					return null;
 				}
 
 			} else {
 				Logger.Error("Loading Playlist: File path of Playlist does not exist: " + pathofile);
-				return null;
 			}
+			return null;
 		}
 
 
