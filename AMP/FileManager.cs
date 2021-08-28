@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Un4seen.Bass.AddOn.Tags;
+using Newtonsoft.Json;
+
 
 namespace ArientMusicPlayer {
 	public class FileManager {
 
+		//public static readonly string currentWorkingDirectory = Directory.GetCurrentDirectory();
+		//public static string directoryPlaylist = Path.Combine(currentWorkingDirectory,"\\Playlists\\");
 
-		//Loads in a Playlist file from disk and overwrites a passed-as-reference Playlist.
-		public static Arient.Playlist ImportPlaylist(string pathofile) {
+		//Loads in a Playlist file from disk
+		public static Arient.Playlist ImportPlaylistM3U8 (string pathofile) {
 
 			//await Task.Yield(); //for use with an async method.
 			//Put this at top of the method to force the whole thing to be an async method.
@@ -44,7 +48,7 @@ namespace ArientMusicPlayer {
 					Arient.Playlist tempPlaylist = new Arient.Playlist(tempTags.Count, true);
 
 					//Add the name and array of tags to the name var in tempPlaylist
-					tempPlaylist.name = Path.GetFileName(pathofile).Split('.')[1];
+					tempPlaylist.name = Path.GetFileName(pathofile).Split('.')[0];
 					tempPlaylist.songs = tempTags.ToArray();
 
 					return tempPlaylist;
@@ -58,7 +62,32 @@ namespace ArientMusicPlayer {
 			return null;
 		}
 
+		//Loads in a Playlist file from disk
+		public static Arient.Playlist ImportPlaylistJSON(string playlistName) {
+			string path = Directory.GetCurrentDirectory() + "\\Playlists\\" + playlistName + ".json";
+			if (File.Exists(path)) {
+				string raw = File.ReadAllText(path);
+				return JsonConvert.DeserializeObject<Arient.Playlist>(raw);
+			} else {
+				Logger.Warning("Unable to find playlist file at " + path);
+				return null;
+			}
+		}
 
+		//Saves Playlist class as a JSON File
+		public static void WritePlaylistToJSON(Arient.Playlist playlist) {
+			
+			string path = Directory.GetCurrentDirectory() + "\\Playlists\\";
+			Logger.Debug(path);
+			Directory.CreateDirectory(path);
+			File.WriteAllText(path + playlist.name + ".json", JsonConvert.SerializeObject(playlist,Formatting.Indented));
+		}
+
+		public static bool CheckPlaylistExists(string playlistName) {
+			return File.Exists(Directory.GetCurrentDirectory() + "\\Playlists\\" + playlistName + ".json");
+		}
+
+		//Loads TAG_INFO from a music file and returns it.
 		public static TAG_INFO GetTag(string path) {
 			TAG_INFO toreturn = null;
 			try {

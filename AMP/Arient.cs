@@ -23,8 +23,9 @@ namespace ArientMusicPlayer {
 			arientWindow = new ArientWindow();
 			//arientBackend = new Arient();
 			InitializeArientBackend();
-			LoadSettingsAsync(); //Ignore the green squiggly;
-								 //that behaviour is what i need lol
+#pragma warning disable CS4014 
+			LoadSettingsAsync();//Suppressed green squiggly Warning cos i need this behaviour
+#pragma warning restore CS4014
 			Application.Run(arientWindow);
 			UnloadBASS();
 		}
@@ -60,8 +61,15 @@ namespace ArientMusicPlayer {
 
 		//Loading of saved settings + TESTING stuff.
 		static async Task LoadSettingsAsync() {
-			internalPlaylist = await Task.Run(() => FileManager.ImportPlaylist("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
-			internalPlaylist.currentSongIndex = 0;
+			
+			if (FileManager.CheckPlaylistExists("Local files")) {
+				internalPlaylist = FileManager.ImportPlaylistJSON("Local files");
+			} else {
+				Logger.Debug("Playlist not found, importing from m38u lol");
+				internalPlaylist = await Task.Run(() => FileManager.ImportPlaylistM3U8("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
+				internalPlaylist.currentSongIndex = 0;
+				FileManager.WritePlaylistToJSON(internalPlaylist);
+			}
 			arientWindow.UpdatePlaylistWindow();
 		}
 
@@ -175,6 +183,8 @@ namespace ArientMusicPlayer {
 
 		#region Playlist Controls
 
+		//TODO: Replace TAG_INFO with a custom struct, to save space when saving playlists.
+
 		public class Playlist {
 
 			#region Constructors
@@ -217,15 +227,14 @@ namespace ArientMusicPlayer {
 			}
 		}
 
-		public static Playlist internalPlaylist = new Playlist();
+
 
 		#endregion
 
 		#region Settings Management
 		//Load in settings from some savefile.
 		public static bool settingMinToTray = true;
-
-
+		public static Playlist internalPlaylist = new Playlist();
 		#endregion
 
 
