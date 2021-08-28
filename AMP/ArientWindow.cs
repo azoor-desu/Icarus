@@ -82,12 +82,12 @@ namespace ArientMusicPlayer {
 		public void UpdatePlaylistWindow() {
 			playlistListView.Items.Clear();
 			for (int i = 0; i < Arient.internalPlaylist.songs.Length; i++) {
-				listViewItem = new ListViewItem(i.ToString());
+				listViewItem = new ListViewItem((i+1).ToString());
 				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].title);
 				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].album);
 				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].artist);
 				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].duration.ToString());
-				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].channelinfo.ctype.ToString());
+				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].format);
 				playlistListView.Items.Add(listViewItem);
 			}
 		}

@@ -61,14 +61,14 @@ namespace ArientMusicPlayer {
 
 		//Loading of saved settings + TESTING stuff.
 		static async Task LoadSettingsAsync() {
-			
+
 			if (FileManager.CheckPlaylistExists("Local files")) {
-				internalPlaylist = FileManager.ImportPlaylistJSON("Local files");
+				internalPlaylist = FileManager.LoadPlaylistFromDisk("Local files");
 			} else {
 				Logger.Debug("Playlist not found, importing from m38u lol");
 				internalPlaylist = await Task.Run(() => FileManager.ImportPlaylistM3U8("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
 				internalPlaylist.currentSongIndex = 0;
-				FileManager.WritePlaylistToJSON(internalPlaylist);
+				FileManager.SavePlaylistToDisk(internalPlaylist);
 			}
 			arientWindow.UpdatePlaylistWindow();
 		}
@@ -188,46 +188,52 @@ namespace ArientMusicPlayer {
 		public class Playlist {
 
 			#region Constructors
-			public Playlist() { //WARNING: Need to manually set TAG_INFO.
+			public Playlist() { //WARNING: Need to manually set songs array length.
 
 			}
 
-			public Playlist(int length, bool createEmptyTags = false) {
-				SetSongLength(length, createEmptyTags);
+			public Playlist(int length) {
+				songs = new TagInfo[length]; //set the length
 			}
 			#endregion
 
 			public string name;
 			public int currentSongIndex = 0;
+			public double currentSongPos = 0;
 			public bool shuffle = false;
 			public bool repeatPlaylist = true;
-			public bool loaded = false;
-			public TAG_INFO[] songs;
+			public TagInfo[] songs;
 
-			//Helper Methods for managing TAG_INFO songs.
-
-			public void SetSongLength(int length, bool createEmptyTags) {
-				songs = new TAG_INFO[length]; //set the length
-				if (createEmptyTags) {
-					for (int i = 0; i < length; i++) { //loop length and do NEW.
-						songs[i] = new TAG_INFO();
-					}
-				}
-			}
-
-			public void AddSong(string path) {
-				//Create new array with length +1 and copy all old data to it.
-				TAG_INFO[] newArray = new TAG_INFO[songs.Length + 1];
-				for (int i = 0; i < songs.Length; i++) {
-					newArray[i] = songs[i];
-				}
-				//Add new song to end of array.
-				newArray[newArray.Length - 1] = FileManager.GetTag(path);
-				songs = newArray;
-			}
+			//public void AddSong(string path) {
+			//	//Create new array with length +1 and copy all old data to it.
+			//	TagInfo[] newArray = new TagInfo[songs.Length + 1];
+			//	for (int i = 0; i < songs.Length; i++) {
+			//		newArray[i] = songs[i];
+			//	}
+			//	//Add new song to end of array.
+			//	newArray[newArray.Length - 1] = FileManager.GetTag(path);
+			//	songs = newArray;
+			//}
 		}
 
-
+		public struct TagInfo {
+			public string filename { get; set; }
+			public string title { get; set; }
+			public string artist { get; set; }
+			public string album { get; set; }
+			public string albumartist { get; set; }
+			public string year { get; set; }
+			public double duration { get; set; }
+			public string genre { get; set; }
+			public string track { get; set; }
+			public string disc { get; set; }
+			public int bitrate { get; set; }
+			public int frequency { get; set; }
+			public string format { get; set; }
+			public long size { get; set; }
+			public string mood { get; set; }
+			public string rating { get; set; }
+		}
 
 		#endregion
 
