@@ -9,15 +9,6 @@ namespace ArientMusicPlayer {
 	//AKA FRONTEND
 	public partial class ArientWindow : Form {
 
-		public const int WM_NCLBUTTONDOWN = 0xA1;
-		public const int HT_CAPTION = 0x2;
-
-		[DllImportAttribute("user32.dll")]
-		public static extern int SendMessage(IntPtr hWnd,
-						 int Msg, int wParam, int lParam);
-		[DllImportAttribute("user32.dll")]
-		public static extern bool ReleaseCapture();
-
 		public ArientWindow() {
 			InitializeComponent();
 			InitializeExtraComponents();
@@ -42,6 +33,14 @@ namespace ArientMusicPlayer {
 			trayIcon.Visible = false;
 			menuToolStripMenuItemExit.Click += new EventHandler(UniversalExitApp);
 			trayiconToolStripMenuItemExit.Click += new EventHandler(UniversalExitApp);
+
+			this.playlistMenuItemPlayItem.Click += new System.EventHandler(this.playlistMenuItemPlayItem_Click);
+			this.playlistMenuItemFileInfo.Click += new System.EventHandler(this.playlistMenuItemFileInfo_Click);
+			this.playlistMenuItemAddToPlaylist.Click += new System.EventHandler(this.playlistMenuItemAddToPlaylist_Click);
+			this.playlistMenuItemFileLocation.Click += new System.EventHandler(this.playlistMenuItemFileLocation_Click);
+			this.playlistMenuItemRemoveFrmPlaylist.Click += new System.EventHandler(this.playlistMenuItemRemoveFrmPlaylist_Click);
+			this.playlistMenuItemDeleteFromDisk.Click += new System.EventHandler(this.playlistMenuItemDeleteFromDisk_Click);
+
 		}
 
 		#region Music Player Interface Buttons
@@ -79,22 +78,47 @@ namespace ArientMusicPlayer {
 		#region Playlist Display
 
 		ListViewItem listViewItem;
-		public void UpdatePlaylistWindow() {
+		public void LoadPlaylistWindow(int loadedPlaylistIndex) {
 			playlistListView.Items.Clear();
-			for (int i = 0; i < Arient.internalPlaylist.songs.Length; i++) {
-				listViewItem = new ListViewItem((i+1).ToString());
-				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].title);
-				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].album);
-				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].artist);
-				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].duration.ToString());
-				listViewItem.SubItems.Add(Arient.internalPlaylist.songs[i].format);
+			for (int i = 0; i < Arient.loadedPlaylists[loadedPlaylistIndex].songs.Length; i++) {
+				listViewItem = new ListViewItem((i + 1).ToString());
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].title);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].album);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].artist);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].duration.ToString());
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].format);
 				playlistListView.Items.Add(listViewItem);
 			}
+			Arient.currentActivePlaylist = loadedPlaylistIndex; //this should be the only place where
+																//currentActivePlaylist should be changed
+																//i.e. loading a new playlist into view
+		}
+
+		public void OnChangeTrackPlaylist(int newTrackIndex) {
+			playlistListView.Select();
+			playlistListView.Items[newTrackIndex].Focused = true;
+
+			//Clear all other selections
+			foreach (ListViewItem item in playlistListView.Items) {
+				item.Selected = false;
+			}
+
+			playlistListView.Items[newTrackIndex].Selected = true;
+			playlistListView.Items[newTrackIndex].EnsureVisible();
 		}
 
 		#endregion
 
 		#region Windows Stuff (Dragging, Minimizing, tray, Exit etc)
+		public const int WM_NCLBUTTONDOWN = 0xA1;
+		public const int HT_CAPTION = 0x2;
+
+		[DllImportAttribute("user32.dll")]
+		public static extern int SendMessage(IntPtr hWnd,
+						 int Msg, int wParam, int lParam);
+		[DllImportAttribute("user32.dll")]
+		public static extern bool ReleaseCapture();
+
 		private void menuPanel_MouseDown(object sender, MouseEventArgs e) {
 			//Handles Holding Down and Double Clicking.
 			if (e.Clicks == 1) {
@@ -162,14 +186,16 @@ namespace ArientMusicPlayer {
 
 		#region Playlistview Controls
 		void playlistView_MouseDoubleClick(object sender, MouseEventArgs e) {
-			ListViewHitTestInfo info = playlistListView.HitTest(e.X, e.Y);
-			ListViewItem item = info.Item;
+			if (e.Button == MouseButtons.Left) {
+				ListViewHitTestInfo info = playlistListView.HitTest(e.X, e.Y);
+				ListViewItem item = info.Item;
 
-			if (item != null) {
-				MessageBox.Show("The selected Item Name is: " + item.Text);
-			} else {
-				playlistListView.SelectedItems.Clear();
-				MessageBox.Show("No Item is selected");
+				if (item != null) {
+					MessageBox.Show("The selected Item Name is: " + item.Text);
+				} else {
+					playlistListView.SelectedItems.Clear();
+					MessageBox.Show("No Item is selected");
+				}
 			}
 		}
 
@@ -189,7 +215,46 @@ namespace ArientMusicPlayer {
 
 		#endregion
 
-		#region Context Menu
+		#region Context Menu Playlist
+		private void playlistMenuItemPlayItem_Click(object sender, EventArgs e) {
+			Arient.StartPlayback(int.Parse(playlistListView.SelectedItems[0].Text) - 1);
+		}
+
+		private void playlistMenuItemAddToPlaylist_Click(object sender, EventArgs e) {
+
+		}
+
+		private void playlistMenuItemMoveUp_Click(object sender, EventArgs e) {
+
+		}
+
+		private void playlistMenuItemMoveDown_Click(object sender, EventArgs e) {
+
+		}
+
+		private void playlistMenuItemMoveTop_Click(object sender, EventArgs e) {
+
+		}
+
+		private void playlistMenuItemMoveBottom_Click(object sender, EventArgs e) {
+
+		}
+
+		private void playlistMenuItemFileInfo_Click(object sender, EventArgs e) {
+
+		}
+
+		private void playlistMenuItemFileLocation_Click(object sender, EventArgs e) {
+
+		}
+
+		private void playlistMenuItemRemoveFrmPlaylist_Click(object sender, EventArgs e) {
+
+		}
+
+		private void playlistMenuItemDeleteFromDisk_Click(object sender, EventArgs e) {
+
+		}
 
 		#endregion
 

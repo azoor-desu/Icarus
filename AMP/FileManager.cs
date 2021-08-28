@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Un4seen.Bass.AddOn.Tags;
 
@@ -8,13 +9,13 @@ namespace ArientMusicPlayer {
 
 		#region External Imports
 		//Loads in a Playlist file from disk
-		public static Arient.Playlist ImportPlaylistM3U8 (string pathofile) {
+		public static Arient.Playlist ImportPlaylistM3U8(string pathofile) {
 
 			//await Task.Yield(); //for use with an async method.
 			//Put this at top of the method to force the whole thing to be an async method.
 			//usage is: internalPlaylist = await ImportPlaylist(); << must be in another async method.
 
-			List<Arient.TagInfo> tempTags = new List<Arient.TagInfo>();
+			List<Arient.TagInfo> tagInfos = new List<Arient.TagInfo>();
 
 			if (File.Exists(pathofile)) {
 				string[] lines = File.ReadAllLines(pathofile);
@@ -30,25 +31,25 @@ namespace ArientMusicPlayer {
 						//Add each item into tempTags, rejecting those paths where the tag can't be found.
 						var tag = ConvertToTagInfo(GetTag(line));
 						if (tag.filename != "") {
-							tempTags.Add(tag);
+							tagInfos.Add(tag);
 						}
 					}
 				}
 
 				//temp now holds all (hopefully) valid filepaths. Transfer them into a new Playlist Object!
 
-				if (tempTags.Count != 0) { //If ther isn't any valid filepaths, Log an error and return null.
+				if (tagInfos.Count != 0) { //If ther isn't any valid filepaths, Log an error and return null.
 
 					//Create a new Playlist, loop through the new TagInfo in Playlist, and write the TAGS.
 
-					Arient.Playlist tempPlaylist = new Arient.Playlist(tempTags.Count) {
+					Arient.Playlist finalPlaylist = new Arient.Playlist(tagInfos.Count) {
 
 						//Add the name and array of tags to the name var in tempPlaylist
 						name = Path.GetFileName(pathofile).Split('.')[0],
-						songs = tempTags.ToArray()
+						songs = tagInfos.ToArray()
 					};
 
-					return tempPlaylist;
+					return finalPlaylist;
 				} else {
 					Logger.Error("Loading Playlist: No valid songs found in playlist! " + pathofile);
 				}
@@ -65,22 +66,22 @@ namespace ArientMusicPlayer {
 
 		//Save Playlsit class to file on disk
 		public static void SavePlaylistToDisk(Arient.Playlist playlist) {
-			string towrite = "";
+			string writeData = "";
 
 			//Create Header
-			towrite += "#.bigoof file version|1.0\n\n";
+			writeData += "#.bigoof file version|1.0\n\n";
 
 			//Add playlist name and any other settings.
-			towrite += "PlaylistName|" + playlist.name + 
+			writeData += "PlaylistName|" + playlist.name +
 			"\nCurrentSongIndex|" + playlist.currentSongIndex +
 			"\nCurrentSongPos|" + playlist.currentSongPos +
 			"\nShuffle|" + playlist.shuffle +
-			"\nRepeat|" + playlist.repeatPlaylist + 
+			"\nRepeat|" + playlist.repeatPlaylist +
 			"\n\n";
 
 			//Add individual songs, items seperated by |
 			foreach (Arient.TagInfo tag in playlist.songs) {
-				towrite +=
+				writeData +=
 				tag.filename + "|" +
 				tag.title + "|" +
 				tag.artist + "|" +
@@ -102,7 +103,7 @@ namespace ArientMusicPlayer {
 			//Write to file
 			string path = Directory.GetCurrentDirectory() + "\\data\\";
 			Directory.CreateDirectory(path);
-			File.WriteAllText(path + playlist.name + ".bigoof", towrite);
+			File.WriteAllText(path + playlist.name + ".bigoof", writeData);
 
 		}
 
@@ -110,12 +111,12 @@ namespace ArientMusicPlayer {
 		public static Arient.Playlist LoadPlaylistFromDisk(string playlistname) {
 
 			//Create a Object to return.
-			Arient.Playlist toreturn = null;
+			Arient.Playlist playlist = null;
 
 			//Generate Filepath and check if file exists.
 			string filepath = Directory.GetCurrentDirectory() + "\\data\\" + playlistname + ".bigoof";
 			if (File.Exists(filepath)) {
-				toreturn = new Arient.Playlist(); //override null value to prepare for assignment.
+				playlist = new Arient.Playlist(); //override null value to prepare for assignment.
 
 				//load in file to a string
 				string[] rawLines = File.ReadAllLines(filepath);
@@ -132,45 +133,45 @@ namespace ArientMusicPlayer {
 						//Hardcoded. Indexes 2 to 6 are custom values.
 						//Songs start at index 8.
 
-						toreturn.name = playlistname;
-						toreturn.currentSongIndex = int.Parse(rawLines[3].Split('|')[1]);
-						toreturn.currentSongPos = double.Parse(rawLines[4].Split('|')[1]);
+						playlist.name = playlistname;
+						playlist.currentSongIndex = int.Parse(rawLines[3].Split('|')[1]);
+						playlist.currentSongPos = double.Parse(rawLines[4].Split('|')[1]);
 						if (rawLines[5].Split('|')[1] == "True") {
-							toreturn.shuffle = true;
+							playlist.shuffle = true;
 						} else {
-							toreturn.shuffle = false;
+							playlist.shuffle = false;
 						}
 
 						if (rawLines[6].Split('|')[1] == "True") {
-							toreturn.repeatPlaylist = true;
+							playlist.repeatPlaylist = true;
 						} else {
-							toreturn.repeatPlaylist = false;
+							playlist.repeatPlaylist = false;
 						}
 
 						//Determine length of song array and set it.
-						toreturn.songs = new Arient.TagInfo[rawLines.Length - 8];
+						playlist.songs = new Arient.TagInfo[rawLines.Length - 8];
 
 
 						//Loop through the songs and add to Playlist. Use the toreturn.songs's length
 						//the rawLine equavilent is i + 8, because the songs in the file are 8 below the top line
-						for (int i = 0; i < toreturn.songs.Length; i++) {
-							string[] items = rawLines[i+8].Split('|');
-							toreturn.songs[i].filename = items[0];
-							toreturn.songs[i].title = items[1];
-							toreturn.songs[i].artist = items[2];
-							toreturn.songs[i].album = items[3];
-							toreturn.songs[i].albumartist = items[4];
-							toreturn.songs[i].year = items[5];
-							toreturn.songs[i].duration = double.Parse(items[6]);
-							toreturn.songs[i].genre = items[7];
-							toreturn.songs[i].track = items[8];
-							toreturn.songs[i].disc = items[9];
-							toreturn.songs[i].bitrate = int.Parse(items[10]);
-							toreturn.songs[i].frequency = int.Parse(items[11]);
-							toreturn.songs[i].format = items[12];
-							toreturn.songs[i].size = long.Parse(items[13]);
-							toreturn.songs[i].mood = items[14];
-							toreturn.songs[i].rating = items[15];
+						for (int i = 0; i < playlist.songs.Length; i++) {
+							string[] items = rawLines[i + 8].Split('|');
+							playlist.songs[i].filename = items[0];
+							playlist.songs[i].title = items[1];
+							playlist.songs[i].artist = items[2];
+							playlist.songs[i].album = items[3];
+							playlist.songs[i].albumartist = items[4];
+							playlist.songs[i].year = items[5];
+							playlist.songs[i].duration = double.Parse(items[6]);
+							playlist.songs[i].genre = items[7];
+							playlist.songs[i].track = items[8];
+							playlist.songs[i].disc = items[9];
+							playlist.songs[i].bitrate = int.Parse(items[10]);
+							playlist.songs[i].frequency = int.Parse(items[11]);
+							playlist.songs[i].format = items[12];
+							playlist.songs[i].size = long.Parse(items[13]);
+							playlist.songs[i].mood = items[14];
+							playlist.songs[i].rating = items[15];
 						}
 						break;
 				}
@@ -178,181 +179,217 @@ namespace ArientMusicPlayer {
 			} else {
 				Logger.Error("Loading Playlist from disk: Could not find the saved playlist named " + playlistname);
 			}
-			return toreturn;
+			return playlist;
 		}
 
 		#endregion
 
+		#region Misc Helper Methods
 		public static bool CheckPlaylistExists(string playlistName) {
 			return File.Exists(Directory.GetCurrentDirectory() + "\\data\\" + playlistName + ".bigoof");
 		}
 
 		//Loads TAG_INFO from a music file and returns it.
 		public static TAG_INFO GetTag(string path) {
-			TAG_INFO toreturn = null;
+			TAG_INFO tag_info = null;
 
 			if (File.Exists(path)) {
-				toreturn = BassTags.BASS_TAG_GetFromFile(path);
+				tag_info = BassTags.BASS_TAG_GetFromFile(path);
 			} else {
 				Logger.Error("Unable to load tag from file: " + path);
 			}
 
-			return toreturn;
+			return tag_info;
 		}
 
 		public static Arient.TagInfo ConvertToTagInfo(TAG_INFO old) {
 
-			Arient.TagInfo toreturn = new Arient.TagInfo();
+			Arient.TagInfo tagInfo = new Arient.TagInfo();
 
 			if (old != null) {
 				//Map all used stuff from TAG_INFO into toreturn.
-				toreturn.filename = old.filename;
-				toreturn.title = old.title;
-				toreturn.artist = old.artist;
-				toreturn.album = old.album;
-				toreturn.albumartist = old.albumartist;
-				toreturn.year = old.year;
-				toreturn.duration = old.duration;
-				toreturn.genre = old.genre;
-				toreturn.track = old.track;
-				toreturn.disc = old.disc;
-				toreturn.bitrate = old.bitrate;
-				toreturn.frequency = old.channelinfo.freq;
-				toreturn.size = new FileInfo(old.filename).Length;
-				toreturn.rating = old.rating;
+				tagInfo.filename = old.filename;
+				tagInfo.title = old.title;
+				tagInfo.artist = old.artist;
+				tagInfo.album = old.album;
+				tagInfo.albumartist = old.albumartist;
+				tagInfo.year = old.year;
+				tagInfo.duration = old.duration;
+				tagInfo.genre = old.genre;
+				tagInfo.track = old.track;
+				tagInfo.disc = old.disc;
+				tagInfo.bitrate = old.bitrate;
+				tagInfo.frequency = old.channelinfo.freq;
+				tagInfo.size = new FileInfo(old.filename).Length;
+				tagInfo.rating = old.rating;
 
 				switch (old.channelinfo.ctype) {
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_MUSIC_MO3:
-						toreturn.format = "MO3";
+						tagInfo.format = "MO3";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_MUSIC_MOD:
-						toreturn.format = "MOD";
+						tagInfo.format = "MOD";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_MUSIC_MTM:
-						toreturn.format = "MTM";
+						tagInfo.format = "MTM";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_MUSIC_S3M:
-						toreturn.format = "S3M";
+						tagInfo.format = "S3M";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_MUSIC_XM:
-						toreturn.format = "XM";
+						tagInfo.format = "XM";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_AAC:
-						toreturn.format = "AAC";
+						tagInfo.format = "AAC";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_AC3:
-						toreturn.format = "AC3";
+						tagInfo.format = "AC3";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_ADX:
-						toreturn.format = "ADX";
+						tagInfo.format = "ADX";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_AIFF:
-						toreturn.format = "WAV";
+						tagInfo.format = "WAV";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_AIX:
-						toreturn.format = "AIX";
+						tagInfo.format = "AIX";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_ALAC:
-						toreturn.format = "ALAC";
+						tagInfo.format = "ALAC";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_AM:
-						toreturn.format = "AM";
+						tagInfo.format = "AM";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_APE:
-						toreturn.format = "APE";
+						tagInfo.format = "APE";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_CA:
-						toreturn.format = "CA";
+						tagInfo.format = "CA";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_CD:
-						toreturn.format = "CD";
+						tagInfo.format = "CD";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_DSD:
-						toreturn.format = "DSD";
+						tagInfo.format = "DSD";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_FLAC:
-						toreturn.format = "FLAC";
+						tagInfo.format = "FLAC";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_FLAC_OGG:
-						toreturn.format = "FLAC OGG";
+						tagInfo.format = "FLAC OGG";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_MF:
-						toreturn.format = "MF";
+						tagInfo.format = "MF";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_MIDI:
-						toreturn.format = "MIDI";
+						tagInfo.format = "MIDI";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_MP1:
-						toreturn.format = "MP1";
+						tagInfo.format = "MP1";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_MP2:
-						toreturn.format = "MP2";
+						tagInfo.format = "MP2";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_MP3:
-						toreturn.format = "MP3";
+						tagInfo.format = "MP3";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_MP4:
-						toreturn.format = "MP4";
+						tagInfo.format = "MP4";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_MPC:
-						toreturn.format = "MPC";
+						tagInfo.format = "MPC";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_OFR:
-						toreturn.format = "OFR";
+						tagInfo.format = "OFR";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_OGG:
-						toreturn.format = "OGG";
+						tagInfo.format = "OGG";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_OPUS:
-						toreturn.format = "OPUS";
+						tagInfo.format = "OPUS";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_TTA:
-						toreturn.format = "TTA";
+						tagInfo.format = "TTA";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_VIDEO:
-						toreturn.format = "VIDEO";
+						tagInfo.format = "VIDEO";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WAV:
-						toreturn.format = "WAV";
+						tagInfo.format = "WAV";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WAV_FLOAT:
-						toreturn.format = "WAV";
+						tagInfo.format = "WAV";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WAV_PCM:
-						toreturn.format = "WAV";
+						tagInfo.format = "WAV";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WINAMP:
-						toreturn.format = "WINAMP";
+						tagInfo.format = "WINAMP";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WMA:
-						toreturn.format = "WMA";
+						tagInfo.format = "WMA";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WMA_MP3:
-						toreturn.format = "WMA";
+						tagInfo.format = "WMA";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WV:
-						toreturn.format = "WV";
+						tagInfo.format = "WV";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WV_H:
-						toreturn.format = "WV";
+						tagInfo.format = "WV";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WV_L:
-						toreturn.format = "WV";
+						tagInfo.format = "WV";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_STREAM_WV_LH:
-						toreturn.format = "WV";
+						tagInfo.format = "WV";
 						break;
 					case Un4seen.Bass.BASSChannelType.BASS_CTYPE_UNKNOWN:
-						toreturn.format = "UNK";
+						tagInfo.format = "UNK";
 						break;
 					default:
-						toreturn.format = "UNK";
+						tagInfo.format = "UNK";
 						break;
 				}
-			} else { toreturn.filename = ""; }
+			} else { tagInfo.filename = ""; }
 
-			return toreturn;
+			return tagInfo;
+		}
+		#endregion
+	}
+
+
+	public static class Logger {
+
+		public static readonly DateTime dateTime = DateTime.Now;
+
+		static readonly string currentSession = DateTime.Now.ToString().Replace("/", "-").Replace(":", ".").Replace(" ", "_");
+
+		public static void Debug(string lines) {
+			//Write the string to a file.append mode is enabled so that the log
+			//lines get appended to  test.txt than wiping content and writing the log
+
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(Directory.GetCurrentDirectory() + "\\Log.txt", true)) {
+				file.WriteLine("[" + DateTime.Now + "] " + lines);
+			}
 		}
 
+		public static void Warning(string lines) {
+			//Write the string to a file.append mode is enabled so that the log
+			//lines get appended to  test.txt than wiping content and writing the log
+
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(Directory.GetCurrentDirectory() + "\\Log.txt", true)) {
+				file.WriteLine("[" + DateTime.Now + "] WARNING:" + lines);
+			}
+		}
+
+		public static void Error(string lines) {
+			//Write the string to a file.append mode is enabled so that the log
+			//lines get appended to  test.txt than wiping content and writing the log
+
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(Directory.GetCurrentDirectory() + "\\Log.txt", true)) {
+				file.WriteLine("[" + DateTime.Now + "] ERROR: " + lines);
+			}
+		}
 	}
 }

@@ -64,6 +64,11 @@ namespace ArientMusicPlayer
 			this.trayiconToolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
 			this.btnMinimize = new System.Windows.Forms.Button();
 			this.menuPanel = new System.Windows.Forms.Panel();
+			this.playlistMenuItemMoveUp = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuItemMoveDown = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuItemMoveTop = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuItemMoveBottom = new System.Windows.Forms.ToolStripMenuItem();
+			this.playlistMenuSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			entryTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.playlistContextMenuStrip.SuspendLayout();
 			this.menuStrip.SuspendLayout();
@@ -154,15 +159,20 @@ namespace ArientMusicPlayer
 			// 
 			this.playlistContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.playlistMenuItemPlayItem,
-            this.playlistMenuItemAddToPlaylist,
+            this.playlistMenuSeparator3,
+            this.playlistMenuItemMoveUp,
+            this.playlistMenuItemMoveDown,
+            this.playlistMenuItemMoveTop,
+            this.playlistMenuItemMoveBottom,
             this.playlistMenuSeparator1,
             this.playlistMenuItemFileInfo,
             this.playlistMenuItemFileLocation,
             this.playlistMenuSeparator2,
+            this.playlistMenuItemAddToPlaylist,
             this.playlistMenuItemRemoveFrmPlaylist,
             this.playlistMenuItemDeleteFromDisk});
 			this.playlistContextMenuStrip.Name = "playlistContextMenuStrip";
-			this.playlistContextMenuStrip.Size = new System.Drawing.Size(187, 148);
+			this.playlistContextMenuStrip.Size = new System.Drawing.Size(187, 264);
 			// 
 			// playlistMenuItemPlayItem
 			// 
@@ -263,7 +273,6 @@ namespace ArientMusicPlayer
             this.menuToolStripMenuItemOptions,
             this.menuToolStripMenuItemExit});
 			this.menuContextMenuStrip.Name = "trayContextMenuStrip";
-			this.menuContextMenuStrip.OwnerItem = this.menuStripMenuLabel;
 			this.menuContextMenuStrip.Size = new System.Drawing.Size(117, 48);
 			// 
 			// menuToolStripMenuItemOptions
@@ -326,6 +335,39 @@ namespace ArientMusicPlayer
 			this.menuPanel.Name = "menuPanel";
 			this.menuPanel.Size = new System.Drawing.Size(813, 24);
 			this.menuPanel.TabIndex = 14;
+			// 
+			// playlistMenuItemMoveUp
+			// 
+			this.playlistMenuItemMoveUp.Name = "playlistMenuItemMoveUp";
+			this.playlistMenuItemMoveUp.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemMoveUp.Text = "Move Up";
+			this.playlistMenuItemMoveUp.Click += new System.EventHandler(this.playlistMenuItemMoveUp_Click);
+			// 
+			// playlistMenuItemMoveDown
+			// 
+			this.playlistMenuItemMoveDown.Name = "playlistMenuItemMoveDown";
+			this.playlistMenuItemMoveDown.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemMoveDown.Text = "Move Down";
+			this.playlistMenuItemMoveDown.Click += new System.EventHandler(this.playlistMenuItemMoveDown_Click);
+			// 
+			// playlistMenuItemMoveTop
+			// 
+			this.playlistMenuItemMoveTop.Name = "playlistMenuItemMoveTop";
+			this.playlistMenuItemMoveTop.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemMoveTop.Text = "Move to Top";
+			this.playlistMenuItemMoveTop.Click += new System.EventHandler(this.playlistMenuItemMoveTop_Click);
+			// 
+			// playlistMenuItemMoveBottom
+			// 
+			this.playlistMenuItemMoveBottom.Name = "playlistMenuItemMoveBottom";
+			this.playlistMenuItemMoveBottom.Size = new System.Drawing.Size(186, 22);
+			this.playlistMenuItemMoveBottom.Text = "Move to Bottom";
+			this.playlistMenuItemMoveBottom.Click += new System.EventHandler(this.playlistMenuItemMoveBottom_Click);
+			// 
+			// playlistMenuSeparator3
+			// 
+			this.playlistMenuSeparator3.Name = "playlistMenuSeparator3";
+			this.playlistMenuSeparator3.Size = new System.Drawing.Size(183, 6);
 			// 
 			// ArientWindow
 			// 
@@ -391,6 +433,11 @@ namespace ArientMusicPlayer
 		private System.Windows.Forms.ColumnHeader entryArtist;
 		private System.Windows.Forms.ColumnHeader entrySongLength;
 		private System.Windows.Forms.ColumnHeader entryFileFormat;
+		private System.Windows.Forms.ToolStripSeparator playlistMenuSeparator3;
+		private System.Windows.Forms.ToolStripMenuItem playlistMenuItemMoveUp;
+		private System.Windows.Forms.ToolStripMenuItem playlistMenuItemMoveDown;
+		private System.Windows.Forms.ToolStripMenuItem playlistMenuItemMoveTop;
+		private System.Windows.Forms.ToolStripMenuItem playlistMenuItemMoveBottom;
 	}
 }
 

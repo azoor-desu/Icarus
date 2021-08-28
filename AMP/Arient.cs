@@ -1,9 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Un4seen.Bass;
-using Un4seen.Bass.AddOn.Tags;
 
 namespace ArientMusicPlayer {
 	//Contains the entry point. Not really used lol.
@@ -23,15 +21,12 @@ namespace ArientMusicPlayer {
 			arientWindow = new ArientWindow();
 			//arientBackend = new Arient();
 			InitializeArientBackend();
-#pragma warning disable CS4014 
+#pragma warning disable CS4014
 			LoadSettingsAsync();//Suppressed green squiggly Warning cos i need this behaviour
 #pragma warning restore CS4014
 			Application.Run(arientWindow);
-			UnloadBASS();
-		}
 
-		//Free BASS stuff before stopping the app completely.
-		static void UnloadBASS() {
+			//Free BASS stuff before stopping the app completely.
 			Logger.Debug("Program Exiting, freeing memory!");
 			// free BASS
 			if (Bass.BASS_Free()) {
@@ -63,52 +58,56 @@ namespace ArientMusicPlayer {
 		static async Task LoadSettingsAsync() {
 
 			if (FileManager.CheckPlaylistExists("Local files")) {
-				internalPlaylist = FileManager.LoadPlaylistFromDisk("Local files");
+				loadedPlaylists[0] = FileManager.LoadPlaylistFromDisk("Local files");
 			} else {
 				Logger.Debug("Playlist not found, importing from m38u lol");
-				internalPlaylist = await Task.Run(() => FileManager.ImportPlaylistM3U8("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
-				internalPlaylist.currentSongIndex = 0;
-				FileManager.SavePlaylistToDisk(internalPlaylist);
+				loadedPlaylists[0] = await Task.Run(() => FileManager.ImportPlaylistM3U8("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
+				loadedPlaylists[0].currentSongIndex = 0;
+				FileManager.SavePlaylistToDisk(loadedPlaylists[0]);
 			}
-			arientWindow.UpdatePlaylistWindow();
+			arientWindow.LoadPlaylistWindow(0);
 		}
 
 		#endregion
 
 		#region Playback Controls
 
-		static int currentChannel = 0;
-		static bool isPlaying;
+		static int currentChannel = 0; //for use for starting and stopping streams.
+		static bool isPlaying; //for use for play/pause toggle
 
-		public static void StartPlayback() {
+		public static void StartPlayback(int currPlaylistIndex) {
 
-			// create a stream channel from a file
+			if (currentActivePlaylist != -1) {
+				// create a stream channel from a file
 
-			//BASS_StreamCreateFile streams from Memory and plays the file as-is. Easy but not very noice.
-			//BASS_StreamCreate can be used to apply DSP/FX processing to any sample data, by setting DSP/FX on
-			//the stream and feeding the data through BASS_ChannelGetData(Int32, IntPtr, Int32) with STREAMPROC_DUMMY
+				//TODO: Replace BASS_StreamCreateFile with BASS_StreamCreate
 
-			//TODO: Add a Playlist.
-			//TODO: Replace BASS_StreamCreateFile with BASS_StreamCreate
-
-			if (currentChannel == 0) {
-				//No channels created yet, create a channel and play it.
-				Logger.Debug("Loading Music file, doing BASS_StreamCreateFile.");
-				currentChannel = Bass.BASS_StreamCreateFile(internalPlaylist.songs[internalPlaylist.currentSongIndex].filename, 0, 0, BASSFlag.BASS_DEFAULT);
-			}
-
-			if (currentChannel == 0) {
-				//If after creating a channel and channel still 0, log an error.
-				Logger.Error("Error During creating channel: " + Bass.BASS_ErrorGetCode());
-			} else {
-				//Stream successfully created, play the audio!
-				if (Bass.BASS_ChannelPlay(currentChannel, false)) {
-					isPlaying = true;
-					Logger.Debug("Playback Started!");
-				} else {
-					//If there's an Error playing, Log the error.
-					Logger.Error("Error starting Playback: " + Bass.BASS_ErrorGetCode());
+				//if something is currently playing/paused. Stop it.
+				if (currentChannel != 0) {
+					if (!Bass.BASS_ChannelStop(currentChannel))
+						Logger.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
 				}
+
+				//Load a new stream, regardless of play/paused/stopped status.
+				currentChannel = Bass.BASS_StreamCreateFile(loadedPlaylists[currentActivePlaylist].songs[currPlaylistIndex].filename, 0, 0, BASSFlag.BASS_DEFAULT);
+				Logger.Debug("Loading Music file: " + loadedPlaylists[currentActivePlaylist].songs[currPlaylistIndex].filename);
+
+				if (currentChannel != 0) {
+					//Stream successfully loaded. Play the stream.
+					if (Bass.BASS_ChannelPlay(currentChannel, true)) {
+						isPlaying = true;
+						OnChangeTrack(currPlaylistIndex);
+						loadedPlaylists[currentActivePlaylist].currentSongIndex = currPlaylistIndex;
+						Logger.Debug("Playback Started!");
+					} else {
+						//If there's an Error playing, Log the error.
+						Logger.Error("Error starting Playback: " + Bass.BASS_ErrorGetCode());
+					}
+				} else {
+					Logger.Error("Error During creating channel: " + Bass.BASS_ErrorGetCode());
+				}
+			} else {
+				MessageBox.Show("There are no Playlists loaded.");
 			}
 		}
 
@@ -128,7 +127,7 @@ namespace ArientMusicPlayer {
 		public static void TogglePlayPause() {
 
 			if (!isPlaying) {
-				StartPlayback();
+				StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
 			} else {
 				PausePlayback();
 			}
@@ -139,12 +138,10 @@ namespace ArientMusicPlayer {
 			//Do BASS_ChannelStop and BASS_StreamFree
 			if (currentChannel != 0) {
 
-				if (!Bass.BASS_ChannelStop(currentChannel)) {
+				if (!Bass.BASS_ChannelStop(currentChannel)) 
 					Logger.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
-				}
-				if (!Bass.BASS_StreamFree(currentChannel)) {
+				if (!Bass.BASS_StreamFree(currentChannel)) 
 					Logger.Debug("Error during Freeing stream: " + Bass.BASS_ErrorGetCode());
-				}
 			}
 			Logger.Debug("Playback Stopped!");
 			isPlaying = false;
@@ -157,12 +154,12 @@ namespace ArientMusicPlayer {
 			StopPlayback();
 
 			//Clamp the max index.
-			internalPlaylist.currentSongIndex++;
-			if (internalPlaylist.currentSongIndex > internalPlaylist.songs.Length - 1) {
-				internalPlaylist.currentSongIndex = 0;
+			loadedPlaylists[currentActivePlaylist].currentSongIndex++;
+			if (loadedPlaylists[currentActivePlaylist].currentSongIndex > loadedPlaylists[currentActivePlaylist].songs.Length - 1) {
+				loadedPlaylists[currentActivePlaylist].currentSongIndex = 0;
 			}
 
-			StartPlayback();
+			StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
 		}
 
 		public static void PrevTrack() {
@@ -171,24 +168,28 @@ namespace ArientMusicPlayer {
 			StopPlayback();
 
 			//Clamp the min index.
-			internalPlaylist.currentSongIndex--;
-			if (internalPlaylist.currentSongIndex < 0) {
-				internalPlaylist.currentSongIndex = internalPlaylist.songs.Length - 1;
+			loadedPlaylists[currentActivePlaylist].currentSongIndex--;
+			if (loadedPlaylists[currentActivePlaylist].currentSongIndex < 0) {
+				loadedPlaylists[currentActivePlaylist].currentSongIndex = loadedPlaylists[currentActivePlaylist].songs.Length - 1;
 			}
 
-			StartPlayback();
+			StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
+		}
+
+		public static void OnChangeTrack(int newTrackIndex) {
+			arientWindow.OnChangeTrackPlaylist(newTrackIndex);
+			//do update for pictures and labels too
 		}
 
 		#endregion
 
 		#region Playlist Controls
 
-		//TODO: Replace TAG_INFO with a custom struct, to save space when saving playlists.
-
 		public class Playlist {
 
 			#region Constructors
-			public Playlist() { //WARNING: Need to manually set songs array length.
+			public Playlist()//WARNING: Need to manually set songs array length.
+			{
 
 			}
 
@@ -240,43 +241,12 @@ namespace ArientMusicPlayer {
 		#region Settings Management
 		//Load in settings from some savefile.
 		public static bool settingMinToTray = true;
-		public static Playlist internalPlaylist = new Playlist();
+		public static Playlist[] loadedPlaylists = new Playlist[1];
+		public static int currentActivePlaylist = -1; //will only swap when user physically
+													 //changes current view and a LoadPlaylistWindow
+													 //is called
 		#endregion
 
 
-	}
-
-	public static class Logger {
-
-		public static readonly DateTime dateTime = DateTime.Now;
-
-		static readonly string currentSession = DateTime.Now.ToString().Replace("/", "-").Replace(":", ".").Replace(" ", "_");
-
-		public static void Debug(string lines) {
-			//Write the string to a file.append mode is enabled so that the log
-			//lines get appended to  test.txt than wiping content and writing the log
-
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(Directory.GetCurrentDirectory() + "\\Log.txt", true)) {
-				file.WriteLine("[" + DateTime.Now + "] " + lines);
-			}
-		}
-
-		public static void Warning(string lines) {
-			//Write the string to a file.append mode is enabled so that the log
-			//lines get appended to  test.txt than wiping content and writing the log
-
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(Directory.GetCurrentDirectory() + "\\Log.txt", true)) {
-				file.WriteLine("[" + DateTime.Now + "] WARNING:" + lines);
-			}
-		}
-
-		public static void Error(string lines) {
-			//Write the string to a file.append mode is enabled so that the log
-			//lines get appended to  test.txt than wiping content and writing the log
-
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(Directory.GetCurrentDirectory() + "\\Log.txt", true)) {
-				file.WriteLine("[" + DateTime.Now + "] ERROR: " + lines);
-			}
-		}
 	}
 }
