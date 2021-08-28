@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Un4seen.Bass.AddOn.Tags;
-using System.Threading.Tasks;
 
 namespace ArientMusicPlayer {
 	public class FileManager {
@@ -27,11 +26,12 @@ namespace ArientMusicPlayer {
 				foreach (string line in lines) {
 					if (line[0] != '#' && line.Length > 8) {
 
-					//Add each item into tempTags, rejecting those paths where the tag can't be found.
+						//Add each item into tempTags, rejecting those paths where the tag can't be found.
 
 						var tag = GetTag(line);
-						if (tag != null)
+						if (tag != null) {
 							tempTags.Add(tag);
+						}
 					}
 				}
 
