@@ -24,7 +24,7 @@ namespace ArientMusicPlayer {
 			btnExitApp.Click += new EventHandler(UniversalExitApp);
 			btnMinimize.MouseClick += new MouseEventHandler(btnMinimize_Click);
 			MouseDown += new MouseEventHandler(UniversalDragWindowAction);
-			menuPanel.MouseDown += new MouseEventHandler(menuPanel_MouseDown);
+			topPanel.MouseDown += new MouseEventHandler(menuPanel_MouseDown);
 			//menuPanel.MouseDoubleClick += new MouseEventHandler(UniversalMaximize); //dosent work if MouseDown is there too.
 			playlistListView.MouseDoubleClick += new MouseEventHandler(playlistView_MouseDoubleClick);
 			playlistListView.MouseClick += new MouseEventHandler(playlistView_MouseDown);
@@ -120,11 +120,13 @@ namespace ArientMusicPlayer {
 		public static extern bool ReleaseCapture();
 
 		private void menuPanel_MouseDown(object sender, MouseEventArgs e) {
-			//Handles Holding Down and Double Clicking.
-			if (e.Clicks == 1) {
-				UniversalDragWindowAction(sender, e);
-			} else if (e.Clicks == 2) {
-				UniversalMaximize(sender, e);
+			if (e.Button == MouseButtons.Left) {
+				//Handles Holding Down and Double Clicking.
+				if (e.Clicks == 1) {
+					UniversalDragWindowAction(sender, e);
+				} else if (e.Clicks == 2) {
+					UniversalMaximize(sender, e);
+				}
 			}
 		}
 
@@ -206,10 +208,10 @@ namespace ArientMusicPlayer {
 			ListViewItem item = info.Item;
 
 			if (item != null) {
-				songName.Text = item.Text;
+				labelMainTitle.Text = item.Text;
 			} else {
 				playlistListView.SelectedItems.Clear();
-				songName.Text = "No Item is Selected";
+				labelMainTitle.Text = "No Item is Selected";
 			}
 		}
 
@@ -257,6 +259,5 @@ namespace ArientMusicPlayer {
 		}
 
 		#endregion
-
 	}
 }

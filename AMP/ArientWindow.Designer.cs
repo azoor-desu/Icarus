@@ -55,7 +55,7 @@ namespace ArientMusicPlayer
 			this.playlistMenuItemAddToPlaylist = new System.Windows.Forms.ToolStripMenuItem();
 			this.playlistMenuItemRemoveFrmPlaylist = new System.Windows.Forms.ToolStripMenuItem();
 			this.playlistMenuItemDeleteFromDisk = new System.Windows.Forms.ToolStripMenuItem();
-			this.songName = new System.Windows.Forms.TextBox();
+			this.labelMainTitle = new System.Windows.Forms.TextBox();
 			this.btnExitApp = new System.Windows.Forms.Button();
 			this.btnPrev = new System.Windows.Forms.Button();
 			this.btnNext = new System.Windows.Forms.Button();
@@ -64,26 +64,43 @@ namespace ArientMusicPlayer
 			this.menuToolStripMenuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuToolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStripMenuLabel = new System.Windows.Forms.ToolStripMenuItem();
+			this.syncToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
 			this.trayContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.trayiconToolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
 			this.btnMinimize = new System.Windows.Forms.Button();
-			this.menuPanel = new System.Windows.Forms.Panel();
-			this.comboBox1 = new System.Windows.Forms.ComboBox();
-			this.btnCreateNewPlaylist = new System.Windows.Forms.Button();
-			this.btnDeletePlaylist = new System.Windows.Forms.Button();
-			this.btnImportPlaylist = new System.Windows.Forms.Button();
-			this.btnExportPlaylist = new System.Windows.Forms.Button();
-			this.trackBar1 = new System.Windows.Forms.TrackBar();
+			this.topPanel = new System.Windows.Forms.Panel();
+			this.musicProgressTrackBar = new System.Windows.Forms.TrackBar();
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
+			this.labelMainArtist = new System.Windows.Forms.TextBox();
+			this.labelMainAlbum = new System.Windows.Forms.TextBox();
+			this.labelMainExtraInfo = new System.Windows.Forms.TextBox();
+			this.audioLevelTrackBar = new System.Windows.Forms.TrackBar();
+			this.checkBoxShuffle = new System.Windows.Forms.CheckBox();
+			this.checkBoxRepeat = new System.Windows.Forms.CheckBox();
+			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.pictureBox2 = new System.Windows.Forms.PictureBox();
+			this.btnExportPlaylist = new System.Windows.Forms.Button();
+			this.btnImportPlaylist = new System.Windows.Forms.Button();
+			this.btnDeletePlaylist = new System.Windows.Forms.Button();
+			this.btnCreateNewPlaylist = new System.Windows.Forms.Button();
+			this.playlistSelectComboBox = new System.Windows.Forms.ComboBox();
+			this.panel3 = new System.Windows.Forms.Panel();
+			this.panel1 = new System.Windows.Forms.Panel();
+			this.labelVolumeLevel = new System.Windows.Forms.TextBox();
+			this.labelPlaybackTime = new System.Windows.Forms.TextBox();
+			this.textBox2 = new System.Windows.Forms.TextBox();
 			entryTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.playlistContextMenuStrip.SuspendLayout();
 			this.menuStrip.SuspendLayout();
 			this.menuContextMenuStrip.SuspendLayout();
 			this.trayContextMenuStrip.SuspendLayout();
-			this.menuPanel.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+			this.topPanel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.musicProgressTrackBar)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.audioLevelTrackBar)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// entryTitle
@@ -93,27 +110,27 @@ namespace ArientMusicPlayer
 			// 
 			// btnPlay
 			// 
-			this.btnPlay.Location = new System.Drawing.Point(42, 69);
+			this.btnPlay.Location = new System.Drawing.Point(97, 284);
 			this.btnPlay.Name = "btnPlay";
-			this.btnPlay.Size = new System.Drawing.Size(105, 42);
+			this.btnPlay.Size = new System.Drawing.Size(71, 42);
 			this.btnPlay.TabIndex = 0;
 			this.btnPlay.Text = "Play/Pause";
 			this.btnPlay.UseVisualStyleBackColor = true;
 			// 
 			// btnPause
 			// 
-			this.btnPause.Location = new System.Drawing.Point(153, 69);
+			this.btnPause.Location = new System.Drawing.Point(174, 284);
 			this.btnPause.Name = "btnPause";
-			this.btnPause.Size = new System.Drawing.Size(111, 42);
+			this.btnPause.Size = new System.Drawing.Size(52, 42);
 			this.btnPause.TabIndex = 3;
 			this.btnPause.Text = "Pause";
 			this.btnPause.UseVisualStyleBackColor = true;
 			// 
 			// btnStop
 			// 
-			this.btnStop.Location = new System.Drawing.Point(270, 69);
+			this.btnStop.Location = new System.Drawing.Point(231, 284);
 			this.btnStop.Name = "btnStop";
-			this.btnStop.Size = new System.Drawing.Size(113, 42);
+			this.btnStop.Size = new System.Drawing.Size(66, 42);
 			this.btnStop.TabIndex = 4;
 			this.btnStop.Text = "Stop";
 			this.btnStop.UseVisualStyleBackColor = true;
@@ -130,11 +147,13 @@ namespace ArientMusicPlayer
             this.entryFileFormat});
 			this.playlistListView.ContextMenuStrip = this.playlistContextMenuStrip;
 			this.playlistListView.FullRowSelect = true;
+			this.playlistListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.playlistListView.HideSelection = false;
-			this.playlistListView.Location = new System.Drawing.Point(404, 99);
+			this.playlistListView.Location = new System.Drawing.Point(504, 126);
+			this.playlistListView.MinimumSize = new System.Drawing.Size(350, 100);
 			this.playlistListView.Name = "playlistListView";
 			this.playlistListView.ShowGroups = false;
-			this.playlistListView.Size = new System.Drawing.Size(397, 335);
+			this.playlistListView.Size = new System.Drawing.Size(397, 180);
 			this.playlistListView.TabIndex = 5;
 			this.playlistListView.TabStop = false;
 			this.playlistListView.UseCompatibleStateImageBehavior = false;
@@ -142,8 +161,8 @@ namespace ArientMusicPlayer
 			// 
 			// entryID
 			// 
-			this.entryID.Text = "No.";
-			this.entryID.Width = 31;
+			this.entryID.Text = "Track";
+			this.entryID.Width = 42;
 			// 
 			// entryAlbum
 			// 
@@ -262,16 +281,24 @@ namespace ArientMusicPlayer
 			this.playlistMenuItemDeleteFromDisk.Size = new System.Drawing.Size(186, 22);
 			this.playlistMenuItemDeleteFromDisk.Text = "Delete File";
 			// 
-			// songName
+			// labelMainTitle
 			// 
-			this.songName.Location = new System.Drawing.Point(42, 307);
-			this.songName.Name = "songName";
-			this.songName.Size = new System.Drawing.Size(329, 20);
-			this.songName.TabIndex = 6;
+			this.labelMainTitle.BackColor = System.Drawing.SystemColors.Control;
+			this.labelMainTitle.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.labelMainTitle.Font = new System.Drawing.Font("Calibri", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.labelMainTitle.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.labelMainTitle.Location = new System.Drawing.Point(233, 67);
+			this.labelMainTitle.Name = "labelMainTitle";
+			this.labelMainTitle.ReadOnly = true;
+			this.labelMainTitle.Size = new System.Drawing.Size(265, 33);
+			this.labelMainTitle.TabIndex = 6;
+			this.labelMainTitle.Text = "あんたほんとにさいていだね、ちんぽ切りますください";
+			this.labelMainTitle.WordWrap = false;
 			// 
 			// btnExitApp
 			// 
-			this.btnExitApp.Location = new System.Drawing.Point(776, 0);
+			this.btnExitApp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnExitApp.Location = new System.Drawing.Point(866, 0);
 			this.btnExitApp.Name = "btnExitApp";
 			this.btnExitApp.Size = new System.Drawing.Size(37, 24);
 			this.btnExitApp.TabIndex = 8;
@@ -280,32 +307,34 @@ namespace ArientMusicPlayer
 			// 
 			// btnPrev
 			// 
-			this.btnPrev.Location = new System.Drawing.Point(42, 117);
+			this.btnPrev.Location = new System.Drawing.Point(9, 284);
 			this.btnPrev.Name = "btnPrev";
-			this.btnPrev.Size = new System.Drawing.Size(40, 47);
+			this.btnPrev.Size = new System.Drawing.Size(40, 42);
 			this.btnPrev.TabIndex = 9;
 			this.btnPrev.Text = "<";
 			this.btnPrev.UseVisualStyleBackColor = true;
 			// 
 			// btnNext
 			// 
-			this.btnNext.Location = new System.Drawing.Point(107, 117);
+			this.btnNext.Location = new System.Drawing.Point(53, 284);
 			this.btnNext.Name = "btnNext";
-			this.btnNext.Size = new System.Drawing.Size(40, 47);
+			this.btnNext.Size = new System.Drawing.Size(40, 42);
 			this.btnNext.TabIndex = 10;
 			this.btnNext.Text = ">";
 			this.btnNext.UseVisualStyleBackColor = true;
 			// 
 			// menuStrip
 			// 
+			this.menuStrip.BackColor = System.Drawing.SystemColors.MenuBar;
 			this.menuStrip.ContextMenuStrip = this.menuContextMenuStrip;
 			this.menuStrip.Dock = System.Windows.Forms.DockStyle.None;
 			this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuStripMenuLabel});
+            this.menuStripMenuLabel,
+            this.syncToolStripMenuItem});
 			this.menuStrip.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip.Name = "menuStrip";
 			this.menuStrip.Padding = new System.Windows.Forms.Padding(0, 3, 0, 2);
-			this.menuStrip.Size = new System.Drawing.Size(52, 24);
+			this.menuStrip.Size = new System.Drawing.Size(96, 24);
 			this.menuStrip.TabIndex = 12;
 			this.menuStrip.Text = "menuStrip";
 			// 
@@ -315,7 +344,6 @@ namespace ArientMusicPlayer
             this.menuToolStripMenuItemOptions,
             this.menuToolStripMenuItemExit});
 			this.menuContextMenuStrip.Name = "trayContextMenuStrip";
-			this.menuContextMenuStrip.OwnerItem = this.menuStripMenuLabel;
 			this.menuContextMenuStrip.Size = new System.Drawing.Size(117, 48);
 			// 
 			// menuToolStripMenuItemOptions
@@ -332,10 +360,18 @@ namespace ArientMusicPlayer
 			// 
 			// menuStripMenuLabel
 			// 
+			this.menuStripMenuLabel.BackColor = System.Drawing.SystemColors.MenuBar;
 			this.menuStripMenuLabel.DropDown = this.menuContextMenuStrip;
 			this.menuStripMenuLabel.Name = "menuStripMenuLabel";
 			this.menuStripMenuLabel.Size = new System.Drawing.Size(50, 19);
 			this.menuStripMenuLabel.Text = "Menu";
+			// 
+			// syncToolStripMenuItem
+			// 
+			this.syncToolStripMenuItem.BackColor = System.Drawing.SystemColors.MenuBar;
+			this.syncToolStripMenuItem.Name = "syncToolStripMenuItem";
+			this.syncToolStripMenuItem.Size = new System.Drawing.Size(44, 19);
+			this.syncToolStripMenuItem.Text = "Sync";
 			// 
 			// trayIcon
 			// 
@@ -361,118 +397,293 @@ namespace ArientMusicPlayer
 			// 
 			// btnMinimize
 			// 
-			this.btnMinimize.Location = new System.Drawing.Point(724, 0);
+			this.btnMinimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnMinimize.Location = new System.Drawing.Point(814, 0);
 			this.btnMinimize.Name = "btnMinimize";
 			this.btnMinimize.Size = new System.Drawing.Size(56, 24);
 			this.btnMinimize.TabIndex = 13;
 			this.btnMinimize.Text = "Minimize";
 			this.btnMinimize.UseVisualStyleBackColor = true;
 			// 
-			// menuPanel
+			// topPanel
 			// 
-			this.menuPanel.BackColor = System.Drawing.SystemColors.MenuBar;
-			this.menuPanel.Controls.Add(this.btnMinimize);
-			this.menuPanel.Controls.Add(this.btnExitApp);
-			this.menuPanel.Location = new System.Drawing.Point(0, 0);
-			this.menuPanel.Margin = new System.Windows.Forms.Padding(0);
-			this.menuPanel.Name = "menuPanel";
-			this.menuPanel.Size = new System.Drawing.Size(813, 24);
-			this.menuPanel.TabIndex = 14;
+			this.topPanel.BackColor = System.Drawing.SystemColors.MenuBar;
+			this.topPanel.Controls.Add(this.btnMinimize);
+			this.topPanel.Controls.Add(this.btnExitApp);
+			this.topPanel.Dock = System.Windows.Forms.DockStyle.Top;
+			this.topPanel.Location = new System.Drawing.Point(0, 0);
+			this.topPanel.Margin = new System.Windows.Forms.Padding(0);
+			this.topPanel.Name = "topPanel";
+			this.topPanel.Size = new System.Drawing.Size(903, 24);
+			this.topPanel.TabIndex = 14;
 			// 
-			// comboBox1
+			// musicProgressTrackBar
 			// 
-			this.comboBox1.FormattingEnabled = true;
-			this.comboBox1.Location = new System.Drawing.Point(404, 72);
-			this.comboBox1.Name = "comboBox1";
-			this.comboBox1.Size = new System.Drawing.Size(206, 21);
-			this.comboBox1.TabIndex = 15;
-			// 
-			// btnCreateNewPlaylist
-			// 
-			this.btnCreateNewPlaylist.Location = new System.Drawing.Point(616, 69);
-			this.btnCreateNewPlaylist.Name = "btnCreateNewPlaylist";
-			this.btnCreateNewPlaylist.Size = new System.Drawing.Size(44, 24);
-			this.btnCreateNewPlaylist.TabIndex = 16;
-			this.btnCreateNewPlaylist.Text = "New";
-			this.btnCreateNewPlaylist.UseVisualStyleBackColor = true;
-			// 
-			// btnDeletePlaylist
-			// 
-			this.btnDeletePlaylist.Location = new System.Drawing.Point(666, 69);
-			this.btnDeletePlaylist.Name = "btnDeletePlaylist";
-			this.btnDeletePlaylist.Size = new System.Drawing.Size(50, 24);
-			this.btnDeletePlaylist.TabIndex = 17;
-			this.btnDeletePlaylist.Text = "Delete";
-			this.btnDeletePlaylist.UseVisualStyleBackColor = true;
-			// 
-			// btnImportPlaylist
-			// 
-			this.btnImportPlaylist.Location = new System.Drawing.Point(707, 69);
-			this.btnImportPlaylist.Name = "btnImportPlaylist";
-			this.btnImportPlaylist.Size = new System.Drawing.Size(50, 24);
-			this.btnImportPlaylist.TabIndex = 18;
-			this.btnImportPlaylist.Text = "Import";
-			this.btnImportPlaylist.UseVisualStyleBackColor = true;
-			// 
-			// btnExportPlaylist
-			// 
-			this.btnExportPlaylist.Location = new System.Drawing.Point(763, 69);
-			this.btnExportPlaylist.Name = "btnExportPlaylist";
-			this.btnExportPlaylist.Size = new System.Drawing.Size(50, 24);
-			this.btnExportPlaylist.TabIndex = 19;
-			this.btnExportPlaylist.Text = "Export";
-			this.btnExportPlaylist.UseVisualStyleBackColor = true;
-			// 
-			// trackBar1
-			// 
-			this.trackBar1.Location = new System.Drawing.Point(171, 119);
-			this.trackBar1.Name = "trackBar1";
-			this.trackBar1.Size = new System.Drawing.Size(190, 45);
-			this.trackBar1.TabIndex = 20;
+			this.musicProgressTrackBar.Location = new System.Drawing.Point(8, 258);
+			this.musicProgressTrackBar.Maximum = 100;
+			this.musicProgressTrackBar.Name = "musicProgressTrackBar";
+			this.musicProgressTrackBar.Size = new System.Drawing.Size(428, 45);
+			this.musicProgressTrackBar.TabIndex = 20;
+			this.musicProgressTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
 			// 
 			// pictureBox1
 			// 
 			this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-			this.pictureBox1.Location = new System.Drawing.Point(185, 170);
+			this.pictureBox1.Location = new System.Drawing.Point(12, 46);
 			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(123, 118);
+			this.pictureBox1.Size = new System.Drawing.Size(201, 203);
+			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
 			this.pictureBox1.TabIndex = 21;
 			this.pictureBox1.TabStop = false;
+			// 
+			// labelMainArtist
+			// 
+			this.labelMainArtist.BackColor = System.Drawing.SystemColors.Control;
+			this.labelMainArtist.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.labelMainArtist.Font = new System.Drawing.Font("Calibri", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.labelMainArtist.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.labelMainArtist.Location = new System.Drawing.Point(233, 106);
+			this.labelMainArtist.Name = "labelMainArtist";
+			this.labelMainArtist.ReadOnly = true;
+			this.labelMainArtist.Size = new System.Drawing.Size(265, 23);
+			this.labelMainArtist.TabIndex = 24;
+			this.labelMainArtist.Text = "Becky ft Lemmesmash";
+			this.labelMainArtist.WordWrap = false;
+			// 
+			// labelMainAlbum
+			// 
+			this.labelMainAlbum.BackColor = System.Drawing.SystemColors.Control;
+			this.labelMainAlbum.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.labelMainAlbum.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.labelMainAlbum.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.labelMainAlbum.Location = new System.Drawing.Point(233, 132);
+			this.labelMainAlbum.Name = "labelMainAlbum";
+			this.labelMainAlbum.ReadOnly = true;
+			this.labelMainAlbum.Size = new System.Drawing.Size(315, 20);
+			this.labelMainAlbum.TabIndex = 25;
+			this.labelMainAlbum.Text = "Where all my dreams go to die";
+			this.labelMainAlbum.WordWrap = false;
+			// 
+			// labelMainExtraInfo
+			// 
+			this.labelMainExtraInfo.BackColor = System.Drawing.SystemColors.Control;
+			this.labelMainExtraInfo.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.labelMainExtraInfo.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.labelMainExtraInfo.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.labelMainExtraInfo.Location = new System.Drawing.Point(230, 159);
+			this.labelMainExtraInfo.Multiline = true;
+			this.labelMainExtraInfo.Name = "labelMainExtraInfo";
+			this.labelMainExtraInfo.ReadOnly = true;
+			this.labelMainExtraInfo.Size = new System.Drawing.Size(205, 29);
+			this.labelMainExtraInfo.TabIndex = 26;
+			this.labelMainExtraInfo.Text = "MP3, 44100hz, 320kbps, 123bpm, 16 bit, 1440p, 144hz, HDMI, PPOG";
+			// 
+			// audioLevelTrackBar
+			// 
+			this.audioLevelTrackBar.Location = new System.Drawing.Point(296, 300);
+			this.audioLevelTrackBar.Maximum = 100;
+			this.audioLevelTrackBar.Name = "audioLevelTrackBar";
+			this.audioLevelTrackBar.Size = new System.Drawing.Size(138, 45);
+			this.audioLevelTrackBar.TabIndex = 27;
+			this.audioLevelTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
+			// 
+			// checkBoxShuffle
+			// 
+			this.checkBoxShuffle.AutoSize = true;
+			this.checkBoxShuffle.Location = new System.Drawing.Point(504, 316);
+			this.checkBoxShuffle.Name = "checkBoxShuffle";
+			this.checkBoxShuffle.Size = new System.Drawing.Size(59, 17);
+			this.checkBoxShuffle.TabIndex = 28;
+			this.checkBoxShuffle.Text = "Shuffle";
+			this.checkBoxShuffle.UseVisualStyleBackColor = true;
+			// 
+			// checkBoxRepeat
+			// 
+			this.checkBoxRepeat.AutoSize = true;
+			this.checkBoxRepeat.Location = new System.Drawing.Point(569, 316);
+			this.checkBoxRepeat.Name = "checkBoxRepeat";
+			this.checkBoxRepeat.Size = new System.Drawing.Size(61, 17);
+			this.checkBoxRepeat.TabIndex = 29;
+			this.checkBoxRepeat.Text = "Repeat";
+			this.checkBoxRepeat.UseVisualStyleBackColor = true;
+			// 
+			// textBox1
+			// 
+			this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.textBox1.Cursor = System.Windows.Forms.Cursors.Arrow;
+			this.textBox1.Location = new System.Drawing.Point(66, 20);
+			this.textBox1.Multiline = true;
+			this.textBox1.Name = "textBox1";
+			this.textBox1.ReadOnly = true;
+			this.textBox1.Size = new System.Drawing.Size(284, 45);
+			this.textBox1.TabIndex = 23;
+			this.textBox1.Text = "Dr Dre - Beats [4:21]\r\nWhere my dreams go and die\r\nMP3  | 4100hz, 320kbps, 123bpm" +
+    ", 16bit";
+			// 
+			// pictureBox2
+			// 
+			this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
+			this.pictureBox2.Location = new System.Drawing.Point(3, 3);
+			this.pictureBox2.Name = "pictureBox2";
+			this.pictureBox2.Size = new System.Drawing.Size(56, 59);
+			this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.pictureBox2.TabIndex = 22;
+			this.pictureBox2.TabStop = false;
+			// 
+			// btnExportPlaylist
+			// 
+			this.btnExportPlaylist.Location = new System.Drawing.Point(351, 67);
+			this.btnExportPlaylist.Name = "btnExportPlaylist";
+			this.btnExportPlaylist.Size = new System.Drawing.Size(46, 21);
+			this.btnExportPlaylist.TabIndex = 19;
+			this.btnExportPlaylist.Text = "Export";
+			this.btnExportPlaylist.UseVisualStyleBackColor = true;
+			// 
+			// btnImportPlaylist
+			// 
+			this.btnImportPlaylist.Location = new System.Drawing.Point(304, 67);
+			this.btnImportPlaylist.Name = "btnImportPlaylist";
+			this.btnImportPlaylist.Size = new System.Drawing.Size(46, 21);
+			this.btnImportPlaylist.TabIndex = 18;
+			this.btnImportPlaylist.Text = "Import";
+			this.btnImportPlaylist.UseVisualStyleBackColor = true;
+			// 
+			// btnDeletePlaylist
+			// 
+			this.btnDeletePlaylist.Location = new System.Drawing.Point(257, 67);
+			this.btnDeletePlaylist.Name = "btnDeletePlaylist";
+			this.btnDeletePlaylist.Size = new System.Drawing.Size(46, 21);
+			this.btnDeletePlaylist.TabIndex = 17;
+			this.btnDeletePlaylist.Text = "Delete";
+			this.btnDeletePlaylist.UseVisualStyleBackColor = true;
+			// 
+			// btnCreateNewPlaylist
+			// 
+			this.btnCreateNewPlaylist.Location = new System.Drawing.Point(211, 67);
+			this.btnCreateNewPlaylist.Name = "btnCreateNewPlaylist";
+			this.btnCreateNewPlaylist.Size = new System.Drawing.Size(46, 21);
+			this.btnCreateNewPlaylist.TabIndex = 16;
+			this.btnCreateNewPlaylist.Text = "New";
+			this.btnCreateNewPlaylist.UseVisualStyleBackColor = true;
+			// 
+			// playlistSelectComboBox
+			// 
+			this.playlistSelectComboBox.FormattingEnabled = true;
+			this.playlistSelectComboBox.Location = new System.Drawing.Point(3, 67);
+			this.playlistSelectComboBox.Name = "playlistSelectComboBox";
+			this.playlistSelectComboBox.Size = new System.Drawing.Size(206, 21);
+			this.playlistSelectComboBox.TabIndex = 15;
+			// 
+			// panel3
+			// 
+			this.panel3.AutoSize = true;
+			this.panel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.panel3.Location = new System.Drawing.Point(0, 99);
+			this.panel3.Name = "panel3";
+			this.panel3.Size = new System.Drawing.Size(397, 0);
+			this.panel3.TabIndex = 31;
+			// 
+			// panel1
+			// 
+			this.panel1.ContextMenuStrip = this.playlistContextMenuStrip;
+			this.panel1.Controls.Add(this.textBox2);
+			this.panel1.Controls.Add(this.btnImportPlaylist);
+			this.panel1.Controls.Add(this.btnExportPlaylist);
+			this.panel1.Controls.Add(this.btnDeletePlaylist);
+			this.panel1.Controls.Add(this.textBox1);
+			this.panel1.Controls.Add(this.btnCreateNewPlaylist);
+			this.panel1.Controls.Add(this.pictureBox2);
+			this.panel1.Controls.Add(this.panel3);
+			this.panel1.Controls.Add(this.playlistSelectComboBox);
+			this.panel1.Location = new System.Drawing.Point(504, 27);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(397, 99);
+			this.panel1.TabIndex = 30;
+			// 
+			// labelVolumeLevel
+			// 
+			this.labelVolumeLevel.BackColor = System.Drawing.SystemColors.Control;
+			this.labelVolumeLevel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.labelVolumeLevel.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.labelVolumeLevel.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.labelVolumeLevel.Location = new System.Drawing.Point(303, 286);
+			this.labelVolumeLevel.Name = "labelVolumeLevel";
+			this.labelVolumeLevel.ReadOnly = true;
+			this.labelVolumeLevel.Size = new System.Drawing.Size(131, 15);
+			this.labelVolumeLevel.TabIndex = 31;
+			this.labelVolumeLevel.Text = "Volume: 100%";
+			this.labelVolumeLevel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.labelVolumeLevel.WordWrap = false;
+			// 
+			// labelPlaybackTime
+			// 
+			this.labelPlaybackTime.BackColor = System.Drawing.SystemColors.Control;
+			this.labelPlaybackTime.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.labelPlaybackTime.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.labelPlaybackTime.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.labelPlaybackTime.Location = new System.Drawing.Point(277, 241);
+			this.labelPlaybackTime.Name = "labelPlaybackTime";
+			this.labelPlaybackTime.ReadOnly = true;
+			this.labelPlaybackTime.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.labelPlaybackTime.Size = new System.Drawing.Size(150, 17);
+			this.labelPlaybackTime.TabIndex = 32;
+			this.labelPlaybackTime.Text = "Elapsed: 1:43/3:46";
+			this.labelPlaybackTime.WordWrap = false;
+			// 
+			// textBox2
+			// 
+			this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.textBox2.Cursor = System.Windows.Forms.Cursors.Arrow;
+			this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.textBox2.Location = new System.Drawing.Point(65, 3);
+			this.textBox2.Name = "textBox2";
+			this.textBox2.ReadOnly = true;
+			this.textBox2.Size = new System.Drawing.Size(111, 13);
+			this.textBox2.TabIndex = 32;
+			this.textBox2.Text = "Current Selection:";
 			// 
 			// ArientWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(813, 487);
-			this.Controls.Add(this.pictureBox1);
-			this.Controls.Add(this.trackBar1);
-			this.Controls.Add(this.btnExportPlaylist);
-			this.Controls.Add(this.btnImportPlaylist);
-			this.Controls.Add(this.btnDeletePlaylist);
-			this.Controls.Add(this.btnCreateNewPlaylist);
-			this.Controls.Add(this.comboBox1);
+			this.ClientSize = new System.Drawing.Size(903, 339);
+			this.ControlBox = false;
 			this.Controls.Add(this.menuStrip);
+			this.Controls.Add(this.labelPlaybackTime);
+			this.Controls.Add(this.labelVolumeLevel);
+			this.Controls.Add(this.checkBoxRepeat);
+			this.Controls.Add(this.playlistListView);
+			this.Controls.Add(this.checkBoxShuffle);
+			this.Controls.Add(this.panel1);
+			this.Controls.Add(this.labelMainExtraInfo);
+			this.Controls.Add(this.labelMainAlbum);
+			this.Controls.Add(this.labelMainArtist);
+			this.Controls.Add(this.pictureBox1);
 			this.Controls.Add(this.btnNext);
 			this.Controls.Add(this.btnPrev);
-			this.Controls.Add(this.songName);
-			this.Controls.Add(this.playlistListView);
+			this.Controls.Add(this.labelMainTitle);
 			this.Controls.Add(this.btnStop);
 			this.Controls.Add(this.btnPause);
 			this.Controls.Add(this.btnPlay);
-			this.Controls.Add(this.menuPanel);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+			this.Controls.Add(this.topPanel);
+			this.Controls.Add(this.musicProgressTrackBar);
+			this.Controls.Add(this.audioLevelTrackBar);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip;
 			this.Name = "ArientWindow";
-			this.Text = "Arient Music Player";
 			this.playlistContextMenuStrip.ResumeLayout(false);
 			this.menuStrip.ResumeLayout(false);
 			this.menuStrip.PerformLayout();
 			this.menuContextMenuStrip.ResumeLayout(false);
 			this.trayContextMenuStrip.ResumeLayout(false);
-			this.menuPanel.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+			this.topPanel.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.musicProgressTrackBar)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.audioLevelTrackBar)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+			this.panel1.ResumeLayout(false);
+			this.panel1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -484,14 +695,14 @@ namespace ArientMusicPlayer
 		private System.Windows.Forms.Button btnPause;
 		private System.Windows.Forms.Button btnStop;
 		private System.Windows.Forms.ListView playlistListView;
-		private System.Windows.Forms.TextBox songName;
+		private System.Windows.Forms.TextBox labelMainTitle;
 		private System.Windows.Forms.Button btnExitApp;
 		private System.Windows.Forms.Button btnPrev;
 		private System.Windows.Forms.Button btnNext;
 		private System.Windows.Forms.MenuStrip menuStrip;
 		private System.Windows.Forms.NotifyIcon trayIcon;
 		private System.Windows.Forms.Button btnMinimize;
-		private System.Windows.Forms.Panel menuPanel;
+		private System.Windows.Forms.Panel topPanel;
 		private System.Windows.Forms.ContextMenuStrip trayContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem trayiconToolStripMenuItemExit;
 		private System.Windows.Forms.ContextMenuStrip playlistContextMenuStrip;
@@ -517,13 +728,27 @@ namespace ArientMusicPlayer
 		private System.Windows.Forms.ToolStripMenuItem playlistMenuItemMoveDown;
 		private System.Windows.Forms.ToolStripMenuItem playlistMenuItemMoveTop;
 		private System.Windows.Forms.ToolStripMenuItem playlistMenuItemMoveBottom;
-		private System.Windows.Forms.ComboBox comboBox1;
-		private System.Windows.Forms.Button btnCreateNewPlaylist;
-		private System.Windows.Forms.Button btnDeletePlaylist;
-		private System.Windows.Forms.Button btnImportPlaylist;
-		private System.Windows.Forms.Button btnExportPlaylist;
-		private System.Windows.Forms.TrackBar trackBar1;
+		private System.Windows.Forms.TrackBar musicProgressTrackBar;
 		private System.Windows.Forms.PictureBox pictureBox1;
+		private System.Windows.Forms.TextBox labelMainArtist;
+		private System.Windows.Forms.TextBox labelMainAlbum;
+		private System.Windows.Forms.TextBox labelMainExtraInfo;
+		private System.Windows.Forms.TrackBar audioLevelTrackBar;
+		private System.Windows.Forms.CheckBox checkBoxShuffle;
+		private System.Windows.Forms.CheckBox checkBoxRepeat;
+		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.PictureBox pictureBox2;
+		private System.Windows.Forms.Button btnExportPlaylist;
+		private System.Windows.Forms.Button btnImportPlaylist;
+		private System.Windows.Forms.Button btnDeletePlaylist;
+		private System.Windows.Forms.Button btnCreateNewPlaylist;
+		private System.Windows.Forms.ComboBox playlistSelectComboBox;
+		private System.Windows.Forms.Panel panel3;
+		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.TextBox labelVolumeLevel;
+		private System.Windows.Forms.ToolStripMenuItem syncToolStripMenuItem;
+		private System.Windows.Forms.TextBox labelPlaybackTime;
+		private System.Windows.Forms.TextBox textBox2;
 	}
 }
 
