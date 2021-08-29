@@ -74,8 +74,7 @@ namespace ArientMusicPlayer
 			this.checkBoxRepeat = new System.Windows.Forms.CheckBox();
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.pictureBox2 = new System.Windows.Forms.PictureBox();
-			this.btnExportPlaylist = new System.Windows.Forms.Button();
-			this.btnImportPlaylist = new System.Windows.Forms.Button();
+			this.btnRenamePlaylist = new System.Windows.Forms.Button();
 			this.btnDeletePlaylist = new System.Windows.Forms.Button();
 			this.btnCreateNewPlaylist = new System.Windows.Forms.Button();
 			this.playlistSelectComboBox = new System.Windows.Forms.ComboBox();
@@ -93,6 +92,9 @@ namespace ArientMusicPlayer
 			this.entryFileFormat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.panel4 = new System.Windows.Forms.Panel();
 			this.PlayerPanel = new System.Windows.Forms.Panel();
+			this.menuToolStripMenuItemExportPlaylist = new System.Windows.Forms.ToolStripMenuItem();
+			this.menuToolStripMenuItemImportPlaylist = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			entryTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.playlistContextMenuStrip.SuspendLayout();
 			this.menuStrip.SuspendLayout();
@@ -256,7 +258,7 @@ namespace ArientMusicPlayer
 			// btnExitApp
 			// 
 			this.btnExitApp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnExitApp.Location = new System.Drawing.Point(936, 0);
+			this.btnExitApp.Location = new System.Drawing.Point(918, 0);
 			this.btnExitApp.Name = "btnExitApp";
 			this.btnExitApp.Size = new System.Drawing.Size(37, 24);
 			this.btnExitApp.TabIndex = 8;
@@ -299,22 +301,24 @@ namespace ArientMusicPlayer
 			// menuContextMenuStrip
 			// 
 			this.menuContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuToolStripMenuItemImportPlaylist,
+            this.menuToolStripMenuItemExportPlaylist,
+            this.toolStripSeparator1,
             this.menuToolStripMenuItemOptions,
             this.menuToolStripMenuItemExit});
 			this.menuContextMenuStrip.Name = "trayContextMenuStrip";
-			this.menuContextMenuStrip.OwnerItem = this.menuStripMenuLabel;
-			this.menuContextMenuStrip.Size = new System.Drawing.Size(117, 48);
+			this.menuContextMenuStrip.Size = new System.Drawing.Size(151, 98);
 			// 
 			// menuToolStripMenuItemOptions
 			// 
 			this.menuToolStripMenuItemOptions.Name = "menuToolStripMenuItemOptions";
-			this.menuToolStripMenuItemOptions.Size = new System.Drawing.Size(116, 22);
+			this.menuToolStripMenuItemOptions.Size = new System.Drawing.Size(150, 22);
 			this.menuToolStripMenuItemOptions.Text = "Options";
 			// 
 			// menuToolStripMenuItemExit
 			// 
 			this.menuToolStripMenuItemExit.Name = "menuToolStripMenuItemExit";
-			this.menuToolStripMenuItemExit.Size = new System.Drawing.Size(116, 22);
+			this.menuToolStripMenuItemExit.Size = new System.Drawing.Size(150, 22);
 			this.menuToolStripMenuItemExit.Text = "Exit";
 			// 
 			// menuStripMenuLabel
@@ -357,7 +361,7 @@ namespace ArientMusicPlayer
 			// btnMinimize
 			// 
 			this.btnMinimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnMinimize.Location = new System.Drawing.Point(884, 0);
+			this.btnMinimize.Location = new System.Drawing.Point(866, 0);
 			this.btnMinimize.Name = "btnMinimize";
 			this.btnMinimize.Size = new System.Drawing.Size(56, 24);
 			this.btnMinimize.TabIndex = 13;
@@ -374,7 +378,7 @@ namespace ArientMusicPlayer
 			this.topPanel.Location = new System.Drawing.Point(0, 0);
 			this.topPanel.Margin = new System.Windows.Forms.Padding(0);
 			this.topPanel.Name = "topPanel";
-			this.topPanel.Size = new System.Drawing.Size(973, 24);
+			this.topPanel.Size = new System.Drawing.Size(955, 24);
 			this.topPanel.TabIndex = 14;
 			// 
 			// musicProgressTrackBar
@@ -490,23 +494,14 @@ namespace ArientMusicPlayer
 			this.pictureBox2.TabIndex = 22;
 			this.pictureBox2.TabStop = false;
 			// 
-			// btnExportPlaylist
+			// btnRenamePlaylist
 			// 
-			this.btnExportPlaylist.Location = new System.Drawing.Point(351, 67);
-			this.btnExportPlaylist.Name = "btnExportPlaylist";
-			this.btnExportPlaylist.Size = new System.Drawing.Size(46, 21);
-			this.btnExportPlaylist.TabIndex = 19;
-			this.btnExportPlaylist.Text = "Export";
-			this.btnExportPlaylist.UseVisualStyleBackColor = true;
-			// 
-			// btnImportPlaylist
-			// 
-			this.btnImportPlaylist.Location = new System.Drawing.Point(304, 67);
-			this.btnImportPlaylist.Name = "btnImportPlaylist";
-			this.btnImportPlaylist.Size = new System.Drawing.Size(46, 21);
-			this.btnImportPlaylist.TabIndex = 18;
-			this.btnImportPlaylist.Text = "Import";
-			this.btnImportPlaylist.UseVisualStyleBackColor = true;
+			this.btnRenamePlaylist.Location = new System.Drawing.Point(304, 67);
+			this.btnRenamePlaylist.Name = "btnRenamePlaylist";
+			this.btnRenamePlaylist.Size = new System.Drawing.Size(56, 21);
+			this.btnRenamePlaylist.TabIndex = 18;
+			this.btnRenamePlaylist.Text = "Rename";
+			this.btnRenamePlaylist.UseVisualStyleBackColor = true;
 			// 
 			// btnDeletePlaylist
 			// 
@@ -543,15 +538,14 @@ namespace ArientMusicPlayer
 			this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.panel3.Location = new System.Drawing.Point(0, 97);
 			this.panel3.Name = "panel3";
-			this.panel3.Size = new System.Drawing.Size(438, 0);
+			this.panel3.Size = new System.Drawing.Size(420, 0);
 			this.panel3.TabIndex = 31;
 			// 
 			// panel1
 			// 
 			this.panel1.ContextMenuStrip = this.playlistContextMenuStrip;
 			this.panel1.Controls.Add(this.textBox2);
-			this.panel1.Controls.Add(this.btnImportPlaylist);
-			this.panel1.Controls.Add(this.btnExportPlaylist);
+			this.panel1.Controls.Add(this.btnRenamePlaylist);
 			this.panel1.Controls.Add(this.btnDeletePlaylist);
 			this.panel1.Controls.Add(this.textBox1);
 			this.panel1.Controls.Add(this.btnCreateNewPlaylist);
@@ -561,7 +555,7 @@ namespace ArientMusicPlayer
 			this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
 			this.panel1.Location = new System.Drawing.Point(1, 2);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(438, 97);
+			this.panel1.Size = new System.Drawing.Size(420, 97);
 			this.panel1.TabIndex = 30;
 			// 
 			// textBox2
@@ -615,7 +609,7 @@ namespace ArientMusicPlayer
 			this.PlaylistPanel.Location = new System.Drawing.Point(524, 24);
 			this.PlaylistPanel.Name = "PlaylistPanel";
 			this.PlaylistPanel.Padding = new System.Windows.Forms.Padding(1, 2, 10, 2);
-			this.PlaylistPanel.Size = new System.Drawing.Size(449, 475);
+			this.PlaylistPanel.Size = new System.Drawing.Size(431, 475);
 			this.PlaylistPanel.TabIndex = 33;
 			// 
 			// playlistListView
@@ -637,7 +631,7 @@ namespace ArientMusicPlayer
 			this.playlistListView.MinimumSize = new System.Drawing.Size(350, 100);
 			this.playlistListView.Name = "playlistListView";
 			this.playlistListView.ShowGroups = false;
-			this.playlistListView.Size = new System.Drawing.Size(438, 349);
+			this.playlistListView.Size = new System.Drawing.Size(420, 349);
 			this.playlistListView.TabIndex = 5;
 			this.playlistListView.TabStop = false;
 			this.playlistListView.UseCompatibleStateImageBehavior = false;
@@ -674,7 +668,7 @@ namespace ArientMusicPlayer
 			this.panel4.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.panel4.Location = new System.Drawing.Point(1, 448);
 			this.panel4.Name = "panel4";
-			this.panel4.Size = new System.Drawing.Size(438, 25);
+			this.panel4.Size = new System.Drawing.Size(420, 25);
 			this.panel4.TabIndex = 31;
 			// 
 			// PlayerPanel
@@ -699,11 +693,28 @@ namespace ArientMusicPlayer
 			this.PlayerPanel.Size = new System.Drawing.Size(524, 475);
 			this.PlayerPanel.TabIndex = 34;
 			// 
+			// menuToolStripMenuItemExportPlaylist
+			// 
+			this.menuToolStripMenuItemExportPlaylist.Name = "menuToolStripMenuItemExportPlaylist";
+			this.menuToolStripMenuItemExportPlaylist.Size = new System.Drawing.Size(150, 22);
+			this.menuToolStripMenuItemExportPlaylist.Text = "Export Playlist";
+			// 
+			// menuToolStripMenuItemImportPlaylist
+			// 
+			this.menuToolStripMenuItemImportPlaylist.Name = "menuToolStripMenuItemImportPlaylist";
+			this.menuToolStripMenuItemImportPlaylist.Size = new System.Drawing.Size(150, 22);
+			this.menuToolStripMenuItemImportPlaylist.Text = "Import Playlist";
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(147, 6);
+			// 
 			// ArientWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(973, 499);
+			this.ClientSize = new System.Drawing.Size(955, 499);
 			this.ControlBox = false;
 			this.Controls.Add(this.PlaylistPanel);
 			this.Controls.Add(this.PlayerPanel);
@@ -777,8 +788,7 @@ namespace ArientMusicPlayer
 		private System.Windows.Forms.CheckBox checkBoxRepeat;
 		private System.Windows.Forms.TextBox textBox1;
 		private System.Windows.Forms.PictureBox pictureBox2;
-		private System.Windows.Forms.Button btnExportPlaylist;
-		private System.Windows.Forms.Button btnImportPlaylist;
+		private System.Windows.Forms.Button btnRenamePlaylist;
 		private System.Windows.Forms.Button btnDeletePlaylist;
 		private System.Windows.Forms.Button btnCreateNewPlaylist;
 		private System.Windows.Forms.ComboBox playlistSelectComboBox;
@@ -797,6 +807,9 @@ namespace ArientMusicPlayer
 		private System.Windows.Forms.ColumnHeader entryArtist;
 		private System.Windows.Forms.ColumnHeader entrySongLength;
 		private System.Windows.Forms.ColumnHeader entryFileFormat;
+		private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItemImportPlaylist;
+		private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItemExportPlaylist;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 	}
 }
 

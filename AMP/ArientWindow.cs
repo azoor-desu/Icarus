@@ -75,40 +75,6 @@ namespace ArientMusicPlayer {
 		}
 		#endregion
 
-		#region Playlist Display
-
-		ListViewItem listViewItem;
-		public void LoadPlaylistWindow(int loadedPlaylistIndex) {
-			playlistListView.Items.Clear();
-			for (int i = 0; i < Arient.loadedPlaylists[loadedPlaylistIndex].songs.Length; i++) {
-				listViewItem = new ListViewItem((i + 1).ToString());
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].title);
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].album);
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].artist);
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].duration.ToString());
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].format);
-				playlistListView.Items.Add(listViewItem);
-			}
-			Arient.currentActivePlaylist = loadedPlaylistIndex; //this should be the only place where
-																//currentActivePlaylist should be changed
-																//i.e. loading a new playlist into view
-		}
-
-		public void OnChangeTrackPlaylist(int newTrackIndex) {
-			playlistListView.Select();
-			playlistListView.Items[newTrackIndex].Focused = true;
-
-			//Clear all other selections
-			foreach (ListViewItem item in playlistListView.Items) {
-				item.Selected = false;
-			}
-
-			playlistListView.Items[newTrackIndex].Selected = true;
-			playlistListView.Items[newTrackIndex].EnsureVisible();
-		}
-
-		#endregion
-
 		#region Windows Stuff (Dragging, Minimizing, tray, Exit etc)
 		public const int WM_NCLBUTTONDOWN = 0xA1;
 		public const int HT_CAPTION = 0x2;
@@ -213,6 +179,40 @@ namespace ArientMusicPlayer {
 				playlistListView.SelectedItems.Clear();
 				labelMainTitle.Text = "No Item is Selected";
 			}
+		}
+
+		#endregion
+
+		#region Playlist Display
+
+		ListViewItem listViewItem;
+		public void LoadPlaylistWindow(int loadedPlaylistIndex) {
+			playlistListView.Items.Clear();
+			for (int i = 0; i < Arient.loadedPlaylists[loadedPlaylistIndex].songs.Length; i++) {
+				listViewItem = new ListViewItem((i + 1).ToString());
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].title);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].album);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].artist);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].duration.ToString());
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].format);
+				playlistListView.Items.Add(listViewItem);
+			}
+			Arient.currentActivePlaylist = loadedPlaylistIndex; //this should be the only place where
+																//currentActivePlaylist should be changed
+																//i.e. loading a new playlist into view
+		}
+
+		public void OnChangeTrackPlaylist(int newTrackIndex) {
+			playlistListView.Select();
+			playlistListView.Items[newTrackIndex].Focused = true;
+
+			//Clear all other selections
+			foreach (ListViewItem item in playlistListView.Items) {
+				item.Selected = false;
+			}
+
+			playlistListView.Items[newTrackIndex].Selected = true;
+			playlistListView.Items[newTrackIndex].EnsureVisible();
 		}
 
 		#endregion

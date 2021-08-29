@@ -7,6 +7,9 @@ using Un4seen.Bass.AddOn.Tags;
 namespace ArientMusicPlayer {
 	public class FileManager {
 
+		static string playlistExtension = ".arientpl";
+		static string playlistSubfolder = "\\Playlists\\";
+
 		#region External Imports
 		//Loads in a Playlist file from disk
 		public static Arient.Playlist ImportPlaylistM3U8(string pathofile) {
@@ -62,14 +65,14 @@ namespace ArientMusicPlayer {
 
 		#endregion
 
-		#region Internal Saving and Parsing of .bigoof file
+		#region Internal Saving and Parsing of .arientpl file
 
-		//Save Playlsit class to file on disk
-		public static void SavePlaylistToDisk(Arient.Playlist playlist) {
+		//Save Playlist class to file on disk using .arientpl v1.0
+		public static void SavePlaylistToDisk(Arient.Playlist playlist, bool isNewPlaylist = false) {
 			string writeData = "";
 
 			//Create Header
-			writeData += "#.bigoof file version|1.0\n\n";
+			writeData += ".artpl file version|1.0\n\n";
 
 			//Add playlist name and any other settings.
 			writeData += "PlaylistName|" + playlist.name +
@@ -79,49 +82,52 @@ namespace ArientMusicPlayer {
 			"\nRepeat|" + playlist.repeatPlaylist +
 			"\n\n";
 
-			//Add individual songs, items seperated by |
-			foreach (Arient.TagInfo tag in playlist.songs) {
-				writeData +=
-				tag.filename + "|" +
-				tag.title + "|" +
-				tag.artist + "|" +
-				tag.album + "|" +
-				tag.albumartist + "|" +
-				tag.year + "|" +
-				tag.duration + "|" +
-				tag.genre + "|" +
-				tag.track + "|" +
-				tag.disc + "|" +
-				tag.bitrate + "|" +
-				tag.frequency + "|" +
-				tag.format + "|" +
-				tag.size + "|" +
-				tag.mood + "|" +
-				tag.rating + "\n";
+			if (playlist.songs.Length > 0) {
+				//Add individual songs, items seperated by |
+				foreach (Arient.TagInfo tag in playlist.songs) {
+					writeData +=
+					tag.filename + "|" +
+					tag.title + "|" +
+					tag.artist + "|" +
+					tag.album + "|" +
+					tag.albumartist + "|" +
+					tag.year + "|" +
+					tag.duration + "|" +
+					tag.genre + "|" +
+					tag.track + "|" +
+					tag.disc + "|" +
+					tag.bitrate + "|" +
+					tag.frequency + "|" +
+					tag.format + "|" +
+					tag.size + "|" +
+					tag.mood + "|" +
+					tag.rating + "\n";
+				}
 			}
 
-			//Write to file
-			string path = Directory.GetCurrentDirectory() + "\\data\\";
+			
+			//Create the Subfolder directory if dosent exist.
+			string path = Directory.GetCurrentDirectory() + playlistSubfolder;
 			Directory.CreateDirectory(path);
-			File.WriteAllText(path + playlist.name + ".bigoof", writeData);
+			//Write to file. Force overwrite any existsing files.
+			File.WriteAllText(path + playlist.name + playlistExtension, writeData);
 
 		}
 
-		//Load a Playlist file from disk. Quicker than parsing each music file.
-		public static Arient.Playlist LoadPlaylistFromDisk(string playlistname) {
+		//Load a Playlist file from disk.
+		public static Arient.Playlist LoadPlaylistFromDisk(string filename) {
 
 			//Create a Object to return.
 			Arient.Playlist playlist = null;
 
-			//Generate Filepath and check if file exists.
-			string filepath = Directory.GetCurrentDirectory() + "\\data\\" + playlistname + ".bigoof";
-			if (File.Exists(filepath)) {
+			//Check if file exists.
+			if (File.Exists(filename)) {
 				playlist = new Arient.Playlist(); //override null value to prepare for assignment.
 
-				//load in file to a string
-				string[] rawLines = File.ReadAllLines(filepath);
+				//load contents of file to a string array
+				string[] rawLines = File.ReadAllLines(filename);
 
-				//Check version of file
+				//Check version of save file
 				string version = rawLines[0].Split('|')[1];
 
 				//Use different methods to parse depending on version.
@@ -133,7 +139,8 @@ namespace ArientMusicPlayer {
 						//Hardcoded. Indexes 2 to 6 are custom values.
 						//Songs start at index 8.
 
-						playlist.name = playlistname;
+						playlist.filename = filename;
+						playlist.name = rawLines[2].Split('|')[1];
 						playlist.currentSongIndex = int.Parse(rawLines[3].Split('|')[1]);
 						playlist.currentSongPos = double.Parse(rawLines[4].Split('|')[1]);
 						if (rawLines[5].Split('|')[1] == "True") {
@@ -177,16 +184,32 @@ namespace ArientMusicPlayer {
 				}
 
 			} else {
-				Logger.Error("Loading Playlist from disk: Could not find the saved playlist named " + playlistname);
+				Logger.Error("Loading Playlist from disk: Could not find the saved playlist named " + filename);
 			}
 			return playlist;
+		}
+
+		//Loads ALL playlists in the saved data folder.
+		public static Arient.Playlist[] LoadAllPlaylistsFromDisk() {
+			List<Arient.Playlist> playlists = new List<Arient.Playlist>();
+			string dataFolderPath = Directory.GetCurrentDirectory() + playlistSubfolder;
+			Directory.CreateDirectory(dataFolderPath);
+			string[] files = Directory.GetFiles(dataFolderPath,"*" + playlistExtension);
+
+			foreach (string file in files) {
+				playlists.Add(LoadPlaylistFromDisk(file));
+			}
+			if (playlists.Count == 0) {
+				return null;
+			}
+			return playlists.ToArray();
 		}
 
 		#endregion
 
 		#region Misc Helper Methods
 		public static bool CheckPlaylistExists(string playlistName) {
-			return File.Exists(Directory.GetCurrentDirectory() + "\\data\\" + playlistName + ".bigoof");
+			return File.Exists(Directory.GetCurrentDirectory() + playlistSubfolder + playlistName + playlistExtension);
 		}
 
 		//Loads TAG_INFO from a music file and returns it.

@@ -10,7 +10,6 @@ namespace ArientMusicPlayer {
 		//references for all component instances.
 		public static ArientWindow arientWindow;
 
-		//Entry Point. Loads: ArientWindow Components > ArientBackend.Initialize > ArientBackend.LoadSettings
 		#region Main/Exit
 
 		[STAThread]
@@ -21,10 +20,11 @@ namespace ArientMusicPlayer {
 			arientWindow = new ArientWindow();
 			//arientBackend = new Arient();
 			InitializeArientBackend();
-#pragma warning disable CS4014
-			LoadSettingsAsync();//Suppressed green squiggly Warning cos i need this behaviour
-#pragma warning restore CS4014
+			LoadSettings();
 			Application.Run(arientWindow);
+
+			//Before program shuts down, force save all playlists.
+			SaveAllPlaylists();
 
 			//Free BASS stuff before stopping the app completely.
 			Logger.Debug("Program Exiting, freeing memory!");
@@ -42,7 +42,7 @@ namespace ArientMusicPlayer {
 
 		//====================START OF BACKEND FEATURES====================
 
-		#region Startup
+		#region Startup/saving
 		//Initialization BASS.
 		static void InitializeArientBackend() {
 
@@ -55,18 +55,45 @@ namespace ArientMusicPlayer {
 		}
 
 		//Loading of saved settings + TESTING stuff.
-		static async Task LoadSettingsAsync() {
+		static void LoadSettings() {
 
-			if (FileManager.CheckPlaylistExists("Local files")) {
-				loadedPlaylists[0] = FileManager.LoadPlaylistFromDisk("Local files");
-			} else {
-				Logger.Debug("Playlist not found, importing from m38u lol");
-				loadedPlaylists[0] = await Task.Run(() => FileManager.ImportPlaylistM3U8("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
-				loadedPlaylists[0].currentSongIndex = 0;
-				FileManager.SavePlaylistToDisk(loadedPlaylists[0]);
+			//if (FileManager.CheckPlaylistExists("Local files")) {
+			//	loadedPlaylists[0] = FileManager.LoadPlaylistFromDisk("Local files");
+			//} else {
+			//	Logger.Debug("Playlist not found, importing from m38u lol");
+			//	loadedPlaylists[0] = await Task.Run(() => FileManager.ImportPlaylistM3U8("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
+			//	loadedPlaylists[0].currentSongIndex = 0;
+			//	FileManager.SavePlaylistToDisk(loadedPlaylists[0]);
+			//}
+			//arientWindow.LoadPlaylistWindow(0);
+
+			//Load in ALL saved playlists.
+			loadedPlaylists = FileManager.LoadAllPlaylistsFromDisk(); //loaded in alphabetical order.
+
+			//If there are no saved playlists, make one default blank playlist.
+			if (loadedPlaylists == null) {
+				loadedPlaylists = new Playlist[1];
+				loadedPlaylists[0] = new Playlist();
+				loadedPlaylists[0].songs = new TagInfo[0];
+				loadedPlaylists[0].name = "Default";
+				FileManager.SavePlaylistToDisk(loadedPlaylists[0],true);
 			}
-			arientWindow.LoadPlaylistWindow(0);
+
+			//load the playlist in the App window.
+			arientWindow.LoadPlaylistWindow(0); //todo: replace "0" with "lastusedplaylist"
+
 		}
+
+		//Save all playlists before exit.
+		static void SaveAllPlaylists() {
+			Logger.Debug("Saving all playlists...");
+			foreach (Playlist playlist in loadedPlaylists) {
+				FileManager.SavePlaylistToDisk(playlist);
+			}
+			Logger.Debug("Playlists saved.");
+		}
+
+		//Todo: Add option to save app settings too.
 
 		#endregion
 
@@ -77,7 +104,7 @@ namespace ArientMusicPlayer {
 
 		public static void StartPlayback(int currPlaylistIndex) {
 
-			if (currentActivePlaylist != -1) {
+			if (currentActivePlaylist != -1 && loadedPlaylists[currentActivePlaylist].songs.Length > 0) {
 				// create a stream channel from a file
 
 				//TODO: Replace BASS_StreamCreateFile with BASS_StreamCreate
@@ -114,7 +141,7 @@ namespace ArientMusicPlayer {
 		public static void PausePlayback() {
 
 			//do BASS_ChannelPause.
-			if (currentChannel != 0) {
+			if (currentActivePlaylist != -1 && currentChannel != 0) {
 				if (Bass.BASS_ChannelPause(currentChannel)) {
 					Logger.Debug("Channel Paused!");
 					isPlaying = false;
@@ -125,18 +152,19 @@ namespace ArientMusicPlayer {
 		}
 
 		public static void TogglePlayPause() {
-
-			if (!isPlaying) {
-				StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
-			} else {
-				PausePlayback();
+			if (currentActivePlaylist != -1) {
+				if (!isPlaying) {
+					StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
+				} else {
+					PausePlayback();
+				}
 			}
 		}
 
 		public static void StopPlayback() {
 
 			//Do BASS_ChannelStop and BASS_StreamFree
-			if (currentChannel != 0) {
+			if (currentActivePlaylist != -1 && currentChannel != 0) {
 
 				if (!Bass.BASS_ChannelStop(currentChannel)) 
 					Logger.Debug("Error during Stopping playback: " + Bass.BASS_ErrorGetCode());
@@ -149,31 +177,36 @@ namespace ArientMusicPlayer {
 		}
 
 		public static void NextTrack() {
-			//Stop playback, change the internalPlaylistIndex,
-			//then run StartPlayback()
-			StopPlayback();
 
-			//Clamp the max index.
-			loadedPlaylists[currentActivePlaylist].currentSongIndex++;
-			if (loadedPlaylists[currentActivePlaylist].currentSongIndex > loadedPlaylists[currentActivePlaylist].songs.Length - 1) {
-				loadedPlaylists[currentActivePlaylist].currentSongIndex = 0;
+			if (currentActivePlaylist != -1) {
+				//Stop playback, change the internalPlaylistIndex,
+				//then run StartPlayback()
+				StopPlayback();
+
+				//Clamp the max index.
+				loadedPlaylists[currentActivePlaylist].currentSongIndex++;
+				if (loadedPlaylists[currentActivePlaylist].currentSongIndex > loadedPlaylists[currentActivePlaylist].songs.Length - 1) {
+					loadedPlaylists[currentActivePlaylist].currentSongIndex = 0;
+				}
+
+				StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
 			}
-
-			StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
 		}
 
 		public static void PrevTrack() {
-			//Stop playback, change the internalPlaylistIndex,
-			//then run StartPlayback()stIndex,
-			StopPlayback();
+			if (currentActivePlaylist != -1) {
+				//Stop playback, change the internalPlaylistIndex,
+				//then run StartPlayback()stIndex,
+				StopPlayback();
 
-			//Clamp the min index.
-			loadedPlaylists[currentActivePlaylist].currentSongIndex--;
-			if (loadedPlaylists[currentActivePlaylist].currentSongIndex < 0) {
-				loadedPlaylists[currentActivePlaylist].currentSongIndex = loadedPlaylists[currentActivePlaylist].songs.Length - 1;
+				//Clamp the min index.
+				loadedPlaylists[currentActivePlaylist].currentSongIndex--;
+				if (loadedPlaylists[currentActivePlaylist].currentSongIndex < 0) {
+					loadedPlaylists[currentActivePlaylist].currentSongIndex = loadedPlaylists[currentActivePlaylist].songs.Length - 1;
+				}
+
+				StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
 			}
-
-			StartPlayback(loadedPlaylists[currentActivePlaylist].currentSongIndex);
 		}
 
 		public static void OnChangeTrack(int newTrackIndex) {
@@ -198,8 +231,11 @@ namespace ArientMusicPlayer {
 			}
 			#endregion
 
+			public string filename = ""; //not saved to disk. only assigned when loaded in.
+											  //Used when renaming or deleting playlist.
+
 			public string name;
-			public int currentSongIndex = 0;
+			public int currentSongIndex = -1; //default. Indicates there's no songs.
 			public double currentSongPos = 0;
 			public bool shuffle = false;
 			public bool repeatPlaylist = true;
@@ -243,8 +279,8 @@ namespace ArientMusicPlayer {
 		public static bool settingMinToTray = true;
 		public static Playlist[] loadedPlaylists = new Playlist[1];
 		public static int currentActivePlaylist = -1; //will only swap when user physically
-													 //changes current view and a LoadPlaylistWindow
-													 //is called
+													  //changes current view and a LoadPlaylistWindow
+													  //is called
 		#endregion
 
 
