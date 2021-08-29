@@ -84,6 +84,10 @@ namespace ArientMusicPlayer {
 			//load the playlist in the App window.
 			arientWindow.LoadPlaylistWindow(0); //todo: replace "0" with "lastusedplaylist"
 			arientWindow.UpdateMainTitle();
+
+			//PLEASE REMOVE AFTER SAVED SETTINGS ARE HERE. THIS IS HERE TO PREVENT BUG.
+			currentPlayingPlaylist = 0;
+
 		}
 
 		//Save all playlists before exit.
