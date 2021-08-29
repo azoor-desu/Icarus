@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Drawing;
 
 
 namespace ArientMusicPlayer {
@@ -41,6 +42,7 @@ namespace ArientMusicPlayer {
 			this.playlistMenuItemRemoveFrmPlaylist.Click += new System.EventHandler(this.playlistMenuItemRemoveFrmPlaylist_Click);
 			this.playlistMenuItemDeleteFromDisk.Click += new System.EventHandler(this.playlistMenuItemDeleteFromDisk_Click);
 
+			playlistListView.SelectedIndexChanged += new EventHandler(OnPlaylistWindowSelectionChange);
 		}
 
 		#region Music Player Interface Buttons
@@ -152,74 +154,148 @@ namespace ArientMusicPlayer {
 
 		#endregion
 
-		#region Playlistview Controls
+		#region Playlist Controls & display
 		void playlistView_MouseDoubleClick(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
 				ListViewHitTestInfo info = playlistListView.HitTest(e.X, e.Y);
 				ListViewItem item = info.Item;
 
 				if (item != null) {
-					MessageBox.Show("The selected Item Name is: " + item.Text);
-				} else {
-					playlistListView.SelectedItems.Clear();
-					MessageBox.Show("No Item is selected");
+					Arient.StartPlayback(Arient.currentDisplayedPlaylist,int.Parse(item.SubItems[0].Text)-1);
 				}
 			}
 		}
 
-
-
 		void playlistView_MouseDown(object sender, MouseEventArgs e) {
+
 			ListViewHitTestInfo info = playlistListView.HitTest(e.X, e.Y);
 			ListViewItem item = info.Item;
 
-			if (item != null) {
-				labelMainTitle.Text = item.Text;
-			} else {
-				playlistListView.SelectedItems.Clear();
-				labelMainTitle.Text = "No Item is Selected";
+			if (e.Button == MouseButtons.Left) {
+				
+			}
+
+			if (e.Button == MouseButtons.Right) {
+				if (item != null) {
+					Point pos = PointToClient(Cursor.Position);
+					playlistContextMenuStrip.Show(this, pos);
+				}
 			}
 		}
 
-		#endregion
-
-		#region Playlist Display
-
 		ListViewItem listViewItem;
-		public void LoadPlaylistWindow(int loadedPlaylistIndex) {
+		public void LoadPlaylistWindow(int displayPlaylistIndex) {
 			playlistListView.Items.Clear();
-			for (int i = 0; i < Arient.loadedPlaylists[loadedPlaylistIndex].songs.Length; i++) {
+			for (int i = 0; i < Arient.loadedPlaylists[displayPlaylistIndex].songs.Length; i++) {
 				listViewItem = new ListViewItem((i + 1).ToString());
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].title);
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].album);
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].artist);
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].duration.ToString());
-				listViewItem.SubItems.Add(Arient.loadedPlaylists[loadedPlaylistIndex].songs[i].format);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[displayPlaylistIndex].songs[i].title);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[displayPlaylistIndex].songs[i].album);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[displayPlaylistIndex].songs[i].artist);
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[displayPlaylistIndex].songs[i].duration.ToString());
+				listViewItem.SubItems.Add(Arient.loadedPlaylists[displayPlaylistIndex].songs[i].format);
 				playlistListView.Items.Add(listViewItem);
 			}
-			Arient.currentActivePlaylist = loadedPlaylistIndex; //this should be the only place where
+			Arient.currentDisplayedPlaylist = displayPlaylistIndex; //this should be the only place where
 																//currentActivePlaylist should be changed
 																//i.e. loading a new playlist into view
 		}
 
 		public void OnChangeTrackPlaylist(int newTrackIndex) {
-			playlistListView.Select();
-			playlistListView.Items[newTrackIndex].Focused = true;
 
-			//Clear all other selections
-			foreach (ListViewItem item in playlistListView.Items) {
-				item.Selected = false;
+		//If user is looking at the currently playing playlist, update the selections.
+		//if not, then don't fuck up whatever the user is doing on another playlist.
+			if (Arient.currentDisplayedPlaylist == Arient.currentPlayingPlaylist) {
+				playlistListView.Select();
+				playlistListView.Items[newTrackIndex].Focused = true;
+
+				//Clear all other selections
+				foreach (ListViewItem item in playlistListView.Items) {
+					item.Selected = false;
+				}
+
+				playlistListView.Items[newTrackIndex].Selected = true;
+				playlistListView.Items[newTrackIndex].EnsureVisible();
+			}
+		}
+
+		public void OnPlaylistWindowSelectionChange(object sender, EventArgs e) {
+			
+			if (playlistListView.SelectedItems.Count > 0) {
+				Arient.TagInfo tag = Arient.GetLoadedTagInfo(Arient.currentDisplayedPlaylist, int.Parse(playlistListView.SelectedItems[0].SubItems[0].Text) - 1);
+				//Generate text for display. Store in an array. Will be 4 lines tall.
+				string[] display = new string[4];
+
+				TimeSpan ts = TimeSpan.FromSeconds((int)tag.duration);
+				display[0] = tag.title + " [" + String.Format("{0}:{1:D2}", ts.Minutes, ts.Seconds) + "]";
+				display[1] = tag.artist;
+				display[2] = tag.album;
+
+				if (tag.format != "") {
+					display[3] += tag.format + " | ";
+				}
+				if (tag.size != 0) {
+					display[3] += (tag.size / 1048576f).ToString("0.00") + "mb, ";
+				}
+				if (tag.frequency != 0) {
+					display[3] += tag.frequency + "hz, ";
+				}
+				if (tag.bitrate != 0) {
+					display[3] += tag.bitrate + "kbps, ";
+				}
+				if (tag.bpm != "" && tag.bpm != null) {
+					display[3] += tag.bpm + "bpm, ";
+				}
+
+				//remove trailing space and comma if any
+				display[3] = display[3].TrimEnd(',', ' ');
+
+				labelPlaylistSelection.Lines = display;
 			}
 
-			playlistListView.Items[newTrackIndex].Selected = true;
-			playlistListView.Items[newTrackIndex].EnsureVisible();
+		}
+
+		public void UpdateMainTitle(Arient.TagInfo tag) {
+
+			//TimeSpan ts = TimeSpan.FromSeconds((int)tag.duration);
+			labelMainTitle.Text = tag.title;
+			labelMainArtist.Text = tag.artist;
+			labelMainAlbum.Text = tag.album;
+			string info = "";
+			if (tag.format != "") {
+				info += tag.format + " | ";
+			}
+			if (tag.size != 0) {
+				info += (tag.size / 1048576f).ToString("0.00") + "mb, ";
+			}
+			if (tag.frequency != 0) {
+				info += tag.frequency + "hz, ";
+			}
+			if (tag.bitrate != 0) {
+				info += tag.bitrate + "kbps, ";
+			}
+			if (tag.bpm != "" && tag.bpm != null) {
+				info += tag.bpm + "bpm, ";
+			}
+
+			//remove trailing space and comma if any
+			info = info.TrimEnd(',', ' ');
+
+			labelMainExtraInfo.Text = info;
+		}
+
+		//Same as above but with zero info.
+		public void UpdateMainTitle() {
+			labelMainTitle.Text = "Stopped";
+			labelMainArtist.Text = "";
+			labelMainAlbum.Text = "";
+			labelMainExtraInfo.Text = "";
 		}
 
 		#endregion
 
 		#region Context Menu Playlist
 		private void playlistMenuItemPlayItem_Click(object sender, EventArgs e) {
-			Arient.StartPlayback(int.Parse(playlistListView.SelectedItems[0].Text) - 1);
+			Arient.StartPlayback(Arient.currentDisplayedPlaylist, int.Parse(playlistListView.SelectedItems[0].Text) - 1);
 		}
 
 		private void playlistMenuItemAddToPlaylist_Click(object sender, EventArgs e) {

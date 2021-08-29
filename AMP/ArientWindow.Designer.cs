@@ -72,7 +72,7 @@ namespace ArientMusicPlayer
 			this.audioLevelTrackBar = new System.Windows.Forms.TrackBar();
 			this.checkBoxShuffle = new System.Windows.Forms.CheckBox();
 			this.checkBoxRepeat = new System.Windows.Forms.CheckBox();
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.labelPlaylistSelection = new System.Windows.Forms.TextBox();
 			this.pictureBox2 = new System.Windows.Forms.PictureBox();
 			this.btnRenamePlaylist = new System.Windows.Forms.Button();
 			this.btnDeletePlaylist = new System.Windows.Forms.Button();
@@ -471,32 +471,32 @@ namespace ArientMusicPlayer
 			this.checkBoxRepeat.Text = "Repeat";
 			this.checkBoxRepeat.UseVisualStyleBackColor = true;
 			// 
-			// textBox1
+			// labelPlaylistSelection
 			// 
-			this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.textBox1.Cursor = System.Windows.Forms.Cursors.Arrow;
-			this.textBox1.Location = new System.Drawing.Point(66, 20);
-			this.textBox1.Multiline = true;
-			this.textBox1.Name = "textBox1";
-			this.textBox1.ReadOnly = true;
-			this.textBox1.Size = new System.Drawing.Size(284, 45);
-			this.textBox1.TabIndex = 23;
-			this.textBox1.Text = "Dr Dre - Beats [4:21]\r\nWhere my dreams go and die\r\nMP3  | 4100hz, 320kbps, 123bpm" +
-    ", 16bit";
+			this.labelPlaylistSelection.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.labelPlaylistSelection.Cursor = System.Windows.Forms.Cursors.Arrow;
+			this.labelPlaylistSelection.Location = new System.Drawing.Point(86, 23);
+			this.labelPlaylistSelection.Multiline = true;
+			this.labelPlaylistSelection.Name = "labelPlaylistSelection";
+			this.labelPlaylistSelection.ReadOnly = true;
+			this.labelPlaylistSelection.Size = new System.Drawing.Size(311, 54);
+			this.labelPlaylistSelection.TabIndex = 23;
+			this.labelPlaylistSelection.Text = "None";
+			this.labelPlaylistSelection.WordWrap = false;
 			// 
 			// pictureBox2
 			// 
 			this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
 			this.pictureBox2.Location = new System.Drawing.Point(3, 3);
 			this.pictureBox2.Name = "pictureBox2";
-			this.pictureBox2.Size = new System.Drawing.Size(56, 59);
+			this.pictureBox2.Size = new System.Drawing.Size(75, 75);
 			this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
 			this.pictureBox2.TabIndex = 22;
 			this.pictureBox2.TabStop = false;
 			// 
 			// btnRenamePlaylist
 			// 
-			this.btnRenamePlaylist.Location = new System.Drawing.Point(304, 67);
+			this.btnRenamePlaylist.Location = new System.Drawing.Point(304, 82);
 			this.btnRenamePlaylist.Name = "btnRenamePlaylist";
 			this.btnRenamePlaylist.Size = new System.Drawing.Size(56, 21);
 			this.btnRenamePlaylist.TabIndex = 18;
@@ -505,7 +505,7 @@ namespace ArientMusicPlayer
 			// 
 			// btnDeletePlaylist
 			// 
-			this.btnDeletePlaylist.Location = new System.Drawing.Point(257, 67);
+			this.btnDeletePlaylist.Location = new System.Drawing.Point(257, 82);
 			this.btnDeletePlaylist.Name = "btnDeletePlaylist";
 			this.btnDeletePlaylist.Size = new System.Drawing.Size(46, 21);
 			this.btnDeletePlaylist.TabIndex = 17;
@@ -514,7 +514,7 @@ namespace ArientMusicPlayer
 			// 
 			// btnCreateNewPlaylist
 			// 
-			this.btnCreateNewPlaylist.Location = new System.Drawing.Point(211, 67);
+			this.btnCreateNewPlaylist.Location = new System.Drawing.Point(211, 82);
 			this.btnCreateNewPlaylist.Name = "btnCreateNewPlaylist";
 			this.btnCreateNewPlaylist.Size = new System.Drawing.Size(46, 21);
 			this.btnCreateNewPlaylist.TabIndex = 16;
@@ -525,7 +525,7 @@ namespace ArientMusicPlayer
 			// 
 			this.playlistSelectComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.playlistSelectComboBox.FormattingEnabled = true;
-			this.playlistSelectComboBox.Location = new System.Drawing.Point(3, 67);
+			this.playlistSelectComboBox.Location = new System.Drawing.Point(3, 82);
 			this.playlistSelectComboBox.Name = "playlistSelectComboBox";
 			this.playlistSelectComboBox.Size = new System.Drawing.Size(206, 21);
 			this.playlistSelectComboBox.Sorted = true;
@@ -536,7 +536,7 @@ namespace ArientMusicPlayer
 			this.panel3.AutoSize = true;
 			this.panel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.panel3.Location = new System.Drawing.Point(0, 97);
+			this.panel3.Location = new System.Drawing.Point(0, 115);
 			this.panel3.Name = "panel3";
 			this.panel3.Size = new System.Drawing.Size(420, 0);
 			this.panel3.TabIndex = 31;
@@ -547,7 +547,7 @@ namespace ArientMusicPlayer
 			this.panel1.Controls.Add(this.textBox2);
 			this.panel1.Controls.Add(this.btnRenamePlaylist);
 			this.panel1.Controls.Add(this.btnDeletePlaylist);
-			this.panel1.Controls.Add(this.textBox1);
+			this.panel1.Controls.Add(this.labelPlaylistSelection);
 			this.panel1.Controls.Add(this.btnCreateNewPlaylist);
 			this.panel1.Controls.Add(this.pictureBox2);
 			this.panel1.Controls.Add(this.panel3);
@@ -555,7 +555,7 @@ namespace ArientMusicPlayer
 			this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
 			this.panel1.Location = new System.Drawing.Point(1, 2);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(420, 97);
+			this.panel1.Size = new System.Drawing.Size(420, 115);
 			this.panel1.TabIndex = 30;
 			// 
 			// textBox2
@@ -563,7 +563,7 @@ namespace ArientMusicPlayer
 			this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.textBox2.Cursor = System.Windows.Forms.Cursors.Arrow;
 			this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-			this.textBox2.Location = new System.Drawing.Point(65, 3);
+			this.textBox2.Location = new System.Drawing.Point(85, 9);
 			this.textBox2.Name = "textBox2";
 			this.textBox2.ReadOnly = true;
 			this.textBox2.Size = new System.Drawing.Size(111, 13);
@@ -622,16 +622,15 @@ namespace ArientMusicPlayer
             this.entryArtist,
             this.entrySongLength,
             this.entryFileFormat});
-			this.playlistListView.ContextMenuStrip = this.playlistContextMenuStrip;
 			this.playlistListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.playlistListView.FullRowSelect = true;
 			this.playlistListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.playlistListView.HideSelection = false;
-			this.playlistListView.Location = new System.Drawing.Point(1, 99);
+			this.playlistListView.Location = new System.Drawing.Point(1, 117);
 			this.playlistListView.MinimumSize = new System.Drawing.Size(350, 100);
 			this.playlistListView.Name = "playlistListView";
 			this.playlistListView.ShowGroups = false;
-			this.playlistListView.Size = new System.Drawing.Size(420, 349);
+			this.playlistListView.Size = new System.Drawing.Size(420, 331);
 			this.playlistListView.TabIndex = 5;
 			this.playlistListView.TabStop = false;
 			this.playlistListView.UseCompatibleStateImageBehavior = false;
@@ -786,7 +785,7 @@ namespace ArientMusicPlayer
 		private System.Windows.Forms.TrackBar audioLevelTrackBar;
 		private System.Windows.Forms.CheckBox checkBoxShuffle;
 		private System.Windows.Forms.CheckBox checkBoxRepeat;
-		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.TextBox labelPlaylistSelection;
 		private System.Windows.Forms.PictureBox pictureBox2;
 		private System.Windows.Forms.Button btnRenamePlaylist;
 		private System.Windows.Forms.Button btnDeletePlaylist;

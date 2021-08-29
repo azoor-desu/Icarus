@@ -101,7 +101,8 @@ namespace ArientMusicPlayer {
 					tag.format + "|" +
 					tag.size + "|" +
 					tag.mood + "|" +
-					tag.rating + "\n";
+					tag.rating + "|" +
+					tag.bpm + "\n";
 				}
 			}
 
@@ -179,6 +180,7 @@ namespace ArientMusicPlayer {
 							playlist.songs[i].size = long.Parse(items[13]);
 							playlist.songs[i].mood = items[14];
 							playlist.songs[i].rating = items[15];
+							playlist.songs[i].bpm = items[16];
 						}
 						break;
 				}
@@ -208,10 +210,6 @@ namespace ArientMusicPlayer {
 		#endregion
 
 		#region Misc Helper Methods
-		public static bool CheckPlaylistExists(string playlistName) {
-			return File.Exists(Directory.GetCurrentDirectory() + playlistSubfolder + playlistName + playlistExtension);
-		}
-
 		//Loads TAG_INFO from a music file and returns it.
 		public static TAG_INFO GetTag(string path) {
 			TAG_INFO tag_info = null;
