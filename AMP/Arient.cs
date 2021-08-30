@@ -18,13 +18,12 @@ namespace ArientMusicPlayer {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			arientWindow = new ArientWindow();
-			//arientBackend = new Arient();
 			InitializeArientBackend();
 			LoadSettings();
+			arientWindow.UpdatePlaylistSelectComboBox(currentDisplayedPlaylist);
 			Application.Run(arientWindow);
 
 			StopPlayback();
-
 			//Before program shuts down, force save all playlists.
 			SaveAllPlaylists();
 
@@ -200,9 +199,9 @@ namespace ArientMusicPlayer {
 				StopPlayback();
 
 				//Clamp the max index.
-				loadedPlaylists[currentDisplayedPlaylist].currentSongIndex++;
-				if (loadedPlaylists[currentDisplayedPlaylist].currentSongIndex > loadedPlaylists[currentDisplayedPlaylist].songs.Length - 1) {
-					loadedPlaylists[currentDisplayedPlaylist].currentSongIndex = 0;
+				loadedPlaylists[currentPlayingPlaylist].currentSongIndex++;
+				if (loadedPlaylists[currentPlayingPlaylist].currentSongIndex > loadedPlaylists[currentPlayingPlaylist].songs.Length - 1) {
+					loadedPlaylists[currentPlayingPlaylist].currentSongIndex = 0;
 				}
 
 				StartPlayback(currentPlayingPlaylist, loadedPlaylists[currentPlayingPlaylist].currentSongIndex);
@@ -216,9 +215,9 @@ namespace ArientMusicPlayer {
 				StopPlayback();
 
 				//Clamp the min index.
-				loadedPlaylists[currentDisplayedPlaylist].currentSongIndex--;
-				if (loadedPlaylists[currentDisplayedPlaylist].currentSongIndex < 0) {
-					loadedPlaylists[currentDisplayedPlaylist].currentSongIndex = loadedPlaylists[currentDisplayedPlaylist].songs.Length - 1;
+				loadedPlaylists[currentPlayingPlaylist].currentSongIndex--;
+				if (loadedPlaylists[currentPlayingPlaylist].currentSongIndex < 0) {
+					loadedPlaylists[currentPlayingPlaylist].currentSongIndex = loadedPlaylists[currentPlayingPlaylist].songs.Length - 1;
 				}
 
 				StartPlayback(currentPlayingPlaylist, loadedPlaylists[currentPlayingPlaylist].currentSongIndex);

@@ -55,6 +55,9 @@ namespace ArientMusicPlayer
 			this.btnNext = new System.Windows.Forms.Button();
 			this.menuStrip = new System.Windows.Forms.MenuStrip();
 			this.menuContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.menuToolStripMenuItemImportPlaylist = new System.Windows.Forms.ToolStripMenuItem();
+			this.menuToolStripMenuItemExportPlaylist = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.menuToolStripMenuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuToolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStripMenuLabel = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,9 +95,6 @@ namespace ArientMusicPlayer
 			this.entryFileFormat = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.panel4 = new System.Windows.Forms.Panel();
 			this.PlayerPanel = new System.Windows.Forms.Panel();
-			this.menuToolStripMenuItemExportPlaylist = new System.Windows.Forms.ToolStripMenuItem();
-			this.menuToolStripMenuItemImportPlaylist = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			entryTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.playlistContextMenuStrip.SuspendLayout();
 			this.menuStrip.SuspendLayout();
@@ -247,7 +247,7 @@ namespace ArientMusicPlayer
 			this.labelMainTitle.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.labelMainTitle.Font = new System.Drawing.Font("Calibri", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
 			this.labelMainTitle.ForeColor = System.Drawing.SystemColors.WindowText;
-			this.labelMainTitle.Location = new System.Drawing.Point(233, 43);
+			this.labelMainTitle.Location = new System.Drawing.Point(223, 43);
 			this.labelMainTitle.Name = "labelMainTitle";
 			this.labelMainTitle.ReadOnly = true;
 			this.labelMainTitle.Size = new System.Drawing.Size(283, 33);
@@ -307,7 +307,25 @@ namespace ArientMusicPlayer
             this.menuToolStripMenuItemOptions,
             this.menuToolStripMenuItemExit});
 			this.menuContextMenuStrip.Name = "trayContextMenuStrip";
+			this.menuContextMenuStrip.OwnerItem = this.menuStripMenuLabel;
 			this.menuContextMenuStrip.Size = new System.Drawing.Size(151, 98);
+			// 
+			// menuToolStripMenuItemImportPlaylist
+			// 
+			this.menuToolStripMenuItemImportPlaylist.Name = "menuToolStripMenuItemImportPlaylist";
+			this.menuToolStripMenuItemImportPlaylist.Size = new System.Drawing.Size(150, 22);
+			this.menuToolStripMenuItemImportPlaylist.Text = "Import Playlist";
+			// 
+			// menuToolStripMenuItemExportPlaylist
+			// 
+			this.menuToolStripMenuItemExportPlaylist.Name = "menuToolStripMenuItemExportPlaylist";
+			this.menuToolStripMenuItemExportPlaylist.Size = new System.Drawing.Size(150, 22);
+			this.menuToolStripMenuItemExportPlaylist.Text = "Export Playlist";
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(147, 6);
 			// 
 			// menuToolStripMenuItemOptions
 			// 
@@ -406,7 +424,7 @@ namespace ArientMusicPlayer
 			this.labelMainArtist.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.labelMainArtist.Font = new System.Drawing.Font("Calibri", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
 			this.labelMainArtist.ForeColor = System.Drawing.SystemColors.WindowText;
-			this.labelMainArtist.Location = new System.Drawing.Point(233, 82);
+			this.labelMainArtist.Location = new System.Drawing.Point(228, 82);
 			this.labelMainArtist.Name = "labelMainArtist";
 			this.labelMainArtist.ReadOnly = true;
 			this.labelMainArtist.Size = new System.Drawing.Size(283, 23);
@@ -420,7 +438,7 @@ namespace ArientMusicPlayer
 			this.labelMainAlbum.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.labelMainAlbum.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
 			this.labelMainAlbum.ForeColor = System.Drawing.SystemColors.WindowText;
-			this.labelMainAlbum.Location = new System.Drawing.Point(233, 108);
+			this.labelMainAlbum.Location = new System.Drawing.Point(228, 108);
 			this.labelMainAlbum.Name = "labelMainAlbum";
 			this.labelMainAlbum.ReadOnly = true;
 			this.labelMainAlbum.Size = new System.Drawing.Size(283, 20);
@@ -434,7 +452,7 @@ namespace ArientMusicPlayer
 			this.labelMainExtraInfo.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.labelMainExtraInfo.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
 			this.labelMainExtraInfo.ForeColor = System.Drawing.SystemColors.WindowText;
-			this.labelMainExtraInfo.Location = new System.Drawing.Point(230, 135);
+			this.labelMainExtraInfo.Location = new System.Drawing.Point(225, 135);
 			this.labelMainExtraInfo.Multiline = true;
 			this.labelMainExtraInfo.Name = "labelMainExtraInfo";
 			this.labelMainExtraInfo.ReadOnly = true;
@@ -528,7 +546,6 @@ namespace ArientMusicPlayer
 			this.playlistSelectComboBox.Location = new System.Drawing.Point(3, 82);
 			this.playlistSelectComboBox.Name = "playlistSelectComboBox";
 			this.playlistSelectComboBox.Size = new System.Drawing.Size(206, 21);
-			this.playlistSelectComboBox.Sorted = true;
 			this.playlistSelectComboBox.TabIndex = 15;
 			// 
 			// panel3
@@ -691,23 +708,6 @@ namespace ArientMusicPlayer
 			this.PlayerPanel.Name = "PlayerPanel";
 			this.PlayerPanel.Size = new System.Drawing.Size(524, 475);
 			this.PlayerPanel.TabIndex = 34;
-			// 
-			// menuToolStripMenuItemExportPlaylist
-			// 
-			this.menuToolStripMenuItemExportPlaylist.Name = "menuToolStripMenuItemExportPlaylist";
-			this.menuToolStripMenuItemExportPlaylist.Size = new System.Drawing.Size(150, 22);
-			this.menuToolStripMenuItemExportPlaylist.Text = "Export Playlist";
-			// 
-			// menuToolStripMenuItemImportPlaylist
-			// 
-			this.menuToolStripMenuItemImportPlaylist.Name = "menuToolStripMenuItemImportPlaylist";
-			this.menuToolStripMenuItemImportPlaylist.Size = new System.Drawing.Size(150, 22);
-			this.menuToolStripMenuItemImportPlaylist.Text = "Import Playlist";
-			// 
-			// toolStripSeparator1
-			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(147, 6);
 			// 
 			// ArientWindow
 			// 

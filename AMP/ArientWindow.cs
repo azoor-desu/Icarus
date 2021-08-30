@@ -43,6 +43,7 @@ namespace ArientMusicPlayer {
 			this.playlistMenuItemDeleteFromDisk.Click += new System.EventHandler(this.playlistMenuItemDeleteFromDisk_Click);
 
 			playlistListView.SelectedIndexChanged += new EventHandler(OnPlaylistWindowSelectionChange);
+			playlistSelectComboBox.SelectedIndexChanged += new EventHandler(OnPlaylistSelectComboBoxChange);
 		}
 
 		#region Music Player Interface Buttons
@@ -289,6 +290,26 @@ namespace ArientMusicPlayer {
 			labelMainArtist.Text = "";
 			labelMainAlbum.Text = "";
 			labelMainExtraInfo.Text = "";
+		}
+
+		//Playlist Combo Box stuff
+		public void UpdatePlaylistSelectComboBox(int indexToDisplay) {
+			foreach (Arient.Playlist playlist in Arient.loadedPlaylists) {
+				playlistSelectComboBox.Items.Add(playlist.name); //added items should be
+																 //in same order as loadedPlaylists.
+			}
+			if (indexToDisplay >= 0) {
+				playlistSelectComboBox.SelectedIndex = indexToDisplay;
+			}
+		}
+
+		public void OnPlaylistSelectComboBoxChange(object sender, EventArgs e) {
+			//Load new Playlist in ListView.
+			//if the current displaying playlist is the same
+			//as the currently loaded one, dont change.
+
+			LoadPlaylistWindow(playlistSelectComboBox.SelectedIndex); //Assuming playlistSelectComboBox items
+																	  //are still in order with loadedPlaylists
 		}
 
 		#endregion
