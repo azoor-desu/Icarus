@@ -87,6 +87,8 @@ namespace ArientMusicPlayer {
 			//PLEASE REMOVE AFTER SAVED SETTINGS ARE HERE. THIS IS HERE TO PREVENT BUG.
 			currentPlayingPlaylist = 0;
 
+			//MessageBox.Show(FileManager.GetUniqueFileID(@"Z:\Azoor.ovpn"));
+
 		}
 
 		//Save all playlists before exit.
@@ -291,6 +293,15 @@ namespace ArientMusicPlayer {
 		public static  TagInfo GetLoadedTagInfo(int targetPlaylist, int targetSongIndex) {
 			return loadedPlaylists[targetPlaylist].songs[targetSongIndex];
 		}
+
+		public class DatabaseItem {
+			public TagInfo tagInfo;
+			public string uniqueID;
+			public string dateLastModified;
+			public string dateAdded;
+		}
+
+		
 
 		#endregion
 
