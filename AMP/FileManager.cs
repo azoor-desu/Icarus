@@ -133,8 +133,6 @@ namespace ArientMusicPlayer {
 				//Check version of save file
 				string version = rawLines[0].Split('|')[1];
 
-				int indexOffset = -1;//for use on playlist.songs. When i = 8, playlist.songs index must be 0.
-
 				//Loop through every single line of the file.
 				for (int i = 0; i < rawLines.Length; i++) {
 
