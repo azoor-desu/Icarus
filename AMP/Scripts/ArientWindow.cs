@@ -222,7 +222,7 @@ namespace ArientMusicPlayer {
 		public void OnPlaylistWindowSelectionChange(object sender, EventArgs e) {
 			
 			if (playlistListView.SelectedItems.Count > 0) {
-				Arient.TagInfo tag = Arient.GetLoadedTagInfo(Arient.currentDisplayedPlaylist, int.Parse(playlistListView.SelectedItems[0].SubItems[0].Text) - 1);
+				TagInfo tag = Arient.GetLoadedTagInfo(Arient.currentDisplayedPlaylist, int.Parse(playlistListView.SelectedItems[0].SubItems[0].Text) - 1);
 				//Generate text for display. Store in an array. Will be 4 lines tall.
 				string[] display = new string[4];
 
@@ -255,7 +255,7 @@ namespace ArientMusicPlayer {
 
 		}
 
-		public void UpdateMainTitle(Arient.TagInfo tag) {
+		public void UpdateMainTitle(TagInfo tag) {
 
 			//TimeSpan ts = TimeSpan.FromSeconds((int)tag.duration);
 			labelMainTitle.Text = tag.title;
@@ -294,7 +294,8 @@ namespace ArientMusicPlayer {
 
 		//Playlist Combo Box stuff
 		public void UpdatePlaylistSelectComboBox(int indexToDisplay) {
-			foreach (Arient.Playlist playlist in Arient.loadedPlaylists) {
+			playlistSelectComboBox.Items.Clear();
+			foreach (ExternalPlaylist playlist in Arient.loadedPlaylists) {
 				playlistSelectComboBox.Items.Add(playlist.name); //added items should be
 																 //in same order as loadedPlaylists.
 			}
@@ -356,5 +357,6 @@ namespace ArientMusicPlayer {
 		}
 
 		#endregion
+
 	}
 }

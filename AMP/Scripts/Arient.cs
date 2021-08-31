@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Un4seen.Bass;
 
@@ -20,7 +23,6 @@ namespace ArientMusicPlayer {
 			arientWindow = new ArientWindow();
 			InitializeArientBackend();
 			LoadSettings();
-			arientWindow.UpdatePlaylistSelectComboBox(currentDisplayedPlaylist);
 			Application.Run(arientWindow);
 
 			StopPlayback();
@@ -73,8 +75,8 @@ namespace ArientMusicPlayer {
 
 			//If there are no saved playlists, make one default blank playlist.
 			if (loadedPlaylists == null) {
-				loadedPlaylists = new Playlist[1];
-				loadedPlaylists[0] = new Playlist();
+				loadedPlaylists = new ExternalPlaylist[1];
+				loadedPlaylists[0] = new ExternalPlaylist();
 				loadedPlaylists[0].songs = new TagInfo[0];
 				loadedPlaylists[0].name = "Default";
 				FileManager.SavePlaylistToDisk(loadedPlaylists[0],true);
@@ -82,6 +84,7 @@ namespace ArientMusicPlayer {
 
 			//load the playlist in the App window.
 			arientWindow.LoadPlaylistWindow(0); //todo: replace "0" with "lastusedplaylist"
+			arientWindow.UpdatePlaylistSelectComboBox(currentDisplayedPlaylist);
 			arientWindow.UpdateMainTitle();
 
 			//PLEASE REMOVE AFTER SAVED SETTINGS ARE HERE. THIS IS HERE TO PREVENT BUG.
@@ -94,7 +97,7 @@ namespace ArientMusicPlayer {
 		//Save all playlists before exit.
 		static void SaveAllPlaylists() {
 			Logger.Debug("Saving all playlists...");
-			foreach (Playlist playlist in loadedPlaylists) {
+			foreach (ExternalPlaylist playlist in loadedPlaylists) {
 				FileManager.SavePlaylistToDisk(playlist);
 			}
 			Logger.Debug("Playlists saved.");
@@ -127,14 +130,15 @@ namespace ArientMusicPlayer {
 				}
 
 				//Load a new stream, regardless of play/paused/stopped status.
-				currentChannel = Bass.BASS_StreamCreateFile(loadedPlaylists[targetPlaylistIndex].songs[playlistSongIndex].filename, 0, 0, BASSFlag.BASS_DEFAULT);
-				Logger.Debug("Loading Music file: " + loadedPlaylists[targetPlaylistIndex].songs[playlistSongIndex].filename);
+				currentChannel = Bass.BASS_StreamCreateFile(loadedPlaylists[targetPlaylistIndex].songs[playlistSongIndex].filepath, 0, 0, BASSFlag.BASS_DEFAULT);
+				Logger.Debug("Loading Music file: " + loadedPlaylists[targetPlaylistIndex].songs[playlistSongIndex].filepath);
 
 				if (currentChannel != 0) {
 					//Stream successfully loaded. Play the stream.
 					if (Bass.BASS_ChannelPlay(currentChannel, true)) {
 						isPlaying = true;
 						OnChangeTrack(playlistSongIndex);
+						loadedPlaylists[targetPlaylistIndex].OnPlayTrack(targetPlaylistIndex);
 						loadedPlaylists[targetPlaylistIndex].currentSongIndex = playlistSongIndex;
 						currentPlayingPlaylist = targetPlaylistIndex; //this should be the only place
 																	  //currentPlayingPlaylist should be changed.
@@ -235,86 +239,137 @@ namespace ArientMusicPlayer {
 
 		#region Playlist Controls
 
-		public class Playlist {
+		//After init, use these to make changes to add/remove loadedPlaylist items
+		public static void AddNewPlaylist(ExternalPlaylist playlist) {
+			ExternalPlaylist[] old = loadedPlaylists;
+			loadedPlaylists = new ExternalPlaylist[old.Length + 1];
+			//do code
 
-			#region Constructors
-			public Playlist()//WARNING: Need to manually set songs array length.
-			{
 
-			}
-
-			public Playlist(int length) {
-				songs = new TagInfo[length]; //set the length
-			}
-			#endregion
-
-			public string filename = ""; //not saved to disk. only assigned when loaded in.
-											  //Used when renaming or deleting playlist.
-
-			public string name;
-			public int currentSongIndex = -1; //default. Indicates there's no songs.
-			public double currentSongPos = 0;
-			public bool shuffle = false;
-			public bool repeatPlaylist = true;
-			public TagInfo[] songs;
-
-			//public void AddSong(string path) {
-			//	//Create new array with length +1 and copy all old data to it.
-			//	TagInfo[] newArray = new TagInfo[songs.Length + 1];
-			//	for (int i = 0; i < songs.Length; i++) {
-			//		newArray[i] = songs[i];
-			//	}
-			//	//Add new song to end of array.
-			//	newArray[newArray.Length - 1] = FileManager.GetTag(path);
-			//	songs = newArray;
-			//}
+			arientWindow.UpdatePlaylistSelectComboBox(old.Length - 1);
 		}
 
-		public struct TagInfo {
-			public string filename { get; set; }
-			public string title { get; set; }
-			public string artist { get; set; }
-			public string album { get; set; }
-			public string albumartist { get; set; }
-			public string year { get; set; }
-			public double duration { get; set; }
-			public string genre { get; set; }
-			public string track { get; set; }
-			public string disc { get; set; }
-			public int bitrate { get; set; }
-			public int frequency { get; set; }
-			public string format { get; set; }
-			public long size { get; set; }
-			public string mood { get; set; }
-			public string rating { get; set; }
-			public string bpm { get; set; }
+		public static void RemovePlaylist(string playlistname) {
+			//Do code
+
+
+			arientWindow.UpdatePlaylistSelectComboBox(9999);//replace with int of playlist above/below it. 
 		}
 
 		public static  TagInfo GetLoadedTagInfo(int targetPlaylist, int targetSongIndex) {
 			return loadedPlaylists[targetPlaylist].songs[targetSongIndex];
 		}
-
-		public class DatabaseItem {
-			public TagInfo tagInfo;
-			public string uniqueID;
-			public string dateLastModified;
-			public string dateAdded;
-		}
-
-		
-
 		#endregion
 
 		#region Settings Management
 		//Load in settings from some savefile.
 		public static bool settingMinToTray = true;
-		public static Playlist[] loadedPlaylists = new Playlist[1];
+		public static ExternalPlaylist[] loadedPlaylists;
+		public static LibraryPlaylist libraryPlaylist = new LibraryPlaylist();
 		public static int currentDisplayedPlaylist = -1; //will only change when user physically
 														 //changes current view and a LoadPlaylistWindow
 														 //is called
 		public static int currentPlayingPlaylist = -1;//will only change when user
-													  //plays a new file.
+													  //plays a new file using controls in the Playlist.
 		#endregion
 
 	}
+
+	#region Classes and Structs
+
+	public class Playlist {
+		
+
+		public string filepath = ""; //not saved to disk. only assigned when loaded in.
+									 //Used when renaming or deleting playlist.
+		public string name;
+		public int currentSongIndex = -1; //default. Indicates there's no songs.
+		public double currentSongPos = 0; //set when pausing or exiting the app.
+		public bool shuffle = false;
+		public bool repeatPlaylist = true;
+
+		public virtual TagInfo GetFileTagInfo(int index) { 
+			return new TagInfo();
+		}
+
+		public virtual void OnPlayTrack(int trackIndex) {
+
+		}
+	}
+
+	public class ExternalPlaylist: Playlist {
+		public TagInfo[] songs;
+
+		public ExternalPlaylist() {
+			
+		}
+
+		public ExternalPlaylist(int length) {
+			songs = new TagInfo[length]; //set the length
+		}
+
+		public override TagInfo GetFileTagInfo(int trackIndex) {
+			return songs[trackIndex];
+		}
+
+		public override void OnPlayTrack(int trackIndex) { 
+			
+		}
+	}
+
+	public class SyncPlaylist: Playlist {
+		public List<string> shortpath = new List<string>(); // e.g. /Jap/test.mp3
+
+		public override TagInfo GetFileTagInfo(int trackIndex) {
+			//GET FROM THE LIBRARYPLAYLIST INSTANCE
+			DatabaseItem database = new DatabaseItem();
+			if (Arient.libraryPlaylist.songs.TryGetValue(shortpath[trackIndex], out database)){
+				return database.tagInfo;
+			}
+			return new TagInfo();
+		}
+
+		public override void OnPlayTrack(int trackIndex) {
+			
+		}
+	}
+
+	public class LibraryPlaylist : Playlist {
+		//Key: shortpath, value: DatabaseItem
+		public Dictionary<string, DatabaseItem> songs = new Dictionary<string, DatabaseItem>();
+
+		public override TagInfo GetFileTagInfo(int trackIndex) {
+			return songs.ElementAt(trackIndex).Value.tagInfo;
+		}
+	}
+
+	public struct TagInfo {
+		public string filepath { get; set; }
+		public string title { get; set; }
+		public string artist { get; set; }
+		public string album { get; set; }
+		public string albumartist { get; set; }
+		public string year { get; set; }
+		public double duration { get; set; }
+		public string genre { get; set; }
+		public string track { get; set; }
+		public string disc { get; set; }
+		public int bitrate { get; set; }
+		public int frequency { get; set; }
+		public string format { get; set; }
+		public long size { get; set; }
+		public string mood { get; set; }
+		public string rating { get; set; }
+		public string bpm { get; set; }
+	}
+
+	public struct DatabaseItem {
+		public TagInfo tagInfo;
+
+		//for syncing
+		public string uniqueID;
+		public string dateLastModified;
+	}
+
+	#endregion
 }

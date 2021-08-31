@@ -13,13 +13,13 @@ namespace ArientMusicPlayer {
 
 		#region External Imports
 		//Loads in a Playlist file from disk
-		public static Arient.Playlist ImportPlaylistM3U8(string pathofile) {
+		public static ExternalPlaylist ImportPlaylistM3U8(string pathofile) {
 
 			//await Task.Yield(); //for use with an async method.
 			//Put this at top of the method to force the whole thing to be an async method.
 			//usage is: internalPlaylist = await ImportPlaylist(); << must be in another async method.
 
-			List<Arient.TagInfo> tagInfos = new List<Arient.TagInfo>();
+			List<TagInfo> tagInfos = new List<TagInfo>();
 
 			if (File.Exists(pathofile)) {
 				string[] lines = File.ReadAllLines(pathofile);
@@ -34,7 +34,7 @@ namespace ArientMusicPlayer {
 
 						//Add each item into tempTags, rejecting those paths where the tag can't be found.
 						var tag = ConvertToTagInfo(GetTag(line));
-						if (tag.filename != "") {
+						if (tag.filepath != "") {
 							tagInfos.Add(tag);
 						}
 					}
@@ -46,7 +46,7 @@ namespace ArientMusicPlayer {
 
 					//Create a new Playlist, loop through the new TagInfo in Playlist, and write the TAGS.
 
-					Arient.Playlist finalPlaylist = new Arient.Playlist(tagInfos.Count) {
+					ExternalPlaylist finalPlaylist = new ExternalPlaylist(tagInfos.Count) {
 
 						//Add the name and array of tags to the name var in tempPlaylist
 						name = Path.GetFileName(pathofile).Split('.')[0],
@@ -69,7 +69,7 @@ namespace ArientMusicPlayer {
 		#region Internal Saving and Parsing of .arientpl file
 
 		//Save Playlist class to file on disk using .arientpl v1.0
-		public static void SavePlaylistToDisk(Arient.Playlist playlist, bool isNewPlaylist = false) {
+		public static void SavePlaylistToDisk(ExternalPlaylist playlist, bool isNewPlaylist = false) {
 			string writeData = "";
 
 			//Create Header
@@ -85,9 +85,9 @@ namespace ArientMusicPlayer {
 
 			if (playlist.songs.Length > 0) {
 				//Add individual songs, items seperated by |
-				foreach (Arient.TagInfo tag in playlist.songs) {
+				foreach (TagInfo tag in playlist.songs) {
 					writeData +=
-					tag.filename + "|" +
+					tag.filepath + "|" +
 					tag.title + "|" +
 					tag.artist + "|" +
 					tag.album + "|" +
@@ -117,14 +117,14 @@ namespace ArientMusicPlayer {
 		}
 
 		//Load a Playlist file from disk.
-		public static Arient.Playlist LoadPlaylistFromDisk(string filename) {
+		public static ExternalPlaylist LoadPlaylistFromDisk(string filename) {
 
 			//Create a Object to return.
-			Arient.Playlist playlist = null;
+			ExternalPlaylist playlist = null;
 
 			//Check if file exists.
 			if (File.Exists(filename)) {
-				playlist = new Arient.Playlist(); //override null value to prepare for assignment.
+				playlist = new ExternalPlaylist(); //override null value to prepare for assignment.
 
 				//load contents of file to a string array
 				string[] rawLines = File.ReadAllLines(filename);
@@ -141,7 +141,7 @@ namespace ArientMusicPlayer {
 						//Hardcoded. Indexes 2 to 6 are custom values.
 						//Songs start at index 8.
 
-						playlist.filename = filename;
+						playlist.filepath = filename;
 						playlist.name = rawLines[2].Split('|')[1];
 						playlist.currentSongIndex = int.Parse(rawLines[3].Split('|')[1]);
 						playlist.currentSongPos = double.Parse(rawLines[4].Split('|')[1]);
@@ -158,14 +158,14 @@ namespace ArientMusicPlayer {
 						}
 
 						//Determine length of song array and set it.
-						playlist.songs = new Arient.TagInfo[rawLines.Length - 8];
+						playlist.songs = new TagInfo[rawLines.Length - 8];
 
 
 						//Loop through the songs and add to Playlist. Use the toreturn.songs's length
 						//the rawLine equavilent is i + 8, because the songs in the file are 8 below the top line
 						for (int i = 0; i < playlist.songs.Length; i++) {
 							string[] items = rawLines[i + 8].Split('|');
-							playlist.songs[i].filename = items[0];
+							playlist.songs[i].filepath = items[0];
 							playlist.songs[i].title = items[1];
 							playlist.songs[i].artist = items[2];
 							playlist.songs[i].album = items[3];
@@ -193,8 +193,8 @@ namespace ArientMusicPlayer {
 		}
 
 		//Loads ALL playlists in the saved data folder.
-		public static Arient.Playlist[] LoadAllPlaylistsFromDisk() {
-			List<Arient.Playlist> playlists = new List<Arient.Playlist>();
+		public static ExternalPlaylist[] LoadAllPlaylistsFromDisk() {
+			List<ExternalPlaylist> playlists = new List<ExternalPlaylist>();
 			string dataFolderPath = Directory.GetCurrentDirectory() + playlistSubfolder;
 			Directory.CreateDirectory(dataFolderPath);
 			string[] files = Directory.GetFiles(dataFolderPath,"*" + playlistExtension);
@@ -224,13 +224,13 @@ namespace ArientMusicPlayer {
 			return tag_info;
 		}
 
-		public static Arient.TagInfo ConvertToTagInfo(TAG_INFO old) {
+		public static TagInfo ConvertToTagInfo(TAG_INFO old) {
 
-			Arient.TagInfo tagInfo = new Arient.TagInfo();
+			TagInfo tagInfo = new TagInfo();
 
 			if (old != null) {
 				//Map all used stuff from TAG_INFO into toreturn.
-				tagInfo.filename = old.filename;
+				tagInfo.filepath = old.filename;
 				tagInfo.title = old.title;
 				tagInfo.artist = old.artist;
 				tagInfo.album = old.album;
@@ -373,7 +373,7 @@ namespace ArientMusicPlayer {
 						tagInfo.format = "UNK";
 						break;
 				}
-			} else { tagInfo.filename = ""; }
+			} else { tagInfo.filepath = ""; }
 
 			return tagInfo;
 		}
@@ -388,7 +388,7 @@ namespace ArientMusicPlayer {
 
 		//FOR USE ON LOCAL SYSTEM ONLY. so the ext4 problem dosen't matter.
 
-		[DllImport("kernel32.dll", SetLastError = true)]
+		[DllImport("kernel32.dll")]
 		public static extern bool GetFileInformationByHandle(IntPtr hFile, out BY_HANDLE_FILE_INFORMATION lpFileInformation);
 
 		public struct BY_HANDLE_FILE_INFORMATION {
