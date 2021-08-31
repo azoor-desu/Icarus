@@ -187,7 +187,7 @@ namespace ArientMusicPlayer {
 		ListViewItem listViewItem;
 		public void LoadPlaylistWindow(int displayPlaylistIndex) {
 			playlistListView.Items.Clear();
-			for (int i = 0; i < Arient.loadedPlaylists[displayPlaylistIndex].songs.Length; i++) {
+			for (int i = 0; i < Arient.loadedPlaylists[displayPlaylistIndex].songs.Count; i++) {
 				listViewItem = new ListViewItem((i + 1).ToString());
 				listViewItem.SubItems.Add(Arient.loadedPlaylists[displayPlaylistIndex].songs[i].title);
 				listViewItem.SubItems.Add(Arient.loadedPlaylists[displayPlaylistIndex].songs[i].album);

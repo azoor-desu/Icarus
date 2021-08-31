@@ -46,11 +46,11 @@ namespace ArientMusicPlayer {
 
 					//Create a new Playlist, loop through the new TagInfo in Playlist, and write the TAGS.
 
-					ExternalPlaylist finalPlaylist = new ExternalPlaylist(tagInfos.Count) {
+					ExternalPlaylist finalPlaylist = new ExternalPlaylist() {
 
 						//Add the name and array of tags to the name var in tempPlaylist
 						name = Path.GetFileName(pathofile).Split('.')[0],
-						songs = tagInfos.ToArray()
+						songs = tagInfos
 					};
 
 					return finalPlaylist;
@@ -83,7 +83,7 @@ namespace ArientMusicPlayer {
 			"\nRepeat|" + playlist.repeatPlaylist +
 			"\n\n";
 
-			if (playlist.songs != null && playlist.songs.Length > 0) {
+			if (playlist.songs.Count > 0) {
 				//Add individual songs, items seperated by |
 				foreach (TagInfo tag in playlist.songs) {
 					writeData +=
@@ -175,33 +175,28 @@ namespace ArientMusicPlayer {
 									break;
 								default:
 									//Assign tags of each song!
-									//Keep checking until i is at where song tags start. If reached, Assign playlist.songs its length.
-									if (playlist.songs == null && splitline.Length > 3) {
-										playlist.songs = new TagInfo[rawLines.Length - i];
-										indexOffset = i;
-									}
 
-									if (playlist.songs != null && splitline.Length > 3) {
+									if (splitline.Length > 3) {
 										//playlist.songs length assigned. Write splitline data into playlist.songs.
-
-											playlist.songs[i - indexOffset].filepath = splitline[0];
-											playlist.songs[i - indexOffset].title = splitline[1];
-											playlist.songs[i - indexOffset].artist = splitline[2];
-											playlist.songs[i - indexOffset].album = splitline[3];
-											playlist.songs[i - indexOffset].albumartist = splitline[4];
-											playlist.songs[i - indexOffset].year = splitline[5];
-											playlist.songs[i - indexOffset].duration = double.Parse(splitline[6]);
-											playlist.songs[i - indexOffset].genre = splitline[7];
-											playlist.songs[i - indexOffset].track = splitline[8];
-											playlist.songs[i - indexOffset].disc = splitline[9];
-											playlist.songs[i - indexOffset].bitrate = int.Parse(splitline[10]);
-											playlist.songs[i - indexOffset].frequency = int.Parse(splitline[11]);
-											playlist.songs[i - indexOffset].format = splitline[12];
-											playlist.songs[i - indexOffset].size = long.Parse(splitline[13]);
-											playlist.songs[i - indexOffset].mood = splitline[14];
-											playlist.songs[i - indexOffset].rating = splitline[15];
-											playlist.songs[i - indexOffset].bpm = splitline[16];
-										
+										TagInfo newTag = new TagInfo();
+										newTag.filepath = splitline[0];
+										newTag.title = splitline[1];
+										newTag.artist = splitline[2];
+										newTag.album = splitline[3];
+										newTag.albumartist = splitline[4];
+										newTag.year = splitline[5];
+										newTag.duration = double.Parse(splitline[6]);
+										newTag.genre = splitline[7];
+										newTag.track = splitline[8];
+										newTag.disc = splitline[9];
+										newTag.bitrate = int.Parse(splitline[10]);
+										newTag.frequency = int.Parse(splitline[11]);
+										newTag.format = splitline[12];
+										newTag.size = long.Parse(splitline[13]);
+										newTag.mood = splitline[14];
+										newTag.rating = splitline[15];
+										newTag.bpm = splitline[16];
+										playlist.songs.Add(newTag);
 									}
 
 									//playlist.song assigned for this line.
@@ -213,13 +208,6 @@ namespace ArientMusicPlayer {
 			} else {
 				Logger.Error("Loading Playlist from disk: Could not find the saved playlist named " + filepath);
 			}
-
-			//If at the end, no song is assigned to playlist.songs, assign 0 length to it.
-
-			if (playlist.songs == null) {
-				playlist.songs = new TagInfo[0];
-			}
-
 			return playlist;
 		}
 

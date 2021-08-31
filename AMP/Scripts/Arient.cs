@@ -77,7 +77,6 @@ namespace ArientMusicPlayer {
 			if (loadedPlaylists == null) {
 				loadedPlaylists = new ExternalPlaylist[1];
 				loadedPlaylists[0] = new ExternalPlaylist();
-				loadedPlaylists[0].songs = new TagInfo[0];
 				loadedPlaylists[0].name = "Default";
 				FileManager.SavePlaylistToDisk(loadedPlaylists[0],true);
 			}
@@ -118,7 +117,7 @@ namespace ArientMusicPlayer {
 		public static void StartPlayback(int targetPlaylistIndex, int playlistSongIndex) {
 
 			//If no playlists are loaded, currentDisplayedPlaylist will be -1. This should not happen.
-			if (currentDisplayedPlaylist != -1 && loadedPlaylists[targetPlaylistIndex].songs.Length > 0) {
+			if (currentDisplayedPlaylist != -1 && loadedPlaylists[targetPlaylistIndex].songs.Count > 0) {
 				// create a stream channel from a file
 
 				//TODO: Replace BASS_StreamCreateFile with BASS_StreamCreate
@@ -206,7 +205,7 @@ namespace ArientMusicPlayer {
 
 				//Clamp the max index.
 				loadedPlaylists[currentPlayingPlaylist].currentSongIndex++;
-				if (loadedPlaylists[currentPlayingPlaylist].currentSongIndex > loadedPlaylists[currentPlayingPlaylist].songs.Length - 1) {
+				if (loadedPlaylists[currentPlayingPlaylist].currentSongIndex > loadedPlaylists[currentPlayingPlaylist].songs.Count - 1) {
 					loadedPlaylists[currentPlayingPlaylist].currentSongIndex = 0;
 				}
 
@@ -223,7 +222,7 @@ namespace ArientMusicPlayer {
 				//Clamp the min index.
 				loadedPlaylists[currentPlayingPlaylist].currentSongIndex--;
 				if (loadedPlaylists[currentPlayingPlaylist].currentSongIndex < 0) {
-					loadedPlaylists[currentPlayingPlaylist].currentSongIndex = loadedPlaylists[currentPlayingPlaylist].songs.Length - 1;
+					loadedPlaylists[currentPlayingPlaylist].currentSongIndex = loadedPlaylists[currentPlayingPlaylist].songs.Count - 1;
 				}
 
 				StartPlayback(currentPlayingPlaylist, loadedPlaylists[currentPlayingPlaylist].currentSongIndex);
@@ -298,15 +297,7 @@ namespace ArientMusicPlayer {
 	}
 
 	public class ExternalPlaylist: Playlist {
-		public TagInfo[] songs; //replace with list
-
-		public ExternalPlaylist() {
-			
-		}
-
-		public ExternalPlaylist(int length) {
-			songs = new TagInfo[length]; //set the length
-		}
+		public List<TagInfo> songs = new List<TagInfo>();
 
 		public override TagInfo GetFileTagInfo(int trackIndex) {
 			return songs[trackIndex];
