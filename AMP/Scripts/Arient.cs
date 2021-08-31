@@ -298,7 +298,7 @@ namespace ArientMusicPlayer {
 	}
 
 	public class ExternalPlaylist: Playlist {
-		public TagInfo[] songs;
+		public TagInfo[] songs; //replace with list
 
 		public ExternalPlaylist() {
 			
@@ -319,14 +319,10 @@ namespace ArientMusicPlayer {
 
 	public class SyncPlaylist: Playlist {
 		public List<string> shortpath = new List<string>(); // e.g. /Jap/test.mp3
+		public List <TagInfo> songs = new List<TagInfo>(); //not saved. only save shortpath and load in info from LibraryPlaylist.
 
 		public override TagInfo GetFileTagInfo(int trackIndex) {
-			//GET FROM THE LIBRARYPLAYLIST INSTANCE
-			DatabaseItem database = new DatabaseItem();
-			if (Arient.libraryPlaylist.songs.TryGetValue(shortpath[trackIndex], out database)){
-				return database.tagInfo;
-			}
-			return new TagInfo();
+			return songs[trackIndex];
 		}
 
 		public override void OnPlayTrack(int trackIndex) {

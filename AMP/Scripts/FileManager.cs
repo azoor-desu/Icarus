@@ -83,7 +83,7 @@ namespace ArientMusicPlayer {
 			"\nRepeat|" + playlist.repeatPlaylist +
 			"\n\n";
 
-			if (playlist.songs.Length > 0) {
+			if (playlist.songs != null && playlist.songs.Length > 0) {
 				//Add individual songs, items seperated by |
 				foreach (TagInfo tag in playlist.songs) {
 					writeData +=
@@ -113,82 +113,113 @@ namespace ArientMusicPlayer {
 			Directory.CreateDirectory(path);
 			//Write to file. Force overwrite any existsing files.
 			File.WriteAllText(path + playlist.name + playlistExtension, writeData);
+			Logger.Debug("Wrting playlist: " + playlist.name);
 
 		}
 
 		//Load a Playlist file from disk.
-		public static ExternalPlaylist LoadPlaylistFromDisk(string filename) {
+		public static ExternalPlaylist LoadPlaylistFromDisk(string filepath) {
 
 			//Create a Object to return.
 			ExternalPlaylist playlist = null;
 
 			//Check if file exists.
-			if (File.Exists(filename)) {
+			if (File.Exists(filepath)) {
 				playlist = new ExternalPlaylist(); //override null value to prepare for assignment.
 
 				//load contents of file to a string array
-				string[] rawLines = File.ReadAllLines(filename);
+				string[] rawLines = File.ReadAllLines(filepath);
 
 				//Check version of save file
 				string version = rawLines[0].Split('|')[1];
 
-				//Use different methods to parse depending on version.
-				switch (version) {
-					case "1.0":
+				int indexOffset = -1;//for use on playlist.songs. When i = 8, playlist.songs index must be 0.
 
-						//==============PARSE STARTS=====================
+				//Loop through every single line of the file.
+				for (int i = 0; i < rawLines.Length; i++) {
 
-						//Hardcoded. Indexes 2 to 6 are custom values.
-						//Songs start at index 8.
+					if (rawLines[i].Trim(' ') == "") //skip all empty lines
+						continue;
 
-						playlist.filepath = filename;
-						playlist.name = rawLines[2].Split('|')[1];
-						playlist.currentSongIndex = int.Parse(rawLines[3].Split('|')[1]);
-						playlist.currentSongPos = double.Parse(rawLines[4].Split('|')[1]);
-						if (rawLines[5].Split('|')[1] == "True") {
-							playlist.shuffle = true;
-						} else {
-							playlist.shuffle = false;
-						}
+					//Check version and apply different method of parsing if avail.
+					switch (version) {
+						case "1.0":
+							
+							playlist.filepath = filepath; //grab the filepath directly.
+							string[] splitline = rawLines[i].Split('|');
+							
+							//Assigning the Playlist setting variables. Top few lines of the file.
+							switch (splitline[0]) {
+								case "PlaylistName":
+									playlist.name = splitline[1];
+									break;
+								case "CurrentSongIndex":
+									playlist.currentSongIndex = int.Parse(splitline[1]);
+									break;
+								case "CurrentSongPos":
+									playlist.currentSongPos = double.Parse(splitline[1]);
+									break;
+								case "Shuffle":
+									if (splitline[1] == "True") {
+										playlist.shuffle = true;
+									} else {
+										playlist.shuffle = false;
+									}
+									break;
+								case "Repeat":
+									if (splitline[1] == "True") {
+										playlist.repeatPlaylist = true;
+									} else {
+										playlist.repeatPlaylist = false;
+									}
+									break;
+								default:
+									//Assign tags of each song!
+									//Keep checking until i is at where song tags start. If reached, Assign playlist.songs its length.
+									if (playlist.songs == null && splitline.Length > 3) {
+										playlist.songs = new TagInfo[rawLines.Length - i];
+										indexOffset = i;
+									}
 
-						if (rawLines[6].Split('|')[1] == "True") {
-							playlist.repeatPlaylist = true;
-						} else {
-							playlist.repeatPlaylist = false;
-						}
+									if (playlist.songs != null && splitline.Length > 3) {
+										//playlist.songs length assigned. Write splitline data into playlist.songs.
 
-						//Determine length of song array and set it.
-						playlist.songs = new TagInfo[rawLines.Length - 8];
+											playlist.songs[i - indexOffset].filepath = splitline[0];
+											playlist.songs[i - indexOffset].title = splitline[1];
+											playlist.songs[i - indexOffset].artist = splitline[2];
+											playlist.songs[i - indexOffset].album = splitline[3];
+											playlist.songs[i - indexOffset].albumartist = splitline[4];
+											playlist.songs[i - indexOffset].year = splitline[5];
+											playlist.songs[i - indexOffset].duration = double.Parse(splitline[6]);
+											playlist.songs[i - indexOffset].genre = splitline[7];
+											playlist.songs[i - indexOffset].track = splitline[8];
+											playlist.songs[i - indexOffset].disc = splitline[9];
+											playlist.songs[i - indexOffset].bitrate = int.Parse(splitline[10]);
+											playlist.songs[i - indexOffset].frequency = int.Parse(splitline[11]);
+											playlist.songs[i - indexOffset].format = splitline[12];
+											playlist.songs[i - indexOffset].size = long.Parse(splitline[13]);
+											playlist.songs[i - indexOffset].mood = splitline[14];
+											playlist.songs[i - indexOffset].rating = splitline[15];
+											playlist.songs[i - indexOffset].bpm = splitline[16];
+										
+									}
 
-
-						//Loop through the songs and add to Playlist. Use the toreturn.songs's length
-						//the rawLine equavilent is i + 8, because the songs in the file are 8 below the top line
-						for (int i = 0; i < playlist.songs.Length; i++) {
-							string[] items = rawLines[i + 8].Split('|');
-							playlist.songs[i].filepath = items[0];
-							playlist.songs[i].title = items[1];
-							playlist.songs[i].artist = items[2];
-							playlist.songs[i].album = items[3];
-							playlist.songs[i].albumartist = items[4];
-							playlist.songs[i].year = items[5];
-							playlist.songs[i].duration = double.Parse(items[6]);
-							playlist.songs[i].genre = items[7];
-							playlist.songs[i].track = items[8];
-							playlist.songs[i].disc = items[9];
-							playlist.songs[i].bitrate = int.Parse(items[10]);
-							playlist.songs[i].frequency = int.Parse(items[11]);
-							playlist.songs[i].format = items[12];
-							playlist.songs[i].size = long.Parse(items[13]);
-							playlist.songs[i].mood = items[14];
-							playlist.songs[i].rating = items[15];
-							playlist.songs[i].bpm = items[16];
-						}
-						break;
+									//playlist.song assigned for this line.
+									break;
+							}
+							break;
+					}
 				}
-
 			} else {
-				Logger.Error("Loading Playlist from disk: Could not find the saved playlist named " + filename);
+				Logger.Error("Loading Playlist from disk: Could not find the saved playlist named " + filepath);
 			}
+
+			//If at the end, no song is assigned to playlist.songs, assign 0 length to it.
+
+			if (playlist.songs == null) {
+				playlist.songs = new TagInfo[0];
+			}
+
 			return playlist;
 		}
 
