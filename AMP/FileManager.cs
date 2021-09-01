@@ -68,52 +68,101 @@ namespace ArientMusicPlayer {
 		#region Internal Saving and Parsing of .arientpl file
 
 		//Save Playlist class to file on disk using .arientpl v1.0
-		public static void SavePlaylistToDisk(Playlist playlist, bool isNewPlaylist = false) {
+		public static void SavePlaylistToDisk(Playlist playlist, PlaylistType playlistType) {
 			string writeData = "";
 
-			//Create Header
-			writeData += ".artpl file version|1.0\n\n";
+			switch (playlistType) {
+				case PlaylistType.Playlist:
+					//Create Header
+					writeData += ".artpl file version|1.0\n\n";
 
-			//Add playlist name and any other settings.
-			writeData += "PlaylistName|" + playlist.name +
-			"\nCurrentSongIndex|" + playlist.currentSongIndex +
-			"\nCurrentSongPos|" + playlist.currentSongPos +
-			"\nShuffle|" + playlist.shuffle +
-			"\nRepeat|" + playlist.repeatPlaylist +
-			"\n\n";
+					//Add playlist name and any other settings.
+					writeData += "PlaylistName|" + playlist.name +
+					"\nCurrentSongIndex|" + playlist.currentSongIndex +
+					"\nCurrentSongPos|" + playlist.currentSongPos +
+					"\nShuffle|" + playlist.shuffle +
+					"\nRepeat|" + playlist.repeatPlaylist +
+					"\n\n";
 
-			if (playlist.songs.Count > 0) {
-				//Add individual songs, items seperated by |
-				foreach (TagInfo tag in playlist.songs) {
-					writeData +=
-					tag.filepath + "|" +
-					tag.title + "|" +
-					tag.artist + "|" +
-					tag.album + "|" +
-					tag.albumartist + "|" +
-					tag.year + "|" +
-					tag.duration + "|" +
-					tag.genre + "|" +
-					tag.track + "|" +
-					tag.disc + "|" +
-					tag.bitrate + "|" +
-					tag.frequency + "|" +
-					tag.format + "|" +
-					tag.size + "|" +
-					tag.mood + "|" +
-					tag.rating + "|" +
-					tag.bpm + "\n";
-				}
+					if (playlist.songs.Count > 0) {
+						//Add individual songs, items seperated by |
+						foreach (TagInfo tag in playlist.songs) {
+							writeData +=
+							tag.filepath + "|" +
+							tag.title + "|" +
+							tag.artist + "|" +
+							tag.album + "|" +
+							tag.albumartist + "|" +
+							tag.year + "|" +
+							tag.duration + "|" +
+							tag.genre + "|" +
+							tag.track + "|" +
+							tag.disc + "|" +
+							tag.bitrate + "|" +
+							tag.frequency + "|" +
+							tag.format + "|" +
+							tag.size + "|" +
+							tag.mood + "|" +
+							tag.rating + "|" +
+							tag.bpm + "\n";
+						}
+					}
+
+					//Create the Subfolder directory if dosent exist.
+					string path = Directory.GetCurrentDirectory() + playlistSubfolder;
+					Directory.CreateDirectory(path);
+					//Write to file. Force overwrite any existsing files.
+					File.WriteAllText(path + playlist.name + playlistExtension, writeData);
+					Logger.Debug("Wrting playlist: " + playlist.name);
+					break;
+
+
+				case PlaylistType.LibraryPlaylistLocal:
+					//Create Header
+					writeData += ".artpl Library file version|1.0\n\n";
+
+					//Add playlist name and any other settings.
+					writeData += "PlaylistName|Library\n" +
+					"\nCurrentSongIndex|" + playlist.currentSongIndex +
+					"\nCurrentSongPos|" + playlist.currentSongPos +
+					"\nShuffle|" + playlist.shuffle +
+					"\nRepeat|" + playlist.repeatPlaylist +
+					"\n\n";
+
+					if (playlist.songs.Count > 0) {
+						//Add individual songs, items seperated by |
+						foreach (TagInfo tag in playlist.songs) {
+							writeData +=
+							tag.filepath + "|" +
+							tag.title + "|" +
+							tag.artist + "|" +
+							tag.album + "|" +
+							tag.albumartist + "|" +
+							tag.year + "|" +
+							tag.duration + "|" +
+							tag.genre + "|" +
+							tag.track + "|" +
+							tag.disc + "|" +
+							tag.bitrate + "|" +
+							tag.frequency + "|" +
+							tag.format + "|" +
+							tag.size + "|" +
+							tag.mood + "|" +
+							tag.rating + "|" +
+							tag.bpm + "|" +
+							SyncManager.GetUniqueFileID(tag.filepath) +"|" +
+							File.GetLastAccessTime(tag.filepath).ToString("yyyyMMddHHmmss") +"\n";
+						}
+					}
+
+					//Create the Subfolder directory if dosent exist.
+					string localSyncPath = Directory.GetCurrentDirectory() + SyncManager.localSyncFolder;
+					Directory.CreateDirectory(localSyncPath);
+					//Write to file. Force overwrite any existsing files.
+					File.WriteAllText(localSyncPath + "Library" + playlistExtension, writeData);
+					Logger.Debug("Wrting Library...");
+					break;
 			}
-
-			
-			//Create the Subfolder directory if dosent exist.
-			string path = Directory.GetCurrentDirectory() + playlistSubfolder;
-			Directory.CreateDirectory(path);
-			//Write to file. Force overwrite any existsing files.
-			File.WriteAllText(path + playlist.name + playlistExtension, writeData);
-			Logger.Debug("Wrting playlist: " + playlist.name);
-
 		}
 
 		//Load a Playlist file from disk.
@@ -202,10 +251,166 @@ namespace ArientMusicPlayer {
 						return playlist;
 
 					case PlaylistType.SyncPlaylist:
-						break;
+						SyncPlaylist syncPlaylist = new SyncPlaylist();
 
-					case PlaylistType.LibraryPlaylist:
-						break;
+						//Loop through every single line of the file.
+						for (int i = 0; i < rawLines.Length; i++) {
+							if (rawLines[i].Trim(' ') == "") //skip all empty lines
+								continue;
+
+							syncPlaylist.filepath = filepath; //grab the filepath directly.
+							string[] splitline = rawLines[i].Split('|');
+
+							//Assigning the Playlist setting variables. Top few lines of the file.
+							switch (splitline[0]) {
+								case "PlaylistName":
+									syncPlaylist.name = splitline[1];
+									break;
+
+								case "CurrentSongIndex":
+									syncPlaylist.currentSongIndex = int.Parse(splitline[1]);
+									break;
+
+								case "CurrentSongPos":
+									syncPlaylist.currentSongPos = double.Parse(splitline[1]);
+									break;
+
+								case "Shuffle":
+									if (splitline[1] == "True") {
+										syncPlaylist.shuffle = true;
+									} else {
+										syncPlaylist.shuffle = false;
+									}
+									break;
+
+								case "Repeat":
+									if (splitline[1] == "True") {
+										syncPlaylist.repeatPlaylist = true;
+									} else {
+										syncPlaylist.repeatPlaylist = false;
+									}
+									break;
+
+								default:
+									//Assign tags of each song!
+
+									if (splitline.Length > 3) {
+										//playlist.songs length assigned. Write splitline data into playlist.songs.
+										TagInfo newTag = new TagInfo();
+										newTag.filepath = splitline[0];
+										newTag.title = splitline[1];
+										newTag.artist = splitline[2];
+										newTag.album = splitline[3];
+										newTag.albumartist = splitline[4];
+										newTag.year = splitline[5];
+										newTag.duration = double.Parse(splitline[6]);
+										newTag.genre = splitline[7];
+										newTag.track = splitline[8];
+										newTag.disc = splitline[9];
+										newTag.bitrate = int.Parse(splitline[10]);
+										newTag.frequency = int.Parse(splitline[11]);
+										newTag.format = splitline[12];
+										newTag.size = long.Parse(splitline[13]);
+										newTag.mood = splitline[14];
+										newTag.rating = splitline[15];
+										newTag.bpm = splitline[16];
+										syncPlaylist.songs.Add(newTag);
+
+										//Addition to LibraryPlaylist: Add to shortpaths list too
+										syncPlaylist.shortpath.Add(splitline[0].Replace(Directory.GetCurrentDirectory() + SyncManager.localSyncFolder, ""));
+
+									}
+
+									//syncPlaylist.songs and shortpath assigned for this line.
+									break;
+							}
+
+						}
+						return syncPlaylist;
+
+					case PlaylistType.LibraryPlaylistLocal:
+
+						LibraryPlaylist libraryPlaylist = new LibraryPlaylist();
+
+						//Loop through every single line of the file.
+						for (int i = 0; i < rawLines.Length; i++) {
+							if (rawLines[i].Trim(' ') == "") //skip all empty lines
+								continue;
+
+							libraryPlaylist.filepath = filepath; //grab the filepath directly.
+							string[] splitline = rawLines[i].Split('|');
+
+							//Assigning the Playlist setting variables. Top few lines of the file.
+							switch (splitline[0]) {
+								case "PlaylistName":
+									libraryPlaylist.name = splitline[1];
+									break;
+
+								case "CurrentSongIndex":
+									libraryPlaylist.currentSongIndex = int.Parse(splitline[1]);
+									break;
+
+								case "CurrentSongPos":
+									libraryPlaylist.currentSongPos = double.Parse(splitline[1]);
+									break;
+
+								case "Shuffle":
+									if (splitline[1] == "True") {
+										libraryPlaylist.shuffle = true;
+									} else {
+										libraryPlaylist.shuffle = false;
+									}
+									break;
+
+								case "Repeat":
+									if (splitline[1] == "True") {
+										libraryPlaylist.repeatPlaylist = true;
+									} else {
+										libraryPlaylist.repeatPlaylist = false;
+									}
+									break;
+
+								default:
+									//Assign tags of each song!
+
+									if (splitline.Length > 3) {
+										//playlist.songs length assigned. Write splitline data into playlist.songs.
+										TagInfo newTag = new TagInfo();
+										//Addition to LibraryPlaylist: Add the syncinfo too
+										SyncInfo syncInfo = new SyncInfo();
+
+										newTag.filepath = splitline[0];
+										newTag.title = splitline[1];
+										newTag.artist = splitline[2];
+										newTag.album = splitline[3];
+										newTag.albumartist = splitline[4];
+										newTag.year = splitline[5];
+										newTag.duration = double.Parse(splitline[6]);
+										newTag.genre = splitline[7];
+										newTag.track = splitline[8];
+										newTag.disc = splitline[9];
+										newTag.bitrate = int.Parse(splitline[10]);
+										newTag.frequency = int.Parse(splitline[11]);
+										newTag.format = splitline[12];
+										newTag.size = long.Parse(splitline[13]);
+										newTag.mood = splitline[14];
+										newTag.rating = splitline[15];
+										newTag.bpm = splitline[16];
+										syncInfo.uniqueID = splitline[17];
+										syncInfo.dateLastModified = splitline[18];
+
+										libraryPlaylist.songs.Add(newTag);
+										//Addition to LibraryPlaylist: Add to shortpaths list too
+										libraryPlaylist.shortpath.Add(splitline[0].Replace(Directory.GetCurrentDirectory() + SyncManager.localSyncFolder,""));
+										libraryPlaylist.syncInfo.Add(syncInfo);
+									}
+
+									//libraryPlaylist.songs, shortpath and syncinfo assigned for this line.
+									break;
+							}
+
+						}
+						return libraryPlaylist;
 				}
 
 			} else {
@@ -402,7 +607,7 @@ namespace ArientMusicPlayer {
 		#endregion
 	}
 
-	public enum PlaylistType {Playlist, SyncPlaylist, LibraryPlaylist}
+	public enum PlaylistType {Playlist, SyncPlaylist, LibraryPlaylistLocal, LibaryPlaylistHost}
 
 	public static class Logger {
 

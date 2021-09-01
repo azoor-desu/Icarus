@@ -6,7 +6,7 @@ namespace ArientMusicPlayer {
 
 
 	public static class SyncManager {
-		public static string localSyncFolder = Directory.GetCurrentDirectory() + "\\sync\\";
+		public static string localSyncFolder = "\\sync\\";
 		public static string hostSyncFolder = @"Z:\TestSync\";
 
 		public static void WriteSyncFile() { 
@@ -16,13 +16,13 @@ namespace ArientMusicPlayer {
 		public static LibraryPlaylist ReadSyncFile(bool localFolder) {
 			string path;
 			if (localFolder) {
-				path = localSyncFolder + "\\.sync";
+				path = Directory.GetCurrentDirectory() + localSyncFolder + "\\Library.arientpl";
 			} else {
-				path = hostSyncFolder + "\\.sync";
+				path = Directory.GetCurrentDirectory() + hostSyncFolder + "\\Library.arientpl";
 			}
 
 
-			LibraryPlaylist oo = (LibraryPlaylist)FileManager.LoadPlaylistFromDisk(path,PlaylistType.LibraryPlaylist);
+			LibraryPlaylist oo = (LibraryPlaylist)FileManager.LoadPlaylistFromDisk(path,PlaylistType.LibraryPlaylistLocal);
 
 
 			return null;

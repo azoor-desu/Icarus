@@ -70,6 +70,10 @@ namespace ArientMusicPlayer {
 			//}
 			//arientWindow.LoadPlaylistWindow(0);
 
+			//Load library first.
+			libraryPlaylist = (LibraryPlaylist)FileManager.LoadPlaylistFromDisk(Directory.GetCurrentDirectory() + "\\sync\\Library.arientpl",PlaylistType.LibraryPlaylistLocal);
+			FileManager.SavePlaylistToDisk(libraryPlaylist,PlaylistType.LibraryPlaylistLocal);
+
 			//Load in ALL saved playlists.
 			loadedPlaylists = FileManager.LoadAllPlaylistsFromDisk(); //loaded in alphabetical order.
 
@@ -78,7 +82,7 @@ namespace ArientMusicPlayer {
 				loadedPlaylists = new Playlist[1];
 				loadedPlaylists[0] = new Playlist();
 				loadedPlaylists[0].name = "Default";
-				FileManager.SavePlaylistToDisk(loadedPlaylists[0],true);
+				FileManager.SavePlaylistToDisk(loadedPlaylists[0], PlaylistType.Playlist);
 			}
 
 			//load the playlist in the App window.
@@ -97,7 +101,7 @@ namespace ArientMusicPlayer {
 		static void SaveAllPlaylists() {
 			Logger.Debug("Saving all playlists...");
 			foreach (Playlist playlist in loadedPlaylists) {
-				FileManager.SavePlaylistToDisk(playlist);
+				FileManager.SavePlaylistToDisk(playlist, PlaylistType.Playlist);
 			}
 			Logger.Debug("Playlists saved.");
 		}
