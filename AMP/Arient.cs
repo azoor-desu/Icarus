@@ -75,8 +75,8 @@ namespace ArientMusicPlayer {
 
 			//If there are no saved playlists, make one default blank playlist.
 			if (loadedPlaylists == null) {
-				loadedPlaylists = new ExternalPlaylist[1];
-				loadedPlaylists[0] = new ExternalPlaylist();
+				loadedPlaylists = new Playlist[1];
+				loadedPlaylists[0] = new Playlist();
 				loadedPlaylists[0].name = "Default";
 				FileManager.SavePlaylistToDisk(loadedPlaylists[0],true);
 			}
@@ -96,7 +96,7 @@ namespace ArientMusicPlayer {
 		//Save all playlists before exit.
 		static void SaveAllPlaylists() {
 			Logger.Debug("Saving all playlists...");
-			foreach (ExternalPlaylist playlist in loadedPlaylists) {
+			foreach (Playlist playlist in loadedPlaylists) {
 				FileManager.SavePlaylistToDisk(playlist);
 			}
 			Logger.Debug("Playlists saved.");
@@ -239,9 +239,9 @@ namespace ArientMusicPlayer {
 		#region Playlist Controls
 
 		//After init, use these to make changes to add/remove loadedPlaylist items
-		public static void AddNewPlaylist(ExternalPlaylist playlist) {
-			ExternalPlaylist[] old = loadedPlaylists;
-			loadedPlaylists = new ExternalPlaylist[old.Length + 1];
+		public static void AddNewPlaylist(Playlist playlist) {
+			Playlist[] old = loadedPlaylists;
+			loadedPlaylists = new Playlist[old.Length + 1];
 			//do code
 
 
@@ -263,7 +263,7 @@ namespace ArientMusicPlayer {
 		#region Settings Management
 		//Load in settings from some savefile.
 		public static bool settingMinToTray = true;
-		public static ExternalPlaylist[] loadedPlaylists;
+		public static Playlist[] loadedPlaylists;
 		public static LibraryPlaylist libraryPlaylist = new LibraryPlaylist();
 		public static int currentDisplayedPlaylist = -1; //will only change when user physically
 														 //changes current view and a LoadPlaylistWindow
@@ -287,8 +287,11 @@ namespace ArientMusicPlayer {
 		public bool shuffle = false;
 		public bool repeatPlaylist = true;
 
-		public virtual TagInfo GetFileTagInfo(int index) { 
-			return new TagInfo();
+		public List<TagInfo> songs = new List<TagInfo>();
+
+
+		public virtual TagInfo GetFileTagInfo(int index) {
+			return songs[index];
 		}
 
 		public virtual void OnPlayTrack(int trackIndex) {
@@ -296,38 +299,15 @@ namespace ArientMusicPlayer {
 		}
 	}
 
-	public class ExternalPlaylist: Playlist {
-		public List<TagInfo> songs = new List<TagInfo>();
-
-		public override TagInfo GetFileTagInfo(int trackIndex) {
-			return songs[trackIndex];
-		}
-
-		public override void OnPlayTrack(int trackIndex) { 
-			
-		}
-	}
-
 	public class SyncPlaylist: Playlist {
+		//List: songs
 		public List<string> shortpath = new List<string>(); // e.g. /Jap/test.mp3
-		public List <TagInfo> songs = new List<TagInfo>(); //not saved. only save shortpath and load in info from LibraryPlaylist.
-
-		public override TagInfo GetFileTagInfo(int trackIndex) {
-			return songs[trackIndex];
-		}
-
-		public override void OnPlayTrack(int trackIndex) {
-			
-		}
 	}
 
-	public class LibraryPlaylist : Playlist {
-		//Key: shortpath, value: DatabaseItem
-		public Dictionary<string, DatabaseItem> songs = new Dictionary<string, DatabaseItem>();
-
-		public override TagInfo GetFileTagInfo(int trackIndex) {
-			return songs.ElementAt(trackIndex).Value.tagInfo;
-		}
+	public class LibraryPlaylist : SyncPlaylist {
+		//List: songs
+		//List: shortpaths
+		public List<SyncInfo> syncInfo = new List<SyncInfo>();
 	}
 
 	public struct TagInfo {
@@ -350,9 +330,7 @@ namespace ArientMusicPlayer {
 		public string bpm { get; set; }
 	}
 
-	public struct DatabaseItem {
-		public TagInfo tagInfo;
-
+	public struct SyncInfo {
 		//for syncing
 		public string uniqueID;
 		public string dateLastModified;

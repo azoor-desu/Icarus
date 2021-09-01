@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Un4seen.Bass.AddOn.Tags;
-using System.Runtime.InteropServices;
 
 
 namespace ArientMusicPlayer {
@@ -13,7 +12,7 @@ namespace ArientMusicPlayer {
 
 		#region External Imports
 		//Loads in a Playlist file from disk
-		public static ExternalPlaylist ImportPlaylistM3U8(string pathofile) {
+		public static Playlist ImportPlaylistM3U8(string pathofile) {
 
 			//await Task.Yield(); //for use with an async method.
 			//Put this at top of the method to force the whole thing to be an async method.
@@ -46,7 +45,7 @@ namespace ArientMusicPlayer {
 
 					//Create a new Playlist, loop through the new TagInfo in Playlist, and write the TAGS.
 
-					ExternalPlaylist finalPlaylist = new ExternalPlaylist() {
+					Playlist finalPlaylist = new Playlist() {
 
 						//Add the name and array of tags to the name var in tempPlaylist
 						name = Path.GetFileName(pathofile).Split('.')[0],
@@ -69,7 +68,7 @@ namespace ArientMusicPlayer {
 		#region Internal Saving and Parsing of .arientpl file
 
 		//Save Playlist class to file on disk using .arientpl v1.0
-		public static void SavePlaylistToDisk(ExternalPlaylist playlist, bool isNewPlaylist = false) {
+		public static void SavePlaylistToDisk(Playlist playlist, bool isNewPlaylist = false) {
 			string writeData = "";
 
 			//Create Header
@@ -118,45 +117,41 @@ namespace ArientMusicPlayer {
 		}
 
 		//Load a Playlist file from disk.
-		public static ExternalPlaylist LoadPlaylistFromDisk(string filepath) {
+		public static Object LoadPlaylistFromDisk(string filepath, PlaylistType playlistType) {
 
-			//Create a Object to return.
-			ExternalPlaylist playlist = null;
-
-			//Check if file exists.
 			if (File.Exists(filepath)) {
-				playlist = new ExternalPlaylist(); //override null value to prepare for assignment.
 
 				//load contents of file to a string array
 				string[] rawLines = File.ReadAllLines(filepath);
 
-				//Check version of save file
-				string version = rawLines[0].Split('|')[1];
+				//Check what kind of playlist we are parsing
+				switch (playlistType) {
+					case PlaylistType.Playlist:
 
-				//Loop through every single line of the file.
-				for (int i = 0; i < rawLines.Length; i++) {
+						Playlist playlist = new Playlist();
 
-					if (rawLines[i].Trim(' ') == "") //skip all empty lines
-						continue;
+						//Loop through every single line of the file.
+						for (int i = 0; i < rawLines.Length; i++) {
+							if (rawLines[i].Trim(' ') == "") //skip all empty lines
+								continue;
 
-					//Check version and apply different method of parsing if avail.
-					switch (version) {
-						case "1.0":
-							
 							playlist.filepath = filepath; //grab the filepath directly.
 							string[] splitline = rawLines[i].Split('|');
-							
+
 							//Assigning the Playlist setting variables. Top few lines of the file.
 							switch (splitline[0]) {
 								case "PlaylistName":
 									playlist.name = splitline[1];
 									break;
+
 								case "CurrentSongIndex":
 									playlist.currentSongIndex = int.Parse(splitline[1]);
 									break;
+
 								case "CurrentSongPos":
 									playlist.currentSongPos = double.Parse(splitline[1]);
 									break;
+
 								case "Shuffle":
 									if (splitline[1] == "True") {
 										playlist.shuffle = true;
@@ -164,6 +159,7 @@ namespace ArientMusicPlayer {
 										playlist.shuffle = false;
 									}
 									break;
+
 								case "Repeat":
 									if (splitline[1] == "True") {
 										playlist.repeatPlaylist = true;
@@ -171,6 +167,7 @@ namespace ArientMusicPlayer {
 										playlist.repeatPlaylist = false;
 									}
 									break;
+
 								default:
 									//Assign tags of each song!
 
@@ -200,24 +197,32 @@ namespace ArientMusicPlayer {
 									//playlist.song assigned for this line.
 									break;
 							}
-							break;
-					}
+
+						}
+						return playlist;
+
+					case PlaylistType.SyncPlaylist:
+						break;
+
+					case PlaylistType.LibraryPlaylist:
+						break;
 				}
+
 			} else {
 				Logger.Error("Loading Playlist from disk: Could not find the saved playlist named " + filepath);
 			}
-			return playlist;
+			return null;
 		}
 
 		//Loads ALL playlists in the saved data folder.
-		public static ExternalPlaylist[] LoadAllPlaylistsFromDisk() {
-			List<ExternalPlaylist> playlists = new List<ExternalPlaylist>();
+		public static Playlist[] LoadAllPlaylistsFromDisk() {
+			List<Playlist> playlists = new List<Playlist>();
 			string dataFolderPath = Directory.GetCurrentDirectory() + playlistSubfolder;
 			Directory.CreateDirectory(dataFolderPath);
 			string[] files = Directory.GetFiles(dataFolderPath,"*" + playlistExtension);
 
 			foreach (string file in files) {
-				playlists.Add(LoadPlaylistFromDisk(file));
+				playlists.Add((Playlist)LoadPlaylistFromDisk(file, PlaylistType.Playlist));
 			}
 			if (playlists.Count == 0) {
 				return null;
@@ -395,50 +400,9 @@ namespace ArientMusicPlayer {
 			return tagInfo;
 		}
 		#endregion
-
-		#region NTFS Unique Identifier Getter
-		//See: https://stackoverflow.com/questions/1866454/unique-file-identifier-in-windows
-		//Things to note: ID will never change on NTFS systems, unless deleted.
-		//If moved from drive to drive, ID will change. If file is deleted and replaced, ID will change.
-		//If used on FAT system, ID MAY change over time due to how the system stores bytes.
-		//So far, not sure if ID will change on ext4 on linux.
-
-		//FOR USE ON LOCAL SYSTEM ONLY. so the ext4 problem dosen't matter.
-
-		[DllImport("kernel32.dll")]
-		public static extern bool GetFileInformationByHandle(IntPtr hFile, out BY_HANDLE_FILE_INFORMATION lpFileInformation);
-
-		public struct BY_HANDLE_FILE_INFORMATION {
-			public uint FileAttributes;
-			public System.Runtime.InteropServices.ComTypes.FILETIME CreationTime;
-			public System.Runtime.InteropServices.ComTypes.FILETIME LastAccessTime;
-			public System.Runtime.InteropServices.ComTypes.FILETIME LastWriteTime;
-			public uint VolumeSerialNumber;
-			public uint FileSizeHigh;
-			public uint FileSizeLow;
-			public uint NumberOfLinks;
-			public uint FileIndexHigh;
-			public uint FileIndexLow;
-		}
-
-		public static string GetUniqueFileID(string path) {
-			BY_HANDLE_FILE_INFORMATION objectFileInfo = new BY_HANDLE_FILE_INFORMATION();
-
-			FileInfo fi = new FileInfo(path);
-			FileStream fs = fi.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-			GetFileInformationByHandle(fs.Handle, out objectFileInfo);
-
-			fs.Close();
-
-			ulong fileIndex = ((ulong)objectFileInfo.FileIndexHigh << 32) + (ulong)objectFileInfo.FileIndexLow;
-
-			return fileIndex.ToString();
-
-		}
-		#endregion
 	}
 
+	public enum PlaylistType {Playlist, SyncPlaylist, LibraryPlaylist}
 
 	public static class Logger {
 

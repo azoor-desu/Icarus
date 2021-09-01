@@ -295,7 +295,7 @@ namespace ArientMusicPlayer {
 		//Playlist Combo Box stuff
 		public void UpdatePlaylistSelectComboBox(int indexToDisplay) {
 			playlistSelectComboBox.Items.Clear();
-			foreach (ExternalPlaylist playlist in Arient.loadedPlaylists) {
+			foreach (Playlist playlist in Arient.loadedPlaylists) {
 				playlistSelectComboBox.Items.Add(playlist.name); //added items should be
 																 //in same order as loadedPlaylists.
 			}
