@@ -1,0 +1,32 @@
+Part 1: Scanning for changes. (Getting SyncChange)
+1. Loop thru FOLDER songs and compare them to a List/Dict (from the .sync file) using PATHS.
+Check Matched items for Date Modified, and if true, add them to the SyncChange list. (MetaChange)
+Save each of the leftovers into another list each (FolderLeftover and .syncLeftover).
+
+2. Loop thru FolderLeftover and compare them to .syncLeftover using uniqueIDs.
+Matched items are Renamed. Check Matched items for Date Modified, and if true, add them to the SyncChange list. (Rename, or MetaChange + Rename)
+Save each of the leftovers into another list each (FolderLeftoverLeftover and .syncLeftoverLeftover).
+
+3. Finally, add the LeftoverLeftover lists into the SyncChange list. Files in FolderLeftoverLeftover are ADDED, while .syncLeftoverLeftover are DELETED.
+
+4. Update the .sync file with the changes, so that it currently matches what is on the Local Disk.
+
+Part 2: Comparing SyncChange
+Compare the SyncChanges between Local and Server. If there are changes to the same file on Server and Local:
+1. Overrides: Local Add > Server Add.
+2. 
+===========WIP IN THIS PART BELOW=========================
+Scan the Local SyncChange against server's .sync to verify its logic.
+
+If there is a local "ADD" for an existing file on the Server, check date modified. If local date modified is more recent, OVERWRITE server. Else, do nothing.
+If there is a "DELETE" for non-existing files, do nothing.
+If there is a "METACHANGE", check Date Modified on both sides. If Local file is more recent, push. If Local file is same or less recent, do nothing.
+
+Scan the Server SyncChange against local .sync to verify its logic.
+
+If there is a server "ADD" for an existing file on local, check date modified. If server date modified is more recent, OVERWRITE local. Else, do nothing.
+If there is a "DELETE" for non-existing files, do nothing.
+If there is a "METACHANGE", check Date Modified on both sides. If Server file is more recent, push. If Local file is same or less recent, do nothing.
+
+
+need to iron out how to use SyncChange.

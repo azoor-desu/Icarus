@@ -23,6 +23,7 @@ namespace ArientMusicPlayer {
 			arientWindow = new ArientWindow();
 			InitializeArientBackend();
 			LoadSettings();
+			TestingStuff();
 			Application.Run(arientWindow);
 
 			StopPlayback();
@@ -57,22 +58,12 @@ namespace ArientMusicPlayer {
 			}
 		}
 
-		//Loading of saved settings + TESTING stuff.
+		//Loading of saved settings
 		static void LoadSettings() {
 
-			//if (FileManager.CheckPlaylistExists("Local files")) {
-			//	loadedPlaylists[0] = FileManager.LoadPlaylistFromDisk("Local files");
-			//} else {
-			//	Logger.Debug("Playlist not found, importing from m38u lol");
-			//	loadedPlaylists[0] = await Task.Run(() => FileManager.ImportPlaylistM3U8("C:\\WORK\\APP\\ArientMusicPlayer\\AMP\\bin\\Debug\\Local files.m3u8"));
-			//	loadedPlaylists[0].currentSongIndex = 0;
-			//	FileManager.SavePlaylistToDisk(loadedPlaylists[0]);
-			//}
-			//arientWindow.LoadPlaylistWindow(0);
-
 			//Load library first.
-			libraryPlaylist = (LibraryPlaylist)FileManager.LoadPlaylistFromDisk(Directory.GetCurrentDirectory() + "\\sync\\Library.arientpl",PlaylistType.LibraryPlaylistLocal);
-			FileManager.SavePlaylistToDisk(libraryPlaylist,PlaylistType.LibraryPlaylistLocal);
+			//libraryPlaylist = (LibraryPlaylist)FileManager.LoadPlaylistFromDisk(Directory.GetCurrentDirectory() + "\\sync\\Library.arientpl",PlaylistType.LibraryPlaylistLocal);
+			//FileManager.SavePlaylistToDisk(libraryPlaylist,PlaylistType.LibraryPlaylistLocal);
 
 			//Load in ALL saved playlists.
 			loadedPlaylists = FileManager.LoadAllPlaylistsFromDisk(); //loaded in alphabetical order.
@@ -92,8 +83,12 @@ namespace ArientMusicPlayer {
 
 			//PLEASE REMOVE AFTER SAVED SETTINGS ARE HERE. THIS IS HERE TO PREVENT BUG.
 			currentPlayingPlaylist = 0;
+		}
 
-			//MessageBox.Show(FileManager.GetUniqueFileID(@"Z:\Azoor.ovpn"));
+
+		//TESTING stuff.
+		static void TestingStuff() {
+			
 
 		}
 
