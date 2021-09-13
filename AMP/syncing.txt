@@ -1,3 +1,6 @@
+SyncChange: A generated list of changes for local/server. Obtained via comparing Exisitng files vs its corresponding .sync
+.sync: Existing database for local/server that stores sync info for every file to sync.
+
 Part 1: Scanning for changes. (Getting SyncChange)
 1. Loop thru FOLDER songs and compare them to a List/Dict (from the .sync file) using PATHS.
 Check Matched items for Date Modified, and if true, add them to the SyncChange list. (MetaChange)
@@ -10,6 +13,14 @@ Save each of the leftovers into another list each (FolderLeftoverLeftover and .s
 3. Finally, add the LeftoverLeftover lists into the SyncChange list. Files in FolderLeftoverLeftover are ADDED, while .syncLeftoverLeftover are DELETED.
 
 4. Update the .sync file with the changes, so that it currently matches what is on the Local Disk.
+
+SyncChange
+IF a file has changes:
+- MetaChange
+- Rename
+- MetaChange + Rename
+- Added
+- Deleted
 
 Part 2: Comparing SyncChange
 Compare the SyncChanges between Local and Server. If there are changes to the same file on Server and Local:
