@@ -1,3 +1,11 @@
+Data to be saved:
+- arientID (To keep data even after rename, tracking stuff across local and server without relying on uniqueID)
+- Relative filepath
+- New Filepath (on renaming)
+- Date Modified (Windows thing)
+- uniqueID (to identify the actual file on system)
+
+
 SyncChange: A generated list of changes for local/server. Obtained via comparing Exisitng files vs its corresponding .sync
 .sync: Existing database for local/server that stores sync info for every file to sync.
 

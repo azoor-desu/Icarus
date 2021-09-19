@@ -7,28 +7,8 @@ namespace ArientMusicPlayer {
 
 
 	public static class SyncManager {
-		public static string localSyncFolder = "\\sync\\";
-		public static string hostSyncFolder = @"Z:\TestSync\";
-
-		public static void WriteSyncFile() { 
-			
-		}
-
-		public static LibraryPlaylist ReadSyncFile(bool localFolder) {
-			string path;
-			if (localFolder) {
-				path = Directory.GetCurrentDirectory() + localSyncFolder + "\\Library.arientpl";
-			} else {
-				path = Directory.GetCurrentDirectory() + hostSyncFolder + "\\Library.arientpl";
-			}
-
-
-			LibraryPlaylist oo = (LibraryPlaylist)FileManager.LoadPlaylistFromDisk(path,PlaylistType.LibraryPlaylistLocal);
-
-
-			return null;
-		}
-
+		//public static string localSyncFolder = "\\sync\\";
+		//public static string hostSyncFolder = @"Z:\TestSync\";
 
 
 		#region NTFS Unique Identifier Getter
@@ -78,7 +58,7 @@ namespace ArientMusicPlayer {
 
 		#region IO stuff
 		public static void AppendSyncData(SyncData[] data) {
-			string path = Directory.GetCurrentDirectory() + localSyncFolder;
+			string path = FileManager.localLibPath;
 			Directory.CreateDirectory(path);
 			path += ".sync";
 
@@ -108,49 +88,6 @@ namespace ArientMusicPlayer {
 			File.WriteAllText(path, newFileText);
 
 		}
-
-		//Returns sync data from local foplder into a list of SyncData.
-		public static List<SyncData> LoadSyncData() {
-			string path = Directory.GetCurrentDirectory() + localSyncFolder + ".sync";
-			if (File.Exists(path)) {
-
-				//if .sync file exists, read it and return a list.
-				string[] rawlines = File.ReadAllLines(path);
-				List<SyncData> syncDatas = new List<SyncData>();
-
-				foreach (string line in rawlines) {
-					if (line != "") {
-						string[] data = line.Split('|');
-						SyncData syncData = new SyncData();
-						syncData.filePath = data[0];
-						syncData.fileID = data[1];
-						switch (data[2]) {
-							case "MetaChange":
-								syncData.fileChangeEvent = FileChangeType.MetaChange;
-								break;
-							case "Add":
-								syncData.fileChangeEvent = FileChangeType.Add;
-								break;
-							case "Delete":
-								syncData.fileChangeEvent = FileChangeType.Delete;
-								break;
-							case "Rename":
-								syncData.fileChangeEvent = FileChangeType.Rename;
-								break;
-						}
-						syncData.timeModified = data[3];
-						syncDatas.Add(syncData);
-					}
-				}
-				if (syncDatas.Count == 0) {
-					return null;
-				}
-				return syncDatas;
-			} else {
-				//if .sync file does not exist, return null.
-				return null;
-			}
-		}
 		#endregion
 	}
 
@@ -161,6 +98,6 @@ namespace ArientMusicPlayer {
 		public string timeModified { get; set; }
 	}
 
-	public enum FileChangeType {MetaChange, Add, Delete, Rename}
+	public enum FileChangeType {Meta, Add, Delete, Rename, MetaRename, Overwrite}
 
 }

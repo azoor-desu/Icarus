@@ -22,6 +22,7 @@ namespace ArientMusicPlayer {
 			Application.SetCompatibleTextRenderingDefault(false);
 			arientWindow = new ArientWindow();
 			InitializeArientBackend();
+			FileManager.SetFolderPaths();
 			LoadSettings();
 			TestingStuff();
 			Application.Run(arientWindow);
@@ -66,14 +67,14 @@ namespace ArientMusicPlayer {
 			//FileManager.SavePlaylistToDisk(libraryPlaylist,PlaylistType.LibraryPlaylistLocal);
 
 			//Load in ALL saved playlists.
-			loadedPlaylists = FileManager.LoadAllPlaylistsFromDisk(); //loaded in alphabetical order.
+			//loadedPlaylists = FileManager.LoadAllPlaylistsFromDisk(); //loaded in alphabetical order.
 
 			//If there are no saved playlists, make one default blank playlist.
 			if (loadedPlaylists == null) {
 				loadedPlaylists = new Playlist[1];
 				loadedPlaylists[0] = new Playlist();
 				loadedPlaylists[0].name = "Default";
-				FileManager.SavePlaylistToDisk(loadedPlaylists[0], PlaylistType.Playlist);
+				//FileManager.SavePlaylistToDisk(loadedPlaylists[0], PlaylistType.Playlist);
 			}
 
 			//load the playlist in the App window.
@@ -96,7 +97,7 @@ namespace ArientMusicPlayer {
 		static void SaveAllPlaylists() {
 			Logger.Debug("Saving all playlists...");
 			foreach (Playlist playlist in loadedPlaylists) {
-				FileManager.SavePlaylistToDisk(playlist, PlaylistType.Playlist);
+				//FileManager.SavePlaylistToDisk(playlist, PlaylistType.Playlist);
 			}
 			Logger.Debug("Playlists saved.");
 		}
@@ -263,7 +264,7 @@ namespace ArientMusicPlayer {
 		//Load in settings from some savefile.
 		public static bool settingMinToTray = true;
 		public static Playlist[] loadedPlaylists;
-		public static LibraryPlaylist libraryPlaylist = new LibraryPlaylist();
+		public static Playlist libraryPlaylist;
 		public static int currentDisplayedPlaylist = -1; //will only change when user physically
 														 //changes current view and a LoadPlaylistWindow
 														 //is called
@@ -298,17 +299,6 @@ namespace ArientMusicPlayer {
 		}
 	}
 
-	public class SyncPlaylist: Playlist {
-		//List: songs
-		public List<string> shortpath = new List<string>(); // e.g. /Jap/test.mp3
-	}
-
-	public class LibraryPlaylist : SyncPlaylist {
-		//List: songs
-		//List: shortpaths
-		public List<SyncInfo> syncInfo = new List<SyncInfo>();
-	}
-
 	public struct TagInfo {
 		public string filepath { get; set; }
 		public string title { get; set; }
@@ -327,12 +317,6 @@ namespace ArientMusicPlayer {
 		public string mood { get; set; }
 		public string rating { get; set; }
 		public string bpm { get; set; }
-	}
-
-	public struct SyncInfo {
-		//for syncing
-		public string uniqueID;
-		public string dateLastModified;
 	}
 
 	#endregion

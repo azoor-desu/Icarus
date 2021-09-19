@@ -98,7 +98,7 @@ namespace ArientMusicPlayer
 			this.PlayerPanel = new System.Windows.Forms.Panel();
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.DatabaseItemsPanel = new System.Windows.Forms.Panel();
-			this.listView1 = new System.Windows.Forms.ListView();
+			this.libraryListView = new System.Windows.Forms.ListView();
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -746,7 +746,7 @@ namespace ArientMusicPlayer
 			// 
 			// DatabaseItemsPanel
 			// 
-			this.DatabaseItemsPanel.Controls.Add(this.listView1);
+			this.DatabaseItemsPanel.Controls.Add(this.libraryListView);
 			this.DatabaseItemsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.DatabaseItemsPanel.Location = new System.Drawing.Point(0, 240);
 			this.DatabaseItemsPanel.Name = "DatabaseItemsPanel";
@@ -754,29 +754,29 @@ namespace ArientMusicPlayer
 			this.DatabaseItemsPanel.Size = new System.Drawing.Size(477, 221);
 			this.DatabaseItemsPanel.TabIndex = 33;
 			// 
-			// listView1
+			// libraryListView
 			// 
-			this.listView1.AllowDrop = true;
-			this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+			this.libraryListView.AllowDrop = true;
+			this.libraryListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3,
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6});
-			this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.listView1.FullRowSelect = true;
-			this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.listView1.HideSelection = false;
-			this.listView1.Location = new System.Drawing.Point(8, 2);
-			this.listView1.MinimumSize = new System.Drawing.Size(350, 100);
-			this.listView1.Name = "listView1";
-			this.listView1.ShowGroups = false;
-			this.listView1.Size = new System.Drawing.Size(461, 217);
-			this.listView1.TabIndex = 32;
-			this.listView1.TabStop = false;
-			this.listView1.UseCompatibleStateImageBehavior = false;
-			this.listView1.View = System.Windows.Forms.View.Details;
+			this.libraryListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.libraryListView.FullRowSelect = true;
+			this.libraryListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.libraryListView.HideSelection = false;
+			this.libraryListView.Location = new System.Drawing.Point(8, 2);
+			this.libraryListView.MinimumSize = new System.Drawing.Size(350, 100);
+			this.libraryListView.Name = "libraryListView";
+			this.libraryListView.ShowGroups = false;
+			this.libraryListView.Size = new System.Drawing.Size(461, 217);
+			this.libraryListView.TabIndex = 32;
+			this.libraryListView.TabStop = false;
+			this.libraryListView.UseCompatibleStateImageBehavior = false;
+			this.libraryListView.View = System.Windows.Forms.View.Details;
 			// 
 			// columnHeader1
 			// 
@@ -936,7 +936,7 @@ namespace ArientMusicPlayer
 		private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItemExportPlaylist;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.Panel DatabaseItemsPanel;
-		private System.Windows.Forms.ListView listView1;
+		private System.Windows.Forms.ListView libraryListView;
 		private System.Windows.Forms.ColumnHeader columnHeader1;
 		private System.Windows.Forms.ColumnHeader columnHeader3;
 		private System.Windows.Forms.ColumnHeader columnHeader4;

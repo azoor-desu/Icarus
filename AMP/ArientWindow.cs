@@ -201,6 +201,19 @@ namespace ArientMusicPlayer {
 																//i.e. loading a new playlist into view
 		}
 
+		public void LoadLibraryWindow() {
+			libraryListView.Items.Clear();
+			for (int i = 0; i < Arient.libraryPlaylist.songs.Count; i++) {
+				listViewItem = new ListViewItem((i + 1).ToString());
+				listViewItem.SubItems.Add(Arient.libraryPlaylist.songs[i].title);
+				listViewItem.SubItems.Add(Arient.libraryPlaylist.songs[i].album);
+				listViewItem.SubItems.Add(Arient.libraryPlaylist.songs[i].artist);
+				listViewItem.SubItems.Add(Arient.libraryPlaylist.songs[i].duration.ToString());
+				listViewItem.SubItems.Add(Arient.libraryPlaylist.songs[i].format);
+				libraryListView.Items.Add(listViewItem);
+			}
+		}
+
 		public void OnChangeTrackPlaylist(int newTrackIndex) {
 
 		//If user is looking at the currently playing playlist, update the selections.
