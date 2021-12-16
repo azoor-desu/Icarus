@@ -6,4 +6,14 @@ namespace SyncTest {
 			Console.WriteLine("Hello World!");
 		}
 	}
+
+
+	//Reading File
+
+
+	//Writing File
+
+	//Sync botan
+
+
 }

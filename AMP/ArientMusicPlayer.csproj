@@ -93,4 +93,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)Assets\*" "$(TargetDir)Assets" /S /R /Y /I</PostBuildEvent>
+  </PropertyGroup>
 </Project>

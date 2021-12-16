@@ -1,0 +1,16 @@
+- Other file formats not getting tags properly (FLAC, m4a)
+- Track continues playing next track feature
+- Shuffle feature
+- volume control
+- Playback bar control
+- Playlist context menu features (add/remove, rearrange, add to playlist)
+- Main Library
+- Sync feature
+- Saving options
+- Sync options
+
+- FX for tracks
+- Replay gain
+- Options menu
+- Pictures!
+- Playlist Importing (half done with .m38u files)
