@@ -106,7 +106,7 @@ namespace SyncTest {
 				//Browse each and every one of the song files in this dir, and put in the info.
 				foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories)) {
 					if (IsMusicFileExtension(Path.GetExtension(file))) {
-						sw.WriteLine(file.Replace(path, "") + "|" + GetUniqueFileID(file));
+						sw.WriteLine(file.Replace(path, "") + "|" + GetUniqueFileID(file) + "|" + File.GetLastWriteTime(file).ToString("yyyyMMddHHmmssFF"));
 					}
 				}
 			}

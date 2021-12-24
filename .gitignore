@@ -8,3 +8,5 @@ SyncTest/bin/
 SyncTest/obj/
 Bass.Net.dll
 Bass.Net.xml
+.sync
+.data

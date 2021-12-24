@@ -8,4 +8,4 @@ timestamp FileName(relativepath) LocalID ChangeType NewFileName(relativepath)
 FolderPath
 
 //Contains data and info of each song file, data requred for syncing only.
-FileName(relativepath)|LocalID
+FileName(relativepath)|LocalID|LastModified(Format: yyyyMMddHHmmssFF)
