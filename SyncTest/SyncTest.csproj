@@ -9,4 +9,14 @@
     <Exec Command="xcopy &quot;$(ProjectDir)Assets\*&quot; &quot;$(TargetDir)Assets&quot; /S /R /Y /I" />
   </Target>
 
+  <ItemGroup>
+    <Reference Include="Bass.Net">
+      <HintPath>BassLib\Bass.Netv4.5\Bass.Net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="xcopy &quot;$(ProjectDir)BassLib\dlls\*&quot; &quot;$(TargetDir)&quot; /S /R /Y /I" />
+  </Target>
+
 </Project>
