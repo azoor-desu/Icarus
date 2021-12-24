@@ -34,7 +34,7 @@
   <ItemGroup>
     <Reference Include="Bass.Net, Version=2.4.14.1, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Bass.net\v4.5\Bass.Net.dll</HintPath>
+      <HintPath>BassLib\Bass.Netv4.5\Bass.Net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -95,5 +95,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)Assets\*" "$(TargetDir)Assets" /S /R /Y /I</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "$(ProjectDir)BassLib\dlls\*" "$(TargetDir)" /S /R /Y /I</PreBuildEvent>
   </PropertyGroup>
 </Project>
