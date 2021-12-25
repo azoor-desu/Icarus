@@ -7,11 +7,21 @@ using Un4seen.Bass;
 
 namespace SyncTest {
 	class Program {
+
 		static void Main(string[] args) {
 			SyncButton();
 		}
 
 		enum ChangeType { Delete, Add, Rename, MetaChange }
+
+		//Hack for quickly converting strings into enums
+		//https://stackoverflow.com/questions/16100/convert-a-string-to-an-enum-in-c-sharp/38711#38711
+		static Dictionary<string, ChangeType> strToChangeType = new Dictionary<string, ChangeType>() {
+			{"Delete", ChangeType.Delete },
+			{"Add", ChangeType.Add },
+			{"Rename", ChangeType.Rename },
+			{"MetaChange", ChangeType.MetaChange },
+		};
 
 		class SyncEvent {
 
@@ -20,17 +30,37 @@ namespace SyncTest {
 				syncEventNumber = _syncEventNumber;
 				machineID = _machineID;
 				timeStamp = _timeStamp;
-				changes = new List<string[]>();
+				changes = new List<Change>();
+			}
+
+			public void AddNewChange(string fileName, string localId, ChangeType changeType, string newFileName) {
+				Change e = new Change();
+				e.fileName = fileName;
+				e.localId = localId;
+				e.changeType = changeType;
+				e.newFileName = newFileName;
+				changes.Add(e);
 			}
 
 			public string syncEventNumber;
 			public string machineID;
 			public string timeStamp;
-			public List<string[]> changes;
+			public List<Change> changes;
+
+			//used in SyncEvent only
+			public struct Change {
+				public string fileName;
+				public string localId;
+				public ChangeType changeType;
+				public string newFileName;
+			}
 		}
 
-		const string clientFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\AMP\Assets\TEST";
+		const string clientFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST";
 		const string serverFolder = @"Z:\TestSync\";
+
+		static int serverLatestSyncEvent = 0;
+		static int clientLatestSyncEvent = 0;
 
 		//Entry point: Sync Button pressed!
 		static void SyncButton() {
@@ -39,13 +69,21 @@ namespace SyncTest {
 			// ====================== Check if directories exist. ==============================
 
 			if (!Directory.Exists(serverFolder)) {
-				Console.WriteLine("server folder \'" + serverFolder + "\' does not exist. Aborting sync!");
-				return;
+				Console.WriteLine("server folder \'" + serverFolder + "\' does not exist. Attempting to create directory!");
+				Directory.CreateDirectory(serverFolder);
+				if (!Directory.Exists(serverFolder)) {
+					Console.WriteLine("server folder \'" + serverFolder + "\' not able to be created! Aborting");
+					return;
+				}
 			}
 
 			if (!Directory.Exists(clientFolder)) {
 				Console.WriteLine("client folder \'" + clientFolder + "\' does not exist. Aborting sync!");
-				return;
+				Directory.CreateDirectory(clientFolder);
+				if (!Directory.Exists(clientFolder)) {
+					Console.WriteLine("client folder \'" + clientFolder + "\' not able to be created! Aborting");
+					return;
+				}
 			}
 
 			// ====================== Check if files exist. ==============================
@@ -55,7 +93,8 @@ namespace SyncTest {
 			Console.WriteLine("Checking data files for server...");
 			if (!File.Exists(Path.Join(serverFolder,".data"))) {
 
-				//fuck it, assuming .data is parasable.
+				//TODO: Acutally check if .data is parasable. Rebuild if not parsable.
+				//Todo: Maybe attempt a repair on the file?
 				Console.WriteLine("server .data file not exist, building one!");
 				CreateDataFile(serverFolder);
 
@@ -63,7 +102,8 @@ namespace SyncTest {
 
 			if (!File.Exists(Path.Join(serverFolder, ".sync"))) {
 
-				//fuck it, assuming .data is parasable.
+				//TODO: Acutally check if .data is parasable. Rebuild if not parsable.
+				//Todo: Maybe attempt a repair on the file?
 				Console.WriteLine("server .sync file not exist, building one!");
 				CreateSyncFile(serverFolder);
 
@@ -74,7 +114,8 @@ namespace SyncTest {
 			Console.WriteLine("Checking data files for client...");
 			if (!File.Exists(Path.Join(clientFolder, ".data"))) {
 
-				//fuck it, assuming .data is parasable.
+				//TODO: Acutally check if .data is parasable. Rebuild if not parsable.
+				//Todo: Maybe attempt a repair on the file?
 				Console.WriteLine("server .data file not exist, building one!");
 				CreateDataFile(clientFolder);
 
@@ -82,7 +123,8 @@ namespace SyncTest {
 
 			if (!File.Exists(Path.Join(clientFolder, ".sync"))) {
 
-				//fuck it, assuming .data is parasable.
+				//TODO: Acutally check if .data is parasable. Rebuild if not parsable.
+				//Todo: Maybe attempt a repair on the file?
 				Console.WriteLine("server .sync file not exist, building one!");
 				CreateSyncFile(clientFolder);
 
@@ -102,23 +144,22 @@ namespace SyncTest {
 			//.sync files
 			//Refer to SyncEvent class
 			List<SyncEvent> serverSyncs = new List<SyncEvent>();
-			List<SyncEvent> clientSyncs = new List<SyncEvent>();
+			SyncEvent clientSync;
+			
 
 			LoadDataFile(serverFolder, ref serverData);
 			LoadDataFile(clientFolder, ref clientData);
 
 			LoadSyncFile(serverFolder, ref serverSyncs);
-			LoadSyncFile(clientFolder, ref clientSyncs);
+			LoadLatsetSyncEvent(serverFolder, ref serverLatestSyncEvent);
+			LoadLatsetSyncEvent(clientFolder, ref clientLatestSyncEvent);
 
 
 			#region //TEST PRINT SERVER .sync and .data
 			//foreach (SyncEvent ev in serverSyncs) {
 			//	Console.WriteLine("synceventnumber: " + ev.syncEventNumber + " machineid: " + ev.machineID + " time: " + ev.timeStamp);
-			//	foreach (string[] str in ev.changes) {
-			//		for (int i = 0; i < str.Length; i++) {
-			//			Console.Write(str[i] + "|");
-			//		}
-			//		Console.Write('\n');
+			//	foreach (SyncEvent.Change chng in ev.changes) {
+			//		Console.WriteLine("filename: " + chng.fileName + " localId: " + chng.localId + " changetype: " + chng.changeType + " newfilename: " + chng.newFileName);
 			//	}
 			//}
 
@@ -131,7 +172,14 @@ namespace SyncTest {
 
 			//Compare server .data file to server files on disk.
 			Console.WriteLine("Checking file changes for server...");
-			//GetChangesFromDisk(serverFolder); //WIP
+
+			#region //testing GetChangesFromDisk!
+			//SyncEvent e = GetChangesFromDisk(serverFolder, serverData);
+			//Console.WriteLine("\nServer Changes! " + e.syncEventNumber + "|Machine: " + e.machineID + "|No: " + e.syncEventNumber);
+			//foreach (SyncEvent.Change r in e.changes) {
+			//	Console.WriteLine("Name: " + r.fileName + "|Type: " + r.changeType + "|ID: " + r.localId + "|NewPath: " + r.newFileName);
+			//}
+			#endregion
 
 			//if changes are NOT NULL, write to .sync, as a new entry IMMEDIATELY.
 			Console.WriteLine("Writing file changes for server...");
@@ -191,6 +239,7 @@ namespace SyncTest {
 			using (StreamWriter sw = File.CreateText(Path.Join(path, ".sync"))) {
 				sw.WriteLine("#1.0 Sync File");
 				sw.WriteLine("");
+				sw.WriteLine("0");
 			}
 		}
 
@@ -233,8 +282,8 @@ namespace SyncTest {
 
 			int skipcount = 0;
 			foreach (var line in File.ReadLines(Path.Join(path, ".sync"))) {
-				//skip the first 2 lines
-				if (skipcount < 2) {
+				//skip the first 3 lines
+				if (skipcount < 3) {
 					skipcount++;
 					continue;
 				}
@@ -246,34 +295,123 @@ namespace SyncTest {
 				}
 				else { //add individual sync change entries
 					string[] temp = line.Split('|');
-					list[^1].changes.Add(temp);
+					list[^1].AddNewChange(temp[0],temp[1], strToChangeType[temp[2]],temp[3]); //list[^1] is the last element in the list
 				}
 
 			}
 
 		}
 
-		//Compares current serverData/clientData to what's on the disk right now, and returns a SyncEvent
-		//dataFile is the .data parsed prior, belonging to either client or server.
-		static void GetChangesFromDisk(string path, ref Dictionary<string, string[]> dataFile) {
-
-			//SyncNumber does not matter here!
-			//Create a new SyncEvent, this will be returned and later used to compare against other things.
-			SyncEvent newUpdate = new SyncEvent("nil",path == serverFolder?"server":"thisMachine", DateTime.Now.ToString("yyyyMMddHHmmssFF"));
-
-			//Parse the disk files, and compare to dataFile!
-
-		}
-
-		//Gets the latest (biggest number) SyncEventNumber
-		static int GetSyncEventNumber(List<SyncEvent> syncs) {
-
-			int biggest = -1;
-			foreach (SyncEvent ev in syncs) {
-				if (int.Parse(ev.syncEventNumber) > biggest) biggest = int.Parse(ev.syncEventNumber);
+		//Reads the SyncEventNumber from the 3rd line in the .sync file
+		static void LoadLatsetSyncEvent(string path, ref int latestSyncEvent) {
+			if (!File.Exists(Path.Join(path, ".sync"))) {
+				Console.WriteLine("ERROR: .sync file not found at path: " + path + ", unable to load. Did program not manage to create file at this path location?");
+				return;
 			}
 
-			return biggest;
+			int skipcount = 0;
+			foreach (var line in File.ReadLines(Path.Join(path, ".sync"))) {
+				//skip the first 2 lines
+				if (skipcount < 2) {
+					skipcount++;
+					continue;
+				}
+				//skip everything, go straight to third line, read the number and return.
+				latestSyncEvent = int.Parse(line);
+				return;
+			}
+		}
+
+		//Compares current serverData/clientData to what's on the disk right now, and returns a SyncEvent
+		//dataFile is the .data parsed prior, belonging to either client or server.
+		static SyncEvent GetChangesFromDisk(string path, Dictionary<string, string[]> dataFile) {
+
+			//SyncNumber does not matter here! Will override next time!
+			//Create a new SyncEvent, this will be returned and later used to compare against other things.
+			SyncEvent newUpdate = new SyncEvent((serverLatestSyncEvent + 1).ToString(),path == serverFolder?"server": Environment.MachineName, DateTime.Now.ToString("yyyyMMddHHmmssFF"));
+
+			//Parse the disk files, and compare to dataFile!
+			//Browse each and every one of the song files in this dir, and search on the respective .data file
+			foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories)) {
+
+				string fileR = file.Replace(path,"");
+
+				if (IsMusicFileExtension(Path.GetExtension(fileR))) {
+
+					// 1. Check for ADD/REMOVE.
+					// Find the filepath. If found filepath, move straight to check Metachange/last modified.
+					if (!dataFile.ContainsKey(fileR)) {
+						//if NOT found, means this fileR on disk may be a new fileR OR renamed. Check against ALL LocalIDs.
+
+						// If LocalID match, then is rename. Check for any MetaChange/Last modified. Add rename to changes, then remove the element from dataFile
+						// Else, no match, is a new fileR. Add "add" to changes
+						// SKIP to next fileR on disk.
+
+						//Get fileR LocalID
+						string localID = GetUniqueFileID(file);
+						string toRemove = "";
+
+						//Loop all dict items
+						foreach (KeyValuePair<string, string[]> item in dataFile) {
+							//check lastModified against value
+							if (item.Value[0] == localID) {
+
+								//fileR found, this fileR is renamed. Add to changes
+								newUpdate.AddNewChange(item.Key, item.Value[0],ChangeType.Rename,fileR);
+
+								//Remove dataFile entry
+								toRemove = item.Key;
+
+								//Check for metachange/lastmodified
+								if (CheckMetaChange(file,item.Value[1])) {
+									newUpdate.AddNewChange(fileR, item.Value[0], ChangeType.MetaChange, "");
+								}
+
+								break;
+							}
+						}
+
+						//if found a LocalID match, remove an element then move to next fileR on disk
+						if (toRemove != "") {
+							dataFile.Remove(toRemove); //cannot remove element while still in loop.
+							continue; 
+						}
+
+
+						// No LocalID match, this fileR on disk is new. Add to change.
+						newUpdate.AddNewChange(fileR, GetUniqueFileID(file), ChangeType.Add, "");
+
+					}
+					else {
+						//If fileR is found, check for MetaChange. Check this fileR's lastModified date with dataFile.
+						if (CheckMetaChange(file,dataFile[fileR][1])) {
+							newUpdate.AddNewChange(fileR, dataFile[fileR][0], ChangeType.MetaChange, "");
+						}
+
+						//Regardless of match or not, remove entry from dataFile.
+						dataFile.Remove(fileR);
+					}
+
+					//At this point, all files should have been removed from dataFiles, save for the Added/Removed ones. Only those that are missing (Removed) should be leftover in dataFiles.
+				}
+			}
+
+			//After the loop, check if there is any files leftover in dataFile.
+			//Leftovers mean those files have been DELEETED.
+			//Add those to chagnes too.
+
+			foreach (KeyValuePair<string, string[]> item in dataFile) {
+				newUpdate.AddNewChange(item.Key, item.Value[0], ChangeType.Delete, "");
+			}
+
+			//Finally, return
+			return newUpdate;
+
+			//To check for metachange/ last modified. Reusable, only within this method.
+			static bool CheckMetaChange(string filePath, string dataLastModified) {
+				if (long.Parse(File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmssFF")) > long.Parse(dataLastModified)) return true; else return false;
+			}
+
 		}
 
 		//Takes a file extension. period dosen't matter.
