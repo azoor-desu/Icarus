@@ -56,8 +56,8 @@ namespace SyncTest {
 
 		static bool debug = true;
 
-		const string clientFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST";
-		const string serverFolder = @"Z:\TestSync\";
+		static string clientFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST";
+		static string serverFolder = @"Z:\TestSync\";
 
 		static int serverLatestSyncEvent = 0;
 		static int clientLatestSyncEvent = 0;
@@ -158,14 +158,19 @@ namespace SyncTest {
 			Console.WriteLine("Checking file changes for server...");
 			SyncEvent serverChanges = GetChangesFromDisk(serverFolder, serverData);
 
-			if (debug) {
-				if (serverChanges != null) {
+			if (serverChanges != null) {
+				if (debug) {
 					Console.WriteLine("\nServer Changes! " + serverChanges.syncEventNumber + "|Machine: " + serverChanges.machineID + "|No: " + serverChanges.syncEventNumber);
 					foreach (SyncEvent.Change r in serverChanges.changes) {
 						Console.WriteLine("Name: " + r.fileName + "|Type: " + r.changeType + "|RenamedPath: " + r.renamedFileName);
 					}
 				}
-			}			
+			}
+			else {
+				Console.WriteLine("No server changes found!");
+			}
+
+			
 			
 			//if changes are NOT NULL, write to .sync, as a new entry IMMEDIATELY.
 			AddToServerSyncEvents(ref serverSyncs, ref serverChanges);
@@ -183,7 +188,6 @@ namespace SyncTest {
 				//use offset to grab the relevant SyncEvent.
 				int indexOffset = int.Parse(serverSyncs[0].syncEventNumber);
 				if (indexOffset == -1) indexOffset = 0;
-				//Console.WriteLine("OFFSET: " + indexOffset + " clientLatestSyncEvent: " + clientLatestSyncEvent);
 
 				List<SyncEvent> outstandingEvents = new List<SyncEvent>();
 				// Grab the whole list of SyncEvents the client is missing out on
@@ -196,6 +200,9 @@ namespace SyncTest {
 
 				// Finally, the merged client changes can be appended to server's .sync (but don't write).
 				AddToServerSyncEvents(ref serverSyncs, ref clientChanges);
+			}
+			else {
+				Console.WriteLine("No client changes found!");
 			}
 
 
