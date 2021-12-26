@@ -2,11 +2,11 @@
 
 13
 #number|MachineID|datetime
-FileName(relativepath)|LocalID|ChangeType|NewFileName(relativepath)
-FileName(relativepath)|LocalID|ChangeType|NewFileName(relativepath)
+FileName(relativepath)|ChangeType|NewFileName(relativepath)
+FileName(relativepath)|ChangeType|NewFileName(relativepath)
 #number|MachineID|datetime
-FileName(relativepath)|LocalID|ChangeType|NewFileName(relativepath)
-FileName(relativepath)|LocalID|ChangeType|NewFileName(relativepath)
+FileName(relativepath)|ChangeType|NewFileName(relativepath)
+FileName(relativepath)|ChangeType|NewFileName(relativepath)
 
 =====================================================================================
 #1.0 Data File
