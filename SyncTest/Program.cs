@@ -56,8 +56,8 @@ namespace SyncTest {
 
 		static bool debug = true;
 
-		static string clientFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\";
-		static string serverFolder = @"Z:\TestSync\";
+		static string clientFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\";
+		static string serverFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\";
 
 		static int serverCurrentSyncEvent = 0;
 		static int clientCurrentSyncEvent = 0;
