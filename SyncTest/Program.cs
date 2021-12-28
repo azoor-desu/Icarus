@@ -9,13 +9,13 @@ namespace SyncTest {
 	class Program {
 
 		static void Main(string[] args) {
-			
+
 			try {
 				//rename back
 				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 two.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 two.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 three.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
 				//Delete file
-				File.Delete(Path.Join(clientFolder,".sync"));
+				File.Delete(Path.Join(clientFolder, ".sync"));
 				File.Delete(Path.Join(serverFolder, ".sync"));
 				File.Delete(Path.Join(clientFolder, ".data"));
 				File.Delete(Path.Join(serverFolder, ".data"));
@@ -24,13 +24,13 @@ namespace SyncTest {
 				Console.WriteLine("================================================================================\n\n");
 				//rename
 				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 two.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 three.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 three.mp3");
 				SyncButton();
 
 			} catch (Exception e) {
 				Console.WriteLine(e.Message);
 			}
-			
+			//SyncButton();
 		}
 
 		enum ChangeType { Delete, Add, Rename, Modified }
@@ -225,7 +225,7 @@ namespace SyncTest {
 
 				List<SyncEvent> outstandingEvents = new List<SyncEvent>();
 				// Grab the whole list of SyncEvents the client is missing out on
-				for (int i = clientNextSENumber - SENumberOffset; i > serverSyncs.Count; i++) {
+				for (int i = clientNextSENumber - SENumberOffset; i < serverSyncs.Count; i++) {
 					outstandingEvents.Add(serverSyncs[i]);
 				}
 
@@ -233,7 +233,7 @@ namespace SyncTest {
 				SyncEventConflictResolver(ref outstandingEvents, ref clientChanges);
 
 				// Finally, the merged client changes can be appended to server's .sync (but don't write).
-				AddToServerSyncEvents(ref serverSyncs, ref clientChanges);
+				if (clientChanges.changes.Count > 0) AddToServerSyncEvents(ref serverSyncs, ref clientChanges);
 			} else {
 				Console.WriteLine("No client changes found!");
 			}
@@ -264,6 +264,7 @@ namespace SyncTest {
 			// ====================== Updating .sync & .data files ===================
 			#region Updating .sync & .data files
 			// Trim old entries of .sync. Those older than 6 months will be deleted.
+			TrimOldSyncEvents(ref serverSyncs, 31 * 6);
 
 			// Write the entirety of the serverside .sync file into a new .sync file, overwrite.
 			Console.WriteLine("Writing server .sync file...");
@@ -395,7 +396,7 @@ namespace SyncTest {
 
 			//SyncNumber does not matter here! Will override next time!
 			//Create a new SyncEvent, this will be returned and later used to compare against other things.
-			SyncEvent newUpdate = new SyncEvent(globalNextSENumber.ToString(), path == serverFolder ? "server" : Environment.MachineName, DateTime.Now.ToString("yyyyMMddHHmmssFF"));
+			SyncEvent newUpdate = new SyncEvent(globalNextSENumber.ToString(), path == serverFolder ? "server" : Environment.MachineName, DateTime.Now.ToString("yyyyMMddHHmmss"));
 
 			//Parse the disk files, and compare to dataFile!
 			//Browse each and every one of the song files in this dir, and search on the respective .data file
@@ -448,7 +449,7 @@ namespace SyncTest {
 					newUpdate.AddNewChange(fileName, ChangeType.Add, "");
 
 					//Also add to .data file since it's gonna be empty
-					dataFile.Add(fileName,new string[] { GetUniqueFileID(filepathFull), File.GetLastWriteTime(filepathFull).ToString("yyyyMMddHHmmssFF") });
+					dataFile.Add(fileName,new string[] { GetUniqueFileID(filepathFull), File.GetLastWriteTime(filepathFull).ToString("yyyyMMddHHmmss") });
 
 				} else {
 					//If fileName is found, check for Modified. Check this fileName's lastModified date with dataFile.
@@ -534,9 +535,9 @@ namespace SyncTest {
 
 			//To check for modify/ last modified. Reusable, only within this method.
 			static bool CheckMetaChange(string filePath, string dataLastModified) {
-				Console.WriteLine("Checkign file:" + filePath + "\nNewFile: " + File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmssFF") + " lastSaved: " + dataLastModified +
-				(long.Parse(File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmssFF")) > long.Parse(dataLastModified) ? " tru" : " false"));
-				if (long.Parse(File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmssFF")) > long.Parse(dataLastModified)) return true; else return false;
+				Console.WriteLine("Checkign file:" + filePath + "\nNewFile: " + File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmss") + " lastSaved: " + dataLastModified +
+				(long.Parse(File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmss")) > long.Parse(dataLastModified) ? " tru" : " false"));
+				if (long.Parse(File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmss")) > long.Parse(dataLastModified)) return true; else return false;
 			}
 
 		}
@@ -544,24 +545,28 @@ namespace SyncTest {
 		//Adds a new SyncEvent to serverSyncs, after performing parity checks with the rest of the data in serverSyncs.
 		static void AddToServerSyncEvents(ref List<SyncEvent> serverSyncs, ref SyncEvent newSyncEvent) {
 
-			if (newSyncEvent != null) {
-				SyncEventConflictResolver(ref serverSyncs, ref newSyncEvent);
-				Console.WriteLine("Adding server file changes as new SyncEvent entry...");
-				serverSyncs.Add(newSyncEvent);
-				globalNextSENumber++;
+			if (newSyncEvent == null || newSyncEvent.changes.Count == 0) return;
 
-				if (debug) {
-					Console.WriteLine("\n\n ========== Current serverSyncs =============\n");
-					foreach (SyncEvent r in serverSyncs) {
-						Console.WriteLine(r.syncEventNumber + "|Machine: " + r.machineID + "|Time: " + r.timeStamp);
-						foreach (SyncEvent.Change c in r.changes) {
-							Console.WriteLine(c.rFileName + "|" + c.changeType + "|" + c.renamedRFileName);
+			SyncEventConflictResolver(ref serverSyncs, ref newSyncEvent);
 
-						}
-						Console.WriteLine("");
+			if (newSyncEvent == null || newSyncEvent.changes.Count == 0) return;
+
+			Console.WriteLine("Adding server file changes as new SyncEvent entry...");
+			serverSyncs.Add(newSyncEvent);
+			globalNextSENumber++;
+
+			if (debug) {
+				Console.WriteLine("\n ========== Current serverSyncs =============");
+				foreach (SyncEvent r in serverSyncs) {
+					Console.WriteLine(r.syncEventNumber + "|Machine: " + r.machineID + "|Time: " + r.timeStamp);
+					foreach (SyncEvent.Change c in r.changes) {
+						Console.WriteLine(c.rFileName + "|" + c.changeType + "|" + c.renamedRFileName);
+
 					}
+					Console.WriteLine("");
 				}
 			}
+
 		}
 
 		//Compares current newSyncEvent to a list of existing SyncEvent, and edit newSyncEvent so it dosen't conflict with the existing SyncEvent.
@@ -794,10 +799,10 @@ namespace SyncTest {
 
 					//add new .data entry to data
 					if (!targetData.ContainsKey(change.rFileName)) {
-						targetData.Add(change.rFileName, new string[] { GetUniqueFileID(destFile), File.GetLastWriteTime(destFile).ToString("yyyyMMddHHmmssFF") });
+						targetData.Add(change.rFileName, new string[] { GetUniqueFileID(destFile), File.GetLastWriteTime(destFile).ToString("yyyyMMddHHmmss") });
 					} else {
 						Console.WriteLine("WARNING: Could not add new entry to .data, entry already exists: " + change.rFileName + "\n.data File: " + targetFolder);
-						targetData[change.rFileName] = new string[] { GetUniqueFileID(destFile), File.GetLastWriteTime(destFile).ToString("yyyyMMddHHmmssFF") };
+						targetData[change.rFileName] = new string[] { GetUniqueFileID(destFile), File.GetLastWriteTime(destFile).ToString("yyyyMMddHHmmss") };
 					}
 					break;
 
@@ -872,6 +877,22 @@ namespace SyncTest {
 					break;
 			}
 
+		}
+
+		//Deletes entries older than current date + daysToTrim.
+		//Also stop trimming if there's less than 10 entries.
+		static void TrimOldSyncEvents(ref List<SyncEvent> toTrim, int daysToTrim) {
+			long cutoffDate = long.Parse(DateTime.Now.AddDays(-daysToTrim).ToString("yyyyMMddHHmmss"));
+
+			//Start at i = 9 to skip the first 10 entries.
+			for (int i = 9; i < toTrim.Count; i++) {
+				Console.WriteLine("DOING " + toTrim[i].syncEventNumber + " TIMESPAMP: " + toTrim[i].timeStamp + " CUTOFF: " + cutoffDate);
+				if (long.Parse(toTrim[i].timeStamp) < cutoffDate) {
+					Console.WriteLine("TOO OLD, REMOVED: " + toTrim[i].syncEventNumber);
+					toTrim.RemoveAt(i);
+					i--; //removing element in the middle of a loop
+				} else return; //assume the rest are in order. if this guy is bigger, no need to check the rest.
+			}
 		}
 
 		//Writes a new sync file to disk. Accepts null sync file. Used to write client .sync
