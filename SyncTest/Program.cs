@@ -9,7 +9,28 @@ namespace SyncTest {
 	class Program {
 
 		static void Main(string[] args) {
-			SyncButton();
+			
+			try {
+				//rename back
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 two.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 two.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
+				//Delete file
+				File.Delete(Path.Join(clientFolder,".sync"));
+				File.Delete(Path.Join(serverFolder, ".sync"));
+				File.Delete(Path.Join(clientFolder, ".data"));
+				File.Delete(Path.Join(serverFolder, ".data"));
+
+				SyncButton();
+				Console.WriteLine("================================================================================\n\n");
+				//rename
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 two.mp3");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 three.mp3");
+				SyncButton();
+
+			} catch (Exception e) {
+				Console.WriteLine(e.Message);
+			}
+			
 		}
 
 		enum ChangeType { Delete, Add, Rename, Modified }
@@ -148,6 +169,18 @@ namespace SyncTest {
 			LoadDataFile(serverFolder, ref serverData);
 			LoadDataFile(clientFolder, ref clientData);
 
+			if (debug) {
+				Console.WriteLine("\nSERVER LOADED:");
+				foreach (KeyValuePair<string, string[]> item in serverData) {
+					Console.WriteLine(item.Key + "|" + item.Value[0] + "|" + item.Value[1]);
+				}
+
+				Console.WriteLine("\nCLIENT LOADED:");
+				foreach (KeyValuePair<string, string[]> item in clientData) {
+					Console.WriteLine(item.Key + "|" + item.Value[0] + "|" + item.Value[1]);
+				}
+			}
+			
 			LoadSyncFile(serverFolder, ref serverSyncs);
 			LoadDiskNextSENumber(serverFolder, ref globalNextSENumber);
 			LoadDiskNextSENumber(clientFolder, ref clientNextSENumber);
@@ -237,7 +270,7 @@ namespace SyncTest {
 			WriteSyncFile(serverFolder, ref serverSyncs, globalNextSENumber);
 			Console.WriteLine("Writing client .sync file...");
 			serverSyncs = null;
-			WriteSyncFile(clientFolder, ref serverSyncs, clientNextSENumber + 1);
+			WriteSyncFile(clientFolder, ref serverSyncs, globalNextSENumber);
 
 			// Write the entirety of .data to both server and client.
 			Console.WriteLine("Writing server .data file...");
@@ -396,16 +429,15 @@ namespace SyncTest {
 							//fileName found, this fileName is renamed. Add to changes
 							newUpdate.AddNewChange(dataFileTemp[i], ChangeType.Rename, fileName);
 
-							//Remove dataFile entry
-							dataFileTemp.RemoveAt(i);
-							i--;
-							if (i < 0) i = 0;
-							skip = true;
-
 							//Check for modify/lastmodified
 							if (dataFileTemp.Count > 0 && CheckMetaChange(filepathFull, dataFile[dataFileTemp[i]][1])) {
 								newUpdate.AddNewChange(fileName, ChangeType.Modified, "");
 							}
+
+							//Remove dataFile entry
+							dataFileTemp.RemoveAt(i);
+							//At this point, because i am removing an element from a list, the list indexes changes.
+							//i should change too, to keep synchronized. BUT, i'm breaking the code right after this so i'm not concerned about i anymore.
 							break;
 						}
 					}
@@ -502,6 +534,8 @@ namespace SyncTest {
 
 			//To check for modify/ last modified. Reusable, only within this method.
 			static bool CheckMetaChange(string filePath, string dataLastModified) {
+				Console.WriteLine("Checkign file:" + filePath + "\nNewFile: " + File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmssFF") + " lastSaved: " + dataLastModified +
+				(long.Parse(File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmssFF")) > long.Parse(dataLastModified) ? " tru" : " false"));
 				if (long.Parse(File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmssFF")) > long.Parse(dataLastModified)) return true; else return false;
 			}
 
@@ -741,6 +775,12 @@ namespace SyncTest {
 						break;
 					}
 
+					//Check if destination file exists
+					if (File.Exists(destFile)) {
+						Console.WriteLine("Warning: File exists! Skipping. " + hostFile);
+						break;
+					}
+
 					//Create dir
 					Directory.CreateDirectory(destDir);
 
@@ -864,7 +904,6 @@ namespace SyncTest {
 				if (data != null && data.Count > 0) {
 					foreach (KeyValuePair<string, string[]> item in data) {
 						sw.WriteLine(item.Key + "|" + item.Value[0] + "|" + item.Value[1]);
-						
 					}
 				}
 			}
