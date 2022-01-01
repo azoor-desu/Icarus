@@ -9,27 +9,27 @@ namespace SyncTest {
 	class Program {
 
 		static void Main(string[] args) {
-			try {
-				//rename back
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
-				//Delete file
-				File.Delete(Path.Join(clientFolder, ".sync"));
-				File.Delete(Path.Join(serverFolder, ".sync"));
-				File.Delete(Path.Join(clientFolder, ".data"));
-				File.Delete(Path.Join(serverFolder, ".data"));
+			//try {
+			//	//rename back
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
+			//	//Delete file
+			//	File.Delete(Path.Join(clientFolder, ".sync"));
+			//	File.Delete(Path.Join(serverFolder, ".sync"));
+			//	File.Delete(Path.Join(clientFolder, ".data"));
+			//	File.Delete(Path.Join(serverFolder, ".data"));
 
-				SyncButton();
-				Console.WriteLine("================================================================================\n");
-				//rename
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3");
-				SyncButton();
+			//	SyncButton();
+			//	Console.WriteLine("================================================================================\n");
+			//	//rename
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3");
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3");
+			//	SyncButton();
 
-			} catch (Exception e) {
-				Console.WriteLine(e.Message);
-			}
-			//SyncButton();
+			//} catch (Exception e) {
+			//	Console.WriteLine(e.Message);
+			//}
+			SyncButton();
 		}
 
 		enum ChangeType { Delete, Add, Rename, Modified }
@@ -221,6 +221,7 @@ namespace SyncTest {
 			if (serverChanges != null) {
 				Console.WriteLine("Server changes found!");
 				AddToServerSyncEvents(ref serverSyncs, ref serverChanges);
+				UpdateDataWithChange(serverFolder, ref serverData, in serverChanges);
 			} else {
 				Console.WriteLine("No server changes found.");
 			}
@@ -247,18 +248,22 @@ namespace SyncTest {
 
 				// Handle any conflicts in the merge.
 				Console.WriteLine("Processing changes to remove conflicts before adding to serverSyncs...");
-				SyncEventConflictResolver(ref outstandingEvents, ref clientChanges);
-
-				//compress the rename portion before adding client side changes to serverSyncs
-				//WARNING: clientChanges will be updated correctly to reflect what's going to be added in serverSync,
-				//but serverChanges will also be updated but customized to have certain rename events removed for FileIO operations.
-				FixRenameForClientChanges(ref clientChanges, ref serverChanges, ref serverSyncs);
-				//clientChanges is now free of any potential conflicts.
+				SyncEventConflictResolver(in outstandingEvents, ref clientChanges);				
 
 				// Finally, the merged client changes can be appended to server's .sync (but don't write).
 				if (clientChanges.changes.Count > 0) {
+					//Update .data before the rename fix cos .data is still on the old name!
+					UpdateDataWithChange(clientFolder, ref clientData, in clientChanges);
+
+					//compress the rename portion before adding client side changes to serverSyncs
+					//WARNING: clientChanges will be updated correctly to reflect what's going to be added in serverSync,
+					//but serverChanges will also be updated but customized to have certain rename events removed for FileIO operations.
+					FixRenameForClientChanges(ref clientChanges, ref serverChanges, in serverSyncs);
+					//clientChanges is now free of any potential conflicts.
+
 					Console.WriteLine("Processed changes valid, adding to serverSync.");
 					AddToServerSyncEvents(ref serverSyncs, ref clientChanges);
+					
 				} else {
 					Console.WriteLine("No more changes left after processing. No SyncEvent will be added for Client.");
 				}
@@ -297,17 +302,17 @@ namespace SyncTest {
 
 			// Write the entirety of the serverside .sync file into a new .sync file, overwrite.
 			Console.WriteLine("\nWriting server .sync file...");
-			WriteSyncFile(serverFolder, ref serverSyncs, globalNextSENumber);
+			WriteSyncFile(serverFolder, in serverSyncs, globalNextSENumber);
 			Console.WriteLine("Writing client .sync file...");
 			serverSyncs = null;
-			WriteSyncFile(clientFolder, ref serverSyncs, globalNextSENumber);
+			WriteSyncFile(clientFolder, in serverSyncs, globalNextSENumber);
 
 			// Write the entirety of .data to both server and client.
 			Console.WriteLine("Writing server .data file...");
-			WriteDataFile(serverFolder, ref serverData);
+			WriteDataFile(serverFolder, in serverData);
 
 			Console.WriteLine("Writing client .data file...");
-			WriteDataFile(clientFolder, ref clientData);
+			WriteDataFile(clientFolder, in clientData);
 			#endregion
 
 			Console.WriteLine("\nFiles synchronized!");
@@ -582,7 +587,7 @@ namespace SyncTest {
 
 		//go from top down the entire list of .sync and find the latest name! If not found, return "".
 		//Attempts to find the latest updated name of some file that has been renamed many times.
-		static string FindLatestRename(ref List<SyncEvent> syncs, string name) {
+		static string FindLatestRename(in List<SyncEvent> syncs, string name) {
 			if (syncs == null) return "";
 			bool found = false;
 
@@ -612,7 +617,7 @@ namespace SyncTest {
 		//On multiple renames, client rename uses wrong name to try to rename.
 		//Fixes that so when server does fileIO operation, it will be able to find the correct file to rename.
 		//Assumes serverChanges has been appended to syncs, but NOT clientChanges.
-		static void FixRenameForClientChanges(ref SyncEvent clientChanges, ref SyncEvent serverChanges, ref List<SyncEvent> serverSyncs) {
+		static void FixRenameForClientChanges(ref SyncEvent clientChanges, ref SyncEvent serverChanges, in List<SyncEvent> serverSyncs) {
 			//On multiple renames on the same file, GetChangesFromDisk will return something like this:
 			//1. server: 69 -> 69server
 			//2. client1: 69 -> 69client1
@@ -643,7 +648,7 @@ namespace SyncTest {
 					//Change the filename in client.
 					if (clientChanges.changes[i].changeType == ChangeType.Rename) {
 						//Find the latest name according to what is on the server disk rn.
-						string newName = FindLatestRename(ref serverSyncs, clientChanges.changes[i].rFileName);
+						string newName = FindLatestRename(in serverSyncs, clientChanges.changes[i].rFileName);
 						clientChanges.SetFilename(i, newName);
 					}
 				}
@@ -655,7 +660,7 @@ namespace SyncTest {
 
 			if (newSyncEvent == null || newSyncEvent.changes.Count == 0) return;
 
-			SyncEventConflictResolver(ref serverSyncs, ref newSyncEvent);
+			SyncEventConflictResolver(in serverSyncs, ref newSyncEvent);
 
 			if (newSyncEvent == null || newSyncEvent.changes.Count == 0) return;
 
@@ -676,9 +681,56 @@ namespace SyncTest {
 
 		}
 
+		//updates the relevant database with the SyncEvent, to be used right after adding to serverSyncs
+		static void UpdateDataWithChange(string path, ref Dictionary<string, string[]> data, in SyncEvent syncEvent) {
+			// On ADD, copy file to target, add new .data entry
+			// On DELETE, remove file from target, remove .data entry
+			// On RENAME, rename file at target, update fileName in .data entry
+			// On MODIFIED, copy & replace file to target, update LocalId
+
+			if (syncEvent != null && syncEvent.changes.Count > 0) {
+				foreach (SyncEvent.Change change in syncEvent.changes) {
+					string filePath = Path.Join(path, change.rFileName);
+					switch (change.changeType) {
+						case ChangeType.Add:
+							if (!data.ContainsKey(change.rFileName)) {
+								data.Add(change.rFileName, new string[] { GetUniqueFileID(filePath), File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmss") });
+							}
+							break;
+
+						case ChangeType.Delete:
+							if (data.ContainsKey(change.rFileName)) {
+								data.Remove(change.rFileName);
+							} else {
+								Console.WriteLine("ERROR: Unable to find entry in .data to delete! File: " + change.rFileName + "\nLocation: " + path);
+							}
+							break;
+
+						case ChangeType.Rename:
+							if (data.ContainsKey(change.rFileName)) {
+								data.Add(change.renamedRFileName, new string[] { data[change.rFileName][0], data[change.rFileName][1] });
+								data.Remove(change.rFileName);
+							} else {
+								Console.WriteLine("ERROR: Unable to find entry in .data to rename! File: " + change.rFileName + "\nLocation: " + path);
+							}
+							break;
+
+						case ChangeType.Modified:
+							if (data.ContainsKey(change.rFileName)) {
+								data[change.rFileName][1] = File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmss");
+							} else {
+								Console.WriteLine("ERROR: Unable to find entry in .data to update last modified! File: " + change.rFileName + "\nLocation: " + path);
+							}
+							break;
+					}
+
+				}
+			}
+		}
+
 		//Compares current newSyncEvent to a list of existing SyncEvent, and edit newSyncEvent so it dosen't conflict with the existing SyncEvent.
 		//Used in AddToServerSyncEvents() and main SyncButton() logic for merging & conflict management
-		static void SyncEventConflictResolver(ref List<SyncEvent> oldEvents, ref SyncEvent newSyncEvent) {
+		static void SyncEventConflictResolver(in List<SyncEvent> oldEvents, ref SyncEvent newSyncEvent) {
 			
 			//scan thru all the changes in newSyncEvent.
 			// Rules:
@@ -910,7 +962,7 @@ namespace SyncTest {
 						Console.WriteLine("WARNING: Could not add new entry to .data, entry already exists: " + change.rFileName + "\n.data File: " + targetFolder);
 						targetData[change.rFileName] = new string[] { GetUniqueFileID(destFile), File.GetLastWriteTime(destFile).ToString("yyyyMMddHHmmss") };
 					}
-					break;
+						break;
 
 				case ChangeType.Delete:
 					//Check if target file exists
@@ -926,7 +978,6 @@ namespace SyncTest {
 						Console.WriteLine("Error deleting file: " + destFile + "\nError Msg: " + e.Message);
 						break;
 					}
-
 					//remove .data entry to data
 					if (targetData.ContainsKey(change.rFileName)) {
 						targetData.Remove(change.rFileName);
@@ -949,7 +1000,6 @@ namespace SyncTest {
 						Console.WriteLine("Error renaming file: " + destFile + "\nError Msg: " + e.Message);
 						break;
 					}
-
 					// update .data entry
 					if (targetData.ContainsKey(change.rFileName)) {
 						targetData.Add(change.renamedRFileName, targetData[change.rFileName]);
@@ -973,7 +1023,6 @@ namespace SyncTest {
 						Console.WriteLine("Error copying(modify) file: " + hostFile + "\nError Msg: " + e.Message);
 						break;
 					}
-
 					//update .data entry to data
 					if (targetData.ContainsKey(change.rFileName)) {
 						targetData[change.rFileName][0] = GetUniqueFileID(destFile);
@@ -1002,7 +1051,7 @@ namespace SyncTest {
 		}
 
 		//Writes a new sync file to disk. Accepts null sync file. Used to write client .sync
-		static void WriteSyncFile(string path, ref List<SyncEvent> syncs, int nextSENumber) {
+		static void WriteSyncFile(string path, in List<SyncEvent> syncs, int nextSENumber) {
 			Directory.CreateDirectory(path);
 			using (StreamWriter sw = File.CreateText(Path.Join(path, ".sync"))) {
 				sw.WriteLine("#1.0 Sync File");
@@ -1021,7 +1070,7 @@ namespace SyncTest {
 		}
 
 		//Writes a new data file to disk.
-		static void WriteDataFile(string path, ref Dictionary<string, string[]> data) {
+		static void WriteDataFile(string path, in Dictionary<string, string[]> data) {
 			Directory.CreateDirectory(path);
 			using (StreamWriter sw = File.CreateText(Path.Join(path, ".data"))) {
 				sw.WriteLine("#1.0 Data File");
