@@ -734,7 +734,7 @@ namespace SyncTest {
 			
 			//scan thru all the changes in newSyncEvent.
 			// Rules:
-			// 1. ADD must not have ANY PRIOR ACTION other than DELETE on the same file (use filePath as ID). Discard ADD if so, and warn user.
+			// 1. ADD must not have ANY PRIOR ACTION until the next DELETE on the same file (use filePath as ID). Discard ADD if so, and warn user.
 			// 2. RENAME/MODIFIED/DELETE must not have a prior DELETE on the same file (use filePath as ID). Discard RENAME/MODIFIED/DELETE if so, and warn user.
 
 			//Stores a temp array of who to remove AFTER the loop, cos cannot delete elements while iterating.
@@ -763,7 +763,7 @@ namespace SyncTest {
 							switch (newSyncEvent.changes[i].changeType) {
 
 								case ChangeType.Add:
-									// 1. MUST NOT HAVE ANY PRIOR ACTIONS other then DELETE. Mark for deletion and move on.
+									// 1. MUST NOT HAVE ANY PRIOR ACTIONS UNTIL THE NEXT DELETE. Mark for deletion and move on.
 									if (oldChange.changeType != ChangeType.Delete) {
 										toRemove[i] = 1;
 										skip = true;
