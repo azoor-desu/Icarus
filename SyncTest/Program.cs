@@ -9,7 +9,6 @@ namespace SyncTest {
 	class Program {
 
 		static void Main(string[] args) {
-
 			try {
 				//rename back
 				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
@@ -21,7 +20,7 @@ namespace SyncTest {
 				File.Delete(Path.Join(serverFolder, ".data"));
 
 				SyncButton();
-				Console.WriteLine("================================================================================\n\n");
+				Console.WriteLine("================================================================================\n");
 				//rename
 				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3");
 				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3");
@@ -46,7 +45,7 @@ namespace SyncTest {
 
 		class SyncEvent {
 
-			//bob the builder
+			//Builds a new SyncEvent
 			public SyncEvent(string _syncEventNumber, string _machineID, string _timeStamp) {
 				syncEventNumber = _syncEventNumber;
 				machineID = _machineID;
@@ -54,12 +53,22 @@ namespace SyncTest {
 				changes = new List<Change>();
 			}
 
+			//Replicates a new SyncEvent using an existing one.
+			public SyncEvent(SyncEvent syncEvent) {
+				syncEventNumber = syncEvent.syncEventNumber;
+				machineID = syncEvent.machineID;
+				timeStamp = syncEvent.timeStamp;
+				changes = new List<Change> (syncEvent.changes);
+			}
+
 			public void AddNewChange(string fileName, ChangeType changeType, string newFileName) {
-				Change e = new Change();
-				e.rFileName = fileName;
-				e.changeType = changeType;
-				e.renamedRFileName = newFileName;
-				changes.Add(e);
+				changes.Add(new Change(fileName,changeType,newFileName));
+			}
+
+			public void SetFilename(int index, string newName) {
+				if (index < changes.Count) {
+					changes[index] = new Change(newName, changes[index].changeType, changes[index].renamedRFileName);
+				}
 			}
 
 			public string syncEventNumber;
@@ -72,7 +81,14 @@ namespace SyncTest {
 				public string rFileName;
 				public ChangeType changeType;
 				public string renamedRFileName;
+				public Change(string _rFilename, ChangeType _changeType, string _renamedRFielName) {
+					rFileName = _rFilename;
+					changeType = _changeType;
+					renamedRFileName = _renamedRFielName;
+				}
 			}
+
+			
 		}
 
 		static bool debug = true;
@@ -216,11 +232,13 @@ namespace SyncTest {
 			// ====================== Merging & Conflict Management ===========================
 			// Compare client changes to server changes, cancel out actions that have alr been done.
 			#region Merging and Conflict Management
+
 			if (clientChanges != null) {
 				Console.WriteLine("Client changes found!");
 				//Grab the offset of index to be used. Assuming the serverSyncs is in order of oldest at index 0 and newest at bottom
 				//use offset to grab the relevant SyncEvent.
 
+				//Use outstanding events to compare against the current client changes, and discard any conflicting client changes.
 				List<SyncEvent> outstandingEvents = new List<SyncEvent>();
 				// Grab the whole list of SyncEvents the client is missing out on
 				for (int i = clientNextSENumber - SENumberOffset; i < serverSyncs.Count; i++) {
@@ -230,6 +248,12 @@ namespace SyncTest {
 				// Handle any conflicts in the merge.
 				Console.WriteLine("Processing changes to remove conflicts before adding to serverSyncs...");
 				SyncEventConflictResolver(ref outstandingEvents, ref clientChanges);
+
+				//compress the rename portion before adding client side changes to serverSyncs
+				//WARNING: clientChanges will be updated correctly to reflect what's going to be added in serverSync,
+				//but serverChanges will also be updated but customized to have certain rename events removed for FileIO operations.
+				FixRenameForClientChanges(ref clientChanges, ref serverChanges, ref serverSyncs);
+				//clientChanges is now free of any potential conflicts.
 
 				// Finally, the merged client changes can be appended to server's .sync (but don't write).
 				if (clientChanges.changes.Count > 0) {
@@ -247,15 +271,6 @@ namespace SyncTest {
 			#region File IO
 			List<SyncEvent.Change> changesToDo = new List<SyncEvent.Change>();
 
-			//Do client file IO.
-			Console.WriteLine("\nDoing Server to Client file IO...");
-			//serverChanges is already the perfect block to directly carry out actions on Client. Just do actions as is.
-			if (serverChanges != null)
-				foreach (SyncEvent.Change change in serverChanges.changes) {
-					PerformFileIO(serverFolder, clientFolder, change, ref clientData);
-				}
-
-
 			//Do server file IO.
 			Console.WriteLine("\nDoing Client to Server file IO...");
 			//clientChanges is already the perfect block to directly carry out actions on Client. Just do actions as is.
@@ -263,6 +278,16 @@ namespace SyncTest {
 				foreach (SyncEvent.Change change in clientChanges.changes) {
 					PerformFileIO(clientFolder, serverFolder, change, ref serverData);
 				}
+			Console.WriteLine("Done!");
+
+			//Do client file IO.
+			Console.WriteLine("\nDoing Server to Client file IO...");
+			//serverChanges is already the perfect block to directly carry out actions on Client. Just do actions as is.
+			if (serverChanges != null)
+				foreach (SyncEvent.Change change in serverChanges.changes) {
+					PerformFileIO(serverFolder, clientFolder, change, ref clientData);
+				}
+			Console.WriteLine("Done!");
 
 			#endregion
 			// ====================== Writing .sync & .data files ===================
@@ -285,7 +310,7 @@ namespace SyncTest {
 			WriteDataFile(clientFolder, ref clientData);
 			#endregion
 
-			Console.WriteLine("\nSongs synchronized!");
+			Console.WriteLine("\nFiles synchronized!");
 		}
 
 		// ================= Helper Methods ===========================
@@ -555,6 +580,76 @@ namespace SyncTest {
 			}
 		}
 
+		//go from top down the entire list of .sync and find the latest name! If not found, return "".
+		//Attempts to find the latest updated name of some file that has been renamed many times.
+		static string FindLatestRename(ref List<SyncEvent> syncs, string name) {
+			if (syncs == null) return "";
+			bool found = false;
+
+			foreach (SyncEvent syncEvent in syncs) {
+				foreach (SyncEvent.Change chng in syncEvent.changes) {
+					if (name == chng.rFileName) {
+						switch (chng.changeType) {
+							case ChangeType.Add:
+							case ChangeType.Modified:
+								found = true;
+								break;
+							case ChangeType.Rename:
+								found = true;
+								name = chng.renamedRFileName;
+								break;
+						}
+					}
+				}
+			}
+			if (!found) {
+				return "";
+			} else {
+				return name;
+			}
+		}
+
+		//On multiple renames, client rename uses wrong name to try to rename.
+		//Fixes that so when server does fileIO operation, it will be able to find the correct file to rename.
+		//Assumes serverChanges has been appended to syncs, but NOT clientChanges.
+		static void FixRenameForClientChanges(ref SyncEvent clientChanges, ref SyncEvent serverChanges, ref List<SyncEvent> serverSyncs) {
+			//On multiple renames on the same file, GetChangesFromDisk will return something like this:
+			//1. server: 69 -> 69server
+			//2. client1: 69 -> 69client1
+			//------------------------------
+			//3. server: 69client1 -> 69server2 (Client1 and server are on update 3)
+			//------------------------------
+			//4. client2: 69 -> 69client2 << who is 69???? (Client 2 was on update 0.)
+			//Server file's current name is 69server, not 69. just change entry 2 to: client: 69server -> 69client >>Server will carry out this IO operation.
+			//ALSO, remove the rename IO operation for serverChanges, as client folder alr has latest updates.
+
+			if (clientChanges == null) return;
+
+			for (int i = 0; i < clientChanges.changes.Count; i++) {
+
+				if (clientChanges.changes[i].changeType == ChangeType.Rename) {
+					//remove the serverChanges entry.
+					if (serverChanges != null) {
+						//loop thru serverChanges
+						for (int j = 0; j < serverChanges.changes.Count; j++) {
+							//if the names of clientChanges[i] and serverChanges[j] match, then remove the serverChanges one.
+							if (serverChanges.changes[j].changeType == ChangeType.Rename && serverChanges.changes[j].rFileName == clientChanges.changes[i].rFileName) {
+								serverChanges.changes.RemoveAt(j);
+								break; //only 1 rename entry per file, safe to break.
+							}
+						}
+					}
+
+					//Change the filename in client.
+					if (clientChanges.changes[i].changeType == ChangeType.Rename) {
+						//Find the latest name according to what is on the server disk rn.
+						string newName = FindLatestRename(ref serverSyncs, clientChanges.changes[i].rFileName);
+						clientChanges.SetFilename(i, newName);
+					}
+				}
+			}
+		}
+
 		//Adds a new SyncEvent to serverSyncs, after performing parity checks with the rest of the data in serverSyncs.
 		static void AddToServerSyncEvents(ref List<SyncEvent> serverSyncs, ref SyncEvent newSyncEvent) {
 
@@ -565,13 +660,13 @@ namespace SyncTest {
 			if (newSyncEvent == null || newSyncEvent.changes.Count == 0) return;
 
 			Console.WriteLine("Adding a new SyncEvent entry!");
-			serverSyncs.Add(newSyncEvent);
+			serverSyncs.Add(new SyncEvent(newSyncEvent));
 			globalNextSENumber++;
 
 			if (debug) {
 				Console.WriteLine("========== Current serverSyncs =============");
 				foreach (SyncEvent r in serverSyncs) {
-					Console.WriteLine("SyncNumber: " + r.syncEventNumber + "|Machine: " + r.machineID + "|Time: " + r.timeStamp);
+					Console.WriteLine("SyncNumber: " + r.syncEventNumber + "|Machine: " + r.machineID + "|Time: " + r.timeStamp + "|Count: " + r.changes.Count);
 					foreach (SyncEvent.Change c in r.changes) {
 						Console.WriteLine(c.rFileName + "|" + c.changeType + "|" + c.renamedRFileName);
 					}
@@ -753,11 +848,9 @@ namespace SyncTest {
 				
 				//Update renamed name
 				if (listCompressedChanges[i].rFileName != currentFileName) {
-					SyncEvent.Change ee = new SyncEvent.Change();
-					ee.rFileName = currentFileName;
-					ee.changeType = listCompressedChanges[i].changeType;
-					ee.renamedRFileName = listCompressedChanges[i].renamedRFileName;
-					listCompressedChanges[i] = ee;
+					listCompressedChanges[i] = new SyncEvent.Change(currentFileName, 
+					listCompressedChanges[i].changeType, 
+					listCompressedChanges[i].renamedRFileName);
 				}
 			}
 
