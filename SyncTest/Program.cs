@@ -9,26 +9,26 @@ namespace SyncTest {
 	class Program {
 
 		static void Main(string[] args) {
-			try {
-				//RESET
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
-				File.Delete(Path.Join(clientFolder, ".sync"));
-				File.Delete(Path.Join(serverFolder, ".sync"));
-				File.Delete(Path.Join(clientFolder, ".data"));
-				File.Delete(Path.Join(serverFolder, ".data"));
+			//try {
+			//	//RESET
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
+			//	File.Delete(Path.Join(clientFolder, ".sync"));
+			//	File.Delete(Path.Join(serverFolder, ".sync"));
+			//	File.Delete(Path.Join(clientFolder, ".data"));
+			//	File.Delete(Path.Join(serverFolder, ".data"));
 
-				SyncButton();
-				Console.WriteLine("================================================================================\n");
-				//rename
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3");
-				SyncButton();
+			//	SyncButton();
+			//	Console.WriteLine("================================================================================\n");
+			//	//rename
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3");
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3");
+			//	SyncButton();
 
-			} catch (Exception e) {
-				Console.WriteLine(e.Message);
-			}
-			//SyncButton();
+			//} catch (Exception e) {
+			//	Console.WriteLine(e.Message);
+			//}
+			SyncButton();
 		}
 
 		enum ChangeType { Delete, Add, Rename, Modified }
@@ -631,29 +631,42 @@ namespace SyncTest {
 
 			for (int i = 0; i < clientChanges.changes.Count; i++) {
 
-				if (clientChanges.changes[i].changeType == ChangeType.Rename) {
-					//remove the serverChanges entry.
-					if (serverChanges != null) {
-						//loop thru serverChanges
-						for (int j = 0; j < serverChanges.changes.Count; j++) {
-							//if the names of clientChanges[i] and serverChanges[j] match, then remove the serverChanges one.
-							if (serverChanges.changes[j].changeType == ChangeType.Rename && serverChanges.changes[j].rFileName == clientChanges.changes[i].rFileName) {
-								serverChanges.changes.RemoveAt(j);
-								break; //only 1 rename entry per file, safe to break.
-							}
-						}
-					}
+				//only entertain Renames
+				if (clientChanges.changes[i].changeType != ChangeType.Rename) continue;
 
-					//Change the filename in client.
-					if (clientChanges.changes[i].changeType == ChangeType.Rename) {
-						//Find the latest name according to what is on the server disk rn.
-						string newName = FindLatestRename(in serverSyncs, clientChanges.changes[i].rFileName);
-						if (newName != "") {
-							clientChanges.ChangeFileName(i, newName);
-						} else {
-							Console.WriteLine("FIXRENAME ERROR: Could not find old name of file: " + clientChanges.changes[i].rFileName);
+				//remove the serverChanges entry.
+				if (serverChanges != null) {
+					//loop thru serverChanges
+					for (int j = 0; j < serverChanges.changes.Count; j++) {
+						//if the names of clientChanges[i] and serverChanges[j] match, then remove the serverChanges one.
+						if (serverChanges.changes[j].changeType == ChangeType.Rename && serverChanges.changes[j].rFileName == clientChanges.changes[i].rFileName) {
+							serverChanges.changes.RemoveAt(j);
+							break; //only 1 rename entry per file, safe to break.
 						}
 					}
+				}
+
+				//Change the filename in client.
+				//Find the latest name according to what is on the server disk rn.
+				string newName = FindLatestRename(in serverSyncs, clientChanges.changes[i].rFileName);
+
+				//If error, skip.
+				if (newName == "") {
+					Console.WriteLine("FIXRENAME ERROR: Could not find old name of file: " + clientChanges.changes[i].rFileName);
+					continue;
+				}
+
+				if (newName != clientChanges.changes[i].renamedRFileName) {
+					//Just change the name
+					clientChanges.ChangeFileName(i, newName);
+				} else {
+					//Edge case: When renaming 2 files to the same name on server and client, this will happen:
+					//1. server: 69 -> 69a
+					//2. client1: 69a -> 69a
+					//remove the client change!
+					clientChanges.changes.RemoveAt(i);
+					i--;
+					continue; //i did an i-- here, no code should run after this till the next loop.
 				}
 			}
 		}

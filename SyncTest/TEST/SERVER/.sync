@@ -1,14 +1,18 @@
 #1.0 Sync File
 
-3
-#0|SERVER|20220102155518
+5
+#0|SERVER|20220102160605
 1.m4a|Add|
 2.1.mp3|Add|
 4.mp3|Add|
 69.mp3|Add|
 a foldur\5.mp3|Add|
 a foldur\6.mp3|Add|
-#1|SERVER|20220102155519
+#1|SERVER|20220102160605
 69.mp3|Rename|69 server.mp3
-#2|PLEIADES|20220102155519
+#2|PLEIADES|20220102160605
 69 server.mp3|Rename|69 client.mp3
+#3|SERVER|20220102162311
+69 client.mp3|Rename|69 a.mp3
+#4|SERVER|20220102162351
+69 a.mp3|Rename|69 b.mp3
