@@ -9,27 +9,26 @@ namespace SyncTest {
 	class Program {
 
 		static void Main(string[] args) {
-			//try {
-			//	//rename back
-			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
-			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
-			//	//Delete file
-			//	File.Delete(Path.Join(clientFolder, ".sync"));
-			//	File.Delete(Path.Join(serverFolder, ".sync"));
-			//	File.Delete(Path.Join(clientFolder, ".data"));
-			//	File.Delete(Path.Join(serverFolder, ".data"));
+			try {
+				//RESET
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 client.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
+				File.Delete(Path.Join(clientFolder, ".sync"));
+				File.Delete(Path.Join(serverFolder, ".sync"));
+				File.Delete(Path.Join(clientFolder, ".data"));
+				File.Delete(Path.Join(serverFolder, ".data"));
 
-			//	SyncButton();
-			//	Console.WriteLine("================================================================================\n");
-			//	//rename
-			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3");
-			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3");
-			//	SyncButton();
+				SyncButton();
+				Console.WriteLine("================================================================================\n");
+				//rename
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3");
+				SyncButton();
 
-			//} catch (Exception e) {
-			//	Console.WriteLine(e.Message);
-			//}
-			SyncButton();
+			} catch (Exception e) {
+				Console.WriteLine(e.Message);
+			}
+			//SyncButton();
 		}
 
 		enum ChangeType { Delete, Add, Rename, Modified }
@@ -65,7 +64,7 @@ namespace SyncTest {
 				changes.Add(new Change(fileName,changeType,newFileName));
 			}
 
-			public void SetFilename(int index, string newName) {
+			public void ChangeFileName(int index, string newName) {
 				if (index < changes.Count) {
 					changes[index] = new Change(newName, changes[index].changeType, changes[index].renamedRFileName);
 				}
@@ -242,7 +241,7 @@ namespace SyncTest {
 				//Use outstanding events to compare against the current client changes, and discard any conflicting client changes.
 				List<SyncEvent> outstandingEvents = new List<SyncEvent>();
 				// Grab the whole list of SyncEvents the client is missing out on
-				for (int i = clientNextSENumber - SENumberOffset; i < serverSyncs.Count; i++) {
+				for (int i = clientNextSENumber - SENumberOffset; i < serverSyncs.Count && i >= 0; i++) {
 					outstandingEvents.Add(serverSyncs[i]);
 				}
 
@@ -297,8 +296,6 @@ namespace SyncTest {
 			#endregion
 			// ====================== Writing .sync & .data files ===================
 			#region Writing .sync & .data files
-			// Trim old entries of .sync. Those older than 6 months will be deleted.
-			TrimOldSyncEvents(ref serverSyncs, 31 * 6);
 
 			// Write the entirety of the serverside .sync file into a new .sync file, overwrite.
 			Console.WriteLine("\nWriting server .sync file...");
@@ -386,13 +383,15 @@ namespace SyncTest {
 					continue;
 				}
 				//If first char starts with #, new sync event!
-				if (line[0] == '#') { //add sync event
+				if (line.Length > 1 && line[0] == '#') { //add sync event
 					string[] temp = line.Remove(0, 1).Split('|'); //remove the # and split
 					list.Add(new SyncEvent(temp[0], temp[1], temp[2]));
 
 				} else { //add individual sync change entries
 					string[] temp = line.Split('|');
-					list[^1].AddNewChange(temp[0], strToChangeType[temp[1]], temp[2]); //list[^1] is the last element in the list
+					if (temp.Length >= 3) {
+						list[^1].AddNewChange(temp[0], strToChangeType[temp[1]], temp[2]); //list[^1] is the last element in the list
+					}
 				}
 
 			}
@@ -649,7 +648,11 @@ namespace SyncTest {
 					if (clientChanges.changes[i].changeType == ChangeType.Rename) {
 						//Find the latest name according to what is on the server disk rn.
 						string newName = FindLatestRename(in serverSyncs, clientChanges.changes[i].rFileName);
-						clientChanges.SetFilename(i, newName);
+						if (newName != "") {
+							clientChanges.ChangeFileName(i, newName);
+						} else {
+							Console.WriteLine("FIXRENAME ERROR: Could not find old name of file: " + clientChanges.changes[i].rFileName);
+						}
 					}
 				}
 			}
@@ -918,6 +921,7 @@ namespace SyncTest {
 
 		//Perform a singular File IO Operation, from sourceFolder to targetFolder.
 		//sourceFolder is ignored for IO that only happens on targetFolder.
+		//Do a second round of .data updating as FileIO actions are being performed!
 		static void PerformFileIO(string hostFolder, string targetFolder, SyncEvent.Change change, ref Dictionary<string, string[]> targetData) {
 			// On ADD, copy file to target, add new .data entry
 			// On DELETE, remove file from target, remove .data entry
@@ -1032,22 +1036,6 @@ namespace SyncTest {
 					break;
 			}
 
-		}
-
-		//Deletes entries older than current date + daysToTrim.
-		//Also stop trimming if there's less than 10 entries.
-		static void TrimOldSyncEvents(ref List<SyncEvent> toTrim, int daysToTrim) {
-			long cutoffDate = long.Parse(DateTime.Now.AddDays(-daysToTrim).ToString("yyyyMMddHHmmss"));
-
-			//Start at i = 9 to skip the first 10 entries.
-			for (int i = 9; i < toTrim.Count; i++) {
-				Console.WriteLine("DOING " + toTrim[i].syncEventNumber + " TIMESPAMP: " + toTrim[i].timeStamp + " CUTOFF: " + cutoffDate);
-				if (long.Parse(toTrim[i].timeStamp) < cutoffDate) {
-					Console.WriteLine("TOO OLD, REMOVED: " + toTrim[i].syncEventNumber);
-					toTrim.RemoveAt(i);
-					i--; //removing element in the middle of a loop
-				} else return; //assume the rest are in order. if this guy is bigger, no need to check the rest.
-			}
 		}
 
 		//Writes a new sync file to disk. Accepts null sync file. Used to write client .sync
