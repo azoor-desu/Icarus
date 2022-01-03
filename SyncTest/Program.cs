@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 using Un4seen.Bass;
+using System.Diagnostics;
 
 namespace SyncTest {
 	class Program {
@@ -11,8 +12,8 @@ namespace SyncTest {
 		static void Main(string[] args) {
 			//try {
 			//	//RESET
-			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 server.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3");
-			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3");
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69 server.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3");
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69 server.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
 			//	File.Delete(Path.Join(clientFolder, ".sync"));
 			//	File.Delete(Path.Join(serverFolder, ".sync"));
 			//	File.Delete(Path.Join(clientFolder, ".data"));
@@ -21,8 +22,8 @@ namespace SyncTest {
 			//	SyncButton();
 			//	Console.WriteLine("================================================================================\n");
 			//	//rename
-			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\69 client.mp3");
-			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\69 server.mp3");
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69 client.mp3");
+			//	File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69 server.mp3");
 			//	SyncButton();
 
 			//} catch (Exception e) {
@@ -57,11 +58,11 @@ namespace SyncTest {
 				syncEventNumber = syncEvent.syncEventNumber;
 				machineID = syncEvent.machineID;
 				timeStamp = syncEvent.timeStamp;
-				changes = new List<Change> (syncEvent.changes);
+				changes = new List<Change>(syncEvent.changes);
 			}
 
 			public void AddNewChange(string fileName, ChangeType changeType, string newFileName) {
-				changes.Add(new Change(fileName,changeType,newFileName));
+				changes.Add(new Change(fileName, changeType, newFileName));
 			}
 
 			public void ChangeFileName(int index, string newName) {
@@ -84,21 +85,19 @@ namespace SyncTest {
 					changeType = _changeType;
 					renamedRFileName = _renamedRFielName;
 				}
-			}	
+			}
 		}
 
 		static bool debug = true;
 
-		static string clientFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\CLIENT\";
-		static string serverFolder = @"C:\PERSONAL FILES\WORK\APP\ArientMusicPlayer\SyncTest\TEST\SERVER\";
+		static string clientFolder = @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\";
+		static string serverFolder = @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\";
 
 		static int globalNextSENumber = 0; //global SE Number for use to give new updates that are to be added to serverSyncs. Increments when new updates are added.
 		static int clientNextSENumber = 0; //Client's next SE number. Will not change throughout SyncButton().
 
 		//Entry point: Sync Button pressed!
 		static void SyncButton() {
-
-
 			// ====================== Check if directories exist. ==============================
 			#region Check Directories Exist
 			if (!Directory.Exists(serverFolder)) {
@@ -195,7 +194,7 @@ namespace SyncTest {
 				}
 				if (clientData.Count == 0) Console.WriteLine("[empty]");
 			}
-			
+
 			LoadSyncFile(serverFolder, ref serverSyncs);
 			LoadDiskNextSENumber(serverFolder, ref globalNextSENumber);
 			LoadDiskNextSENumber(clientFolder, ref clientNextSENumber);
@@ -213,12 +212,12 @@ namespace SyncTest {
 			//Compare server .data file to server files on disk.
 			Console.WriteLine("\nChecking file changes for server...");
 			SyncEvent serverChanges = GetChangesFromDisk(serverFolder, ref serverData);
+			UpdateDataWithChange(serverFolder, ref serverData, in serverChanges);
 
 			//if changes are NOT NULL, write to .sync, as a new entry IMMEDIATELY.
 			if (serverChanges != null) {
 				Console.WriteLine("Server changes found!");
 				AddToServerSyncEvents(ref serverSyncs, ref serverChanges);
-				UpdateDataWithChange(serverFolder, ref serverData, in serverChanges);
 			} else {
 				Console.WriteLine("No server changes found.");
 			}
@@ -260,11 +259,11 @@ namespace SyncTest {
 				if (clientChanges.changes.Count > 0) {
 					Console.WriteLine("Processed changes valid, adding to serverSync.");
 					AddToServerSyncEvents(ref serverSyncs, ref clientChanges);
-					
+
 				} else {
 					Console.WriteLine("No more changes left after processing. No SyncEvent will be added for Client.");
 				}
-				
+
 			} else {
 				Console.WriteLine("No client changes found.");
 			}
@@ -429,173 +428,206 @@ namespace SyncTest {
 
 		//Compares current serverData/clientData to what's on the disk right now, and returns a SyncEvent
 		//dataFile is the .data parsed prior, belonging to either client or server.
-		static SyncEvent GetChangesFromDisk(string path, ref Dictionary<string, string[]> dataFile) {
+		static SyncEvent GetChangesFromDisk(string path, ref Dictionary<string, string[]> data) {
 
 			//A list of "entries" to keep. Will use this later after searching thru whole directory
 			//to see which entries are leftover. Leftovers are files that are DELETED.
-			List<string> dataFileTemp = new List<string>(dataFile.Keys);
+			List<string> dataFileTemp = new List<string>(data.Keys);
 
 			//SyncNumber does not matter here! Will override next time!
 			//Create a new SyncEvent, this will be returned and later used to compare against other things.
 			SyncEvent newUpdate = new SyncEvent(globalNextSENumber.ToString(), path == serverFolder ? "SERVER" : Environment.MachineName, DateTime.Now.ToString("yyyyMMddHHmmss"));
 
-			//Parse the disk files, and compare to dataFile!
+			//Parse the disk files, and compare to data!
 			//Browse each and every one of the song files in this dir, and search on the respective .data file
 			foreach (string fullFilePath in Directory.GetFiles(path, "*", SearchOption.AllDirectories)) {
 
 				//If not a music file, skip.
 				if (!IsMusicFileExtension(Path.GetExtension(fullFilePath))) continue;
 
-				//removes the front part of the filepath to give the relative filepath.
+				//get the LocalId of this file
+				string localId = GetUniqueFileID(fullFilePath);
+
+				//Removes the front part of the filePath to give the rFilePath
 				string relativeFilePath = fullFilePath.Replace(path, "");
 
-				//Get fileName LocalID, used for both FOUND and NOT FOUND.
-				string localID = GetUniqueFileID(fullFilePath);
+				//Scan the entire .data file for the existence of this localId of this file.
+				string matchedKey = FindKeyInDataDict(localId, in data);
+				if (matchedKey != "") {
+					//found localId. Same file exists on disk and .data, can be either a RENAME or nothing, and/or MODIFIED.
 
-				// Find the filepath. If found filepath, move straight to check Metachange/last modified.
-				//if NOT found, means this fileName on disk may be a new fileName OR renamed. Check against ALL LocalIDs.
-				if (!dataFile.ContainsKey(relativeFilePath)) {
-					// 1. Check for ADD/RENAMED
-
-					// If LocalID match, then is rename. Check for any Modified/Last modified. Add rename to changes, then remove the element from dataFile
-					// Else, no match, is a new fileName. Add "add" to changes
-					// SKIP to next fileName on disk.
-
-					bool skip = false;
-
-					//Loop all remaining items in list
-					for (int i = 0; i < dataFileTemp.Count; i++) {
-
-						//check lastModified against value
-						if (dataFile[dataFileTemp[i]][0] == localID) {
-							//fileName found, this fileName is renamed. Add to changes
-							if (debug) Console.WriteLine("GETCHANGE: File does not exist in .data but LocalId matched. Renamed. " + dataFileTemp[i]);
-							newUpdate.AddNewChange(dataFileTemp[i], ChangeType.Rename, relativeFilePath);
-
-							//Check for modify/lastmodified
-							if (dataFileTemp.Count > 0 && CompareLastModified(fullFilePath, dataFile[dataFileTemp[i]][1])) {
-								if (debug) Console.WriteLine("GETCHANGE: LastModified value is also different. Modified.  " + dataFileTemp[i]);
-								newUpdate.AddNewChange(relativeFilePath, ChangeType.Modified, "");
-							}
-
-							//Remove dataFile entry
-							dataFileTemp.RemoveAt(i);
-							//At this point, because i am removing an element from a list, the list indexes changes.
-							//i should change too, to keep synchronized. BUT, i'm breaking the code right after this so i'm not concerned about i anymore.
-
-							skip = true; //skips adding this file as a new file
-
-							break;
-						}
+					//check for RENAME. if relativeFilePath is not equal to the matchedKey, RENAMED!
+					if (relativeFilePath != matchedKey) {
+						//RENAMED!
+						newUpdate.AddNewChange(matchedKey, ChangeType.Rename, relativeFilePath);
 					}
 
-					if (skip) continue;
+					//check for MODIFIED. If the lastModified date on the file is not equal to the one in .data, then MODIFIED.
+					if (CompareLastModified(fullFilePath,data[matchedKey][1])) {
+						//MODIFIED!
+						newUpdate.AddNewChange(matchedKey, ChangeType.Modified, ""); //use RENAMED name or ORIGINAL name? matchedKey = original name, relativeFilePath = new name
+					}
 
-					// No LocalID match, this fileName on disk is new. Add to change.
-					if (debug) Console.WriteLine("GETCHANGE: File is not found in .data. Add (NewFile). " + relativeFilePath);
-					newUpdate.AddNewChange(relativeFilePath, ChangeType.Add, "");
-
-					//Also add to .data file since it's a new addition.
-					dataFile.Add(relativeFilePath,new string[] { GetUniqueFileID(fullFilePath), File.GetLastWriteTime(fullFilePath).ToString("yyyyMMddHHmmss") });
-
+					//remove entry from dataFileTemp to signify it is accounted for and NOT a deleted file.
+					dataFileTemp.Remove(matchedKey);
 				} else {
-					//If fileName is found, check for Modified. Check this fileName's lastModified date with dataFile.
-					if (CompareLastModified(fullFilePath, dataFile[relativeFilePath][1])) {
-						if (debug) Console.WriteLine("GETCHANGE: File is found in .data, LastModified value is changed. Modified. " + relativeFilePath);
-						newUpdate.AddNewChange(relativeFilePath, ChangeType.Modified, "");
-					}
-
-					// At this point, LocalId is not checked. There exists a certain scenario:
-					// An identical file is drag-dropped into the folder, changing its LocalId.
-					// There is no way to tell if the contents are the same or not. The only thing we are sure of is that the
-					// filename is exactly the same. So Modified aside, this is essentially still the same file. Force update the LocalId.
-
-					if (dataFile[relativeFilePath][0] != localID) {
-						dataFile[relativeFilePath][0] = localID;
-					}
-
-					//Regardless of match or not, remove entry from dataFileTemp.
-					dataFileTemp.Remove(relativeFilePath);
+					//localId not found. Must be NEW file.
+					newUpdate.AddNewChange(relativeFilePath, ChangeType.Add, "");
 				}
-
-				//At this point, all files should have been removed from dataFiles, save for the Added/Removed ones. Only those that are missing (DELETED) should be leftover in dataFiles.
 			}
 
-			//After the loop, check if there is any files leftover in dataFile.
-			//Leftovers mean those files have been DELETED.
-			//Add those to changes too.
-
-			foreach (string item in dataFileTemp) {
-				if (debug) Console.WriteLine("GETCHANGE: Finished scanning whole dir, did not find this file. Deleted. " + item);
-				newUpdate.AddNewChange(item, ChangeType.Delete, "");
+			//leftovers in dataFileTemp are DELETED files.
+			foreach (string leftover in dataFileTemp) {
+				newUpdate.AddNewChange(leftover, ChangeType.Delete, "");
 			}
+
+			//Do a prata flip so that DELETE always happens first, THEN adds/renames/modifies.
+			//Prevents an edge case: DELETE a.mp3, ADD a.mp3. Cannot COPY over cos a.mp3 needs to be DELETED first.
+			newUpdate.changes.Reverse();
 
 			//if there were no changes, return null to indicate nothing to update.
 			if (newUpdate.changes.Count == 0) {
 				if (debug) Console.WriteLine("GETCHANGE: No changes were detected from scanning the disk.");
 				return null;
-			} else {
-				//Attempt a Logic check to ensure newUpdate isn't giving garbage updates
-				// Rules:
-				// 1. ADD must not have ANY PRIOR ACTION other than DELETE on the same file
-				// 2. RENAME/MODIFIED/DELETE must not have a prior DELETE on the same file
-				// BY RIGHT, NO ERRORS SHOULD APPEAR. IF ERRORS, IS A MAJOR BUG.
-
-				//Loop each item against every item below it down the list.
-				//If a logical error is found, uhhhhhhhhhhhhhh idk man return null, whole thing is borked!
-				for (int i = 0; i < newUpdate.changes.Count; i++) {
-					string newFileName = newUpdate.changes[i].rFileName; //name to change if a rename happens
-					for (int j = i + 1; j < newUpdate.changes.Count; j++) {
-						if (newFileName == newUpdate.changes[j].rFileName || newFileName == newUpdate.changes[j].renamedRFileName) {
-
-							//check the changeType of the sync change after this current guy.
-							if (newUpdate.changes[j].changeType == ChangeType.Add) {
-								//Rule 1: if current guy is NOT delete, error
-								if (newUpdate.changes[i].changeType != ChangeType.Delete) {
-									Console.WriteLine("GETCHANGE: ERROR: GetChangesFromDisk did not pass Logic Check! (ADD must not have ANY PRIOR ACTION other than DELETE on the same file)");
-									Console.WriteLine("Error'd Sync Number: " + newUpdate.syncEventNumber + "|Machine: " + newUpdate.machineID + "|Time: " + newUpdate.timeStamp);
-									foreach (SyncEvent.Change r in newUpdate.changes) {
-										Console.WriteLine("Name: " + r.rFileName + "|Type: " + r.changeType + "|RenamedPath: " + r.renamedRFileName);
-									}
-									Console.WriteLine("Offending pair: Current: " + newUpdate.changes[j].rFileName + "|" + newUpdate.changes[j].changeType +
-									" Slave: " + newUpdate.changes[i].rFileName + "|" + newUpdate.changes[j].changeType);
-									return null;
-								}
-							} else { //current guy type is RENAME/MODIFIED/DELETE
-									 //Rule 2: if current guy is delete, error
-								if (newUpdate.changes[i].changeType == ChangeType.Delete) {
-									Console.WriteLine("GETCHANGE: ERROR: GetChangesFromDisk did not pass Logic Check! (RENAME/MODIFIED/DELETE must not have a prior DELETE on the same file)");
-									Console.WriteLine("Error'd Sync Number: " + newUpdate.syncEventNumber + "|Machine: " + newUpdate.machineID + "|Time: " + newUpdate.timeStamp);
-									foreach (SyncEvent.Change r in newUpdate.changes) {
-										Console.WriteLine("Name: " + r.rFileName + "|Type: " + r.changeType + "|RenamedPath: " + r.renamedRFileName);
-									}
-									Console.WriteLine("Offending pair: Current: " + newUpdate.changes[j].rFileName + "|" + newUpdate.changes[j].changeType +
-									" Slave: " + newUpdate.changes[i].rFileName + "|" + newUpdate.changes[j].changeType);
-									return null;
-								}
-							}
-						}
-					}
-				}
-				if (debug) Console.WriteLine("GETCHANGE: Changes are scanned for parity, no issues detected.");
 			}
 
-			//Finally, return
 			return newUpdate;
 
 			//To check for modify/ last modified. Reusable, only within this method.
-			static bool CompareLastModified(string filePath, string dataLastModified) {
-				if (long.Parse(File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmss")) > long.Parse(dataLastModified)) {
-					Console.WriteLine("LocalId has changed! " + filePath);
+			static bool CompareLastModified(string fullFilePath, string dataLastModified) {
+				if (ulong.Parse(File.GetLastWriteTime(fullFilePath).ToString("yyyyMMddHHmmss")) > ulong.Parse(dataLastModified)) {
+					Console.WriteLine("LocalId has changed! " + fullFilePath);
 					return true;
 				} else return false;
 			}
 		}
 
+		//Compares current newSyncEvent to a list of existing SyncEvent, and edit newSyncEvent so it dosen't conflict with the existing SyncEvent.
+		//Used in AddToServerSyncEvents() and main SyncButton() logic for merging & conflict management
+		static void SyncEventConflictResolver(in List<SyncEvent> oldEvents, ref SyncEvent newSyncEvent) {
+			//scan thru all the changes in newSyncEvent.
+			// Rules:
+			// 1. ADD must not have ANY PRIOR ACTION until the next DELETE on the same file (use filePath as ID). Discard ADD if so, and warn user.
+			// 2. RENAME/MODIFIED/DELETE must not have a prior DELETE until the next ADD on the same file (use filePath as ID). Discard RENAME/MODIFIED/DELETE if so, and warn user.
+
+			//make life easier, store all of the oldEvents into one giant list.
+			List<SyncEvent.Change> oldChanges = new List<SyncEvent.Change>();
+			foreach (SyncEvent ev in oldEvents) {
+				foreach (SyncEvent.Change ch in ev.changes) {
+					oldChanges.Add(ch);
+				}
+			}
+
+			//Loop from the latest change to the earliest
+			for (int i = oldChanges.Count - 1; i >= 0; i--) {
+				
+			}
+
+			#region
+			////scan thru all the changes in newSyncEvent.
+			//// Rules:
+			//// 1. ADD must not have ANY PRIOR ACTION until the next DELETE on the same file (use filePath as ID). Discard ADD if so, and warn user.
+			//// 2. RENAME/MODIFIED/DELETE must not have a prior DELETE until the next ADD on the same file (use filePath as ID). Discard RENAME/MODIFIED/DELETE if so, and warn user.
+
+			////Stores a temp array of who to remove AFTER the loop, cos cannot delete elements while iterating.
+			////0 means no delete, 1 means delete.
+			//int[] toRemove = new int[newSyncEvent.changes.Count];
+			//bool skip = false; //to stop the loop
+
+			//for (int i = 0; i < newSyncEvent.changes.Count; i++) {
+			//	string newFileName = newSyncEvent.changes[i].rFileName; //to update this as it scans in case there has been a rename
+			//	skip = false;
+
+			//	//scan thru the newSyncEvent for any renames, so we use the correct name that is in parity with the old list.
+			//	//only scan from current position upwards, as renames that happen that will affect parity with old list will be ABOVE.
+			//	for (int j = i; j >= 0; j--) {
+			//		if (newSyncEvent.changes[j].changeType == ChangeType.Rename) {
+			//			newFileName = newSyncEvent.changes[j].rFileName;
+			//			//DO NOT BREAK, as there may be multiple renames after the first one.
+			//		}
+			//	}
+
+			//	bool canAddFile = false; //for RULE 1. Use only in case ChangeType.Add. FALSE by default, until
+
+			//	//Scan thru the entire list of oldEvents and try to find any parity issues.
+			//	foreach (SyncEvent syncEvent in oldEvents) {
+			//		foreach (SyncEvent.Change oldChange in syncEvent.changes) {
+
+			//			if (newFileName == oldChange.rFileName || newFileName == oldChange.renamedRFileName) {
+
+			//				switch (newSyncEvent.changes[i].changeType) {
+			//					case ChangeType.Add:
+			//						// 1. MUST NOT HAVE ANY PRIOR ACTIONS UNTIL THE NEXT DELETE. Mark for deletion and move on.
+			//						if (oldChange.changeType != ChangeType.Delete) {
+			//							toRemove[i] = 1;
+			//							skip = true;
+			//							Console.WriteLine("WARNING: Existing file added in new SyncEvent! Discarding! " +
+			//							newSyncEvent.changes[i].rFileName +
+			//							"|" + newSyncEvent.changes[i].changeType);
+			//						}
+			//						break;
+
+			//					case ChangeType.Delete:
+			//						if (oldChange.changeType == ChangeType.Delete) {
+			//							// 2. DELETED FILE MUST NOT HAVE DELETE. Mark for deletion and move on.
+			//							toRemove[i] = 1;
+			//							skip = true;
+			//							Console.WriteLine("WARNING: Deleted file deleted again in new SyncEvent! Discarding! " +
+			//							newSyncEvent.changes[i].rFileName +
+			//							"|" + newSyncEvent.changes[i].changeType);
+			//						}
+			//						break;
+
+			//					case ChangeType.Rename:
+
+			//						if (oldChange.changeType == ChangeType.Delete) {
+			//							// 2. DELETED FILE MUST NOT HAVE RENAME. Mark for deletion and move on.
+			//							toRemove[i] = 1;
+			//							skip = true;
+			//							Console.WriteLine("WARNING: Deleted file renamed in new SyncEvent! Discarding! " + newSyncEvent.changes[i].rFileName +
+			//							"|" + newSyncEvent.changes[i].changeType +
+			//							"|" + newSyncEvent.changes[i].renamedRFileName);
+			//						}
+
+			//						//if file was renamed, update file name to the old one.
+			//						if (oldChange.changeType == ChangeType.Rename && newFileName == oldChange.renamedRFileName) {
+			//							newFileName = oldChange.rFileName;
+			//						}
+			//						break;
+
+			//					case ChangeType.Modified:
+			//						if (oldChange.changeType == ChangeType.Delete) {
+			//							// 2. DELETED FILE MUST NOT HAVE MODIFIED. Mark for deletion and move on.
+			//							toRemove[i] = 1;
+			//							skip = true;
+			//							Console.WriteLine("WARNING: Deleted file modified in new SyncEvent! Discarding! " + newSyncEvent.changes[i].rFileName +
+			//							"|" + newSyncEvent.changes[i].changeType);
+			//						}
+			//						break;
+			//				}
+			//				if (skip) break;
+			//			}
+			//		}
+			//		if (skip) break;
+			//	}
+			//}
+
+			////Delete entries in newSyncEvent
+			////delete from the back, so it won't affect the stuff at thr front.
+			//for (int i = newSyncEvent.changes.Count - 1; i >= 0; i--) {
+			//	if (toRemove[i] == 1) {
+			//		newSyncEvent.changes.RemoveAt(i);
+			//	}
+			//}
+
+			////OK done, newSyncEvent has been parity checked. Conflicts have been discarded!
+			#endregion
+		}
+
 		//On multiple renames, client rename uses wrong name to try to rename.
 		//Fixes that so when server does fileIO operation, it will be able to find the correct file to rename.
 		//NOTE: Assumes serverChanges has been appended to syncs, but NOT clientChanges.
-		static void FixRenameForClientChanges(ref SyncEvent clientChanges, ref List<SyncEvent.Change> clientRollbacks, ref SyncEvent serverChanges, 
+		static void FixRenameForClientChanges(ref SyncEvent clientChanges, ref List<SyncEvent.Change> clientRollbacks, ref SyncEvent serverChanges,
 		in Dictionary<string, string[]> serverData) {
 			//On multiple renames on the same file, GetChangesFromDisk will return something like this:
 			//1. server: 69 -> 69server
@@ -631,7 +663,7 @@ namespace SyncTest {
 			for (int i = 0; i < clientChanges.changes.Count; i++) {
 
 				if (clientChanges.changes[i].changeType != ChangeType.Rename) continue;
-				
+
 				// check client rename against serverdata and ensure not renaming to existing file.
 				if (serverData.ContainsKey(clientChanges.changes[i].renamedRFileName)) {
 					//if it exists, do one more check to see if the offending file is going to be renamed to something else.
@@ -647,13 +679,13 @@ namespace SyncTest {
 							}
 						}
 					}
-					
+
 					if (!exists) {
 						//REMOVE from clientchange
 						Console.WriteLine("FixRename: This client file is going to be renamed to an existing file on the server. Rolling back rename for clientChanges." +
 						"\n\tClient File Name: " + clientChanges.changes[i].rFileName + "\n\tRenamed File Name: " + clientChanges.changes[i].renamedRFileName);
 						//Add it to clientRollback. Rename the file back to its original name according to client .data
-						clientRollbacks.Add(new SyncEvent.Change(clientChanges.changes[i].renamedRFileName,ChangeType.Rename, clientChanges.changes[i].rFileName));
+						clientRollbacks.Add(new SyncEvent.Change(clientChanges.changes[i].renamedRFileName, ChangeType.Rename, clientChanges.changes[i].rFileName));
 						//Remove the entry from clientChange
 						clientChanges.changes.RemoveAt(i);
 						i--;
@@ -697,7 +729,7 @@ namespace SyncTest {
 							continue; //i--, immediately move to next item before doing more logic.
 						}
 					}
-				}	
+				}
 			}
 		}
 
@@ -727,7 +759,7 @@ namespace SyncTest {
 
 		}
 
-		//updates the relevant database with the SyncEvent, to be used right after adding to serverSyncs
+		//updates the relevant database with the SyncEvent, to be used right after GetChangesFromDisk (maybe after fixing some conflicts)
 		static void UpdateDataWithChange(string path, ref Dictionary<string, string[]> data, in SyncEvent syncEvent) {
 			// On ADD, copy file to target, add new .data entry
 			// On DELETE, remove file from target, remove .data entry
@@ -741,6 +773,8 @@ namespace SyncTest {
 						case ChangeType.Add:
 							if (!data.ContainsKey(change.rFileName)) {
 								data.Add(change.rFileName, new string[] { GetUniqueFileID(filePath), File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmss") });
+							} else {
+								Console.WriteLine("UPDATE DATA ERROR: Unable to add entry into .data! File already exists! File: " + change.rFileName + "\nLocation: " + path);
 							}
 							break;
 
@@ -748,7 +782,7 @@ namespace SyncTest {
 							if (data.ContainsKey(change.rFileName)) {
 								data.Remove(change.rFileName);
 							} else {
-								Console.WriteLine("ERROR: Unable to find entry in .data to delete! File: " + change.rFileName + "\nLocation: " + path);
+								Console.WriteLine("UPDATE DATA ERROR: Unable to find entry in .data to delete! File: " + change.rFileName + "\nLocation: " + path);
 							}
 							break;
 
@@ -757,7 +791,7 @@ namespace SyncTest {
 								data.Add(change.renamedRFileName, new string[] { data[change.rFileName][0], data[change.rFileName][1] });
 								data.Remove(change.rFileName);
 							} else {
-								Console.WriteLine("ERROR: Unable to find entry in .data to rename! File: " + change.rFileName + "\nLocation: " + path);
+								Console.WriteLine("UPDATE DATA ERROR: Unable to find entry in .data to rename! File: " + change.rFileName + "\nLocation: " + path);
 							}
 							break;
 
@@ -765,114 +799,13 @@ namespace SyncTest {
 							if (data.ContainsKey(change.rFileName)) {
 								data[change.rFileName][1] = File.GetLastWriteTime(filePath).ToString("yyyyMMddHHmmss");
 							} else {
-								Console.WriteLine("ERROR: Unable to find entry in .data to update last modified! File: " + change.rFileName + "\nLocation: " + path);
+								Console.WriteLine("UPDATE DATA ERROR: Unable to find entry in .data to update last modified! File: " + change.rFileName + "\nLocation: " + path);
 							}
 							break;
 					}
 
 				}
 			}
-		}
-
-		//Compares current newSyncEvent to a list of existing SyncEvent, and edit newSyncEvent so it dosen't conflict with the existing SyncEvent.
-		//Used in AddToServerSyncEvents() and main SyncButton() logic for merging & conflict management
-		static void SyncEventConflictResolver(in List<SyncEvent> oldEvents, ref SyncEvent newSyncEvent) {
-			
-			//scan thru all the changes in newSyncEvent.
-			// Rules:
-			// 1. ADD must not have ANY PRIOR ACTION until the next DELETE on the same file (use filePath as ID). Discard ADD if so, and warn user.
-			// 2. RENAME/MODIFIED/DELETE must not have a prior DELETE on the same file (use filePath as ID). Discard RENAME/MODIFIED/DELETE if so, and warn user.
-
-			//Stores a temp array of who to remove AFTER the loop, cos cannot delete elements while iterating.
-			//0 means no delete, 1 means delete.
-			int[] toRemove = new int[newSyncEvent.changes.Count];
-			bool skip = false; //to stop the loop
-
-			for (int i = 0; i < newSyncEvent.changes.Count; i++) {
-				string newFileName = newSyncEvent.changes[i].rFileName; //to update this as it scans in case there has been a rename
-				skip = false;
-
-				//scan thru the newSyncEvent for any renames, so we use the correct name that is in parity with the old list.
-				//only scan from current position upwards, as renames that happen that will affect parity with old list will be ABOVE.
-				for (int j = i; j >= 0; j--) {
-					if (newSyncEvent.changes[j].changeType == ChangeType.Rename) {
-						newFileName = newSyncEvent.changes[j].rFileName;
-						//DO NOT BREAK, as there may be multiple renames after the first one.
-					}
-				}
-
-				//Scan thru the entire list of oldEvents and try to find any parity issues.
-				foreach (SyncEvent syncEvent in oldEvents) {
-					foreach (SyncEvent.Change oldChange in syncEvent.changes) {
-						if (newFileName == oldChange.rFileName || newFileName == oldChange.renamedRFileName) {
-
-							switch (newSyncEvent.changes[i].changeType) {
-
-								case ChangeType.Add:
-									// 1. MUST NOT HAVE ANY PRIOR ACTIONS UNTIL THE NEXT DELETE. Mark for deletion and move on.
-									if (oldChange.changeType != ChangeType.Delete) {
-										toRemove[i] = 1;
-										skip = true;
-										Console.WriteLine("WARNING: Existing file added in new SyncEvent! Discarding! " +
-										newSyncEvent.changes[i].rFileName +
-										"|" + newSyncEvent.changes[i].changeType);
-									}
-									break;
-
-								case ChangeType.Delete:
-									if (oldChange.changeType == ChangeType.Delete) {
-										// 2. DELETED FILE MUST NOT HAVE DELETE. Mark for deletion and move on.
-										toRemove[i] = 1;
-										skip = true;
-										Console.WriteLine("WARNING: Deleted file deleted again in new SyncEvent! Discarding! " +
-										newSyncEvent.changes[i].rFileName +
-										"|" + newSyncEvent.changes[i].changeType);
-									}
-									break;
-
-								case ChangeType.Rename:
-
-									if (oldChange.changeType == ChangeType.Delete) {
-										// 2. DELETED FILE MUST NOT HAVE RENAME. Mark for deletion and move on.
-										toRemove[i] = 1;
-										skip = true;
-										Console.WriteLine("WARNING: Deleted file renamed in new SyncEvent! Discarding! " + newSyncEvent.changes[i].rFileName +
-										"|" + newSyncEvent.changes[i].changeType +
-										"|" + newSyncEvent.changes[i].renamedRFileName);
-									}
-
-									//if file was renamed, update file name to the old one.
-									if (oldChange.changeType == ChangeType.Rename && newFileName == oldChange.renamedRFileName) {
-										newFileName = oldChange.rFileName;
-									}
-									break;
-
-								case ChangeType.Modified:
-									if (oldChange.changeType == ChangeType.Delete) {
-										// 2. DELETED FILE MUST NOT HAVE MODIFIED. Mark for deletion and move on.
-										toRemove[i] = 1;
-										skip = true;
-										Console.WriteLine("WARNING: Deleted file modified in new SyncEvent! Discarding! " + newSyncEvent.changes[i].rFileName +
-										"|" + newSyncEvent.changes[i].changeType);
-									}
-									break;
-							}
-							if (skip) break;
-						}
-					}
-					if (skip) break;
-				}
-			}
-
-			//Delete entries in newSyncEvent
-			//delete from the back, so it won't affect the stuff at thr front.
-			for (int i = newSyncEvent.changes.Count - 1; i >= 0; i--) {
-				if (toRemove[i] == 1) {
-					newSyncEvent.changes.RemoveAt(i);
-				}
-			}
-
-			//OK done, newSyncEvent has been parity checked. Conflicts have been discarded!
 		}
 
 		//Perform a singular File IO Operation, from sourceFolder to targetFolder.
@@ -922,7 +855,7 @@ namespace SyncTest {
 						Console.WriteLine("WARNING: Could not add new entry to .data, entry already exists: " + change.rFileName + "\n.data File: " + targetFolder);
 						targetData[change.rFileName] = new string[] { GetUniqueFileID(destFile), File.GetLastWriteTime(destFile).ToString("yyyyMMddHHmmss") };
 					}
-						break;
+					break;
 
 				case ChangeType.Delete:
 					//Check if target file exists
@@ -955,7 +888,7 @@ namespace SyncTest {
 
 					//rename file
 					try {
-						File.Move(destFile,Path.Join(targetFolder,change.renamedRFileName));
+						File.Move(destFile, Path.Join(targetFolder, change.renamedRFileName));
 					} catch (Exception e) {
 						Console.WriteLine("Error renaming file: " + destFile + "\nError Msg: " + e.Message);
 						break;
@@ -1027,6 +960,17 @@ namespace SyncTest {
 					}
 				}
 			}
+		}
+
+		//searches the entire dict to find the entry that has the matching localId. returns "" if not found.
+		//hella inefficient but i can't be arsed to restructure my entire dictionary structure to have localId as the key. I'm in too deep. 
+		static string FindKeyInDataDict(string localId, in Dictionary<string, string[]> dict) {
+			foreach (KeyValuePair<string, string[]> entry in dict) {
+				if (entry.Value[0] == localId) {
+					return entry.Key;
+				}
+			}
+			return "";
 		}
 
 		//Takes a file extension. period dosen't matter.

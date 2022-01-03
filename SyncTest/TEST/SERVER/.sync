@@ -1,45 +1,14 @@
 #1.0 Sync File
 
-16
-#0|SERVER|20220102215721
-1.m4a|Add|
-2.1.mp3|Add|
-69.mp3|Add|
-bee.mp3|Add|
-a foldur\5.mp3|Add|
-a foldur\6.mp3|Add|
-#1|PLEIADES|20220102215722
-4.mp3|Add|
-#2|SERVER|20220102215722
-69.mp3|Rename|69 server.mp3
-#3|SERVER|20220102215906
-bee.mp3|Rename|gee.mp3
-#4|SERVER|20220102220106
-69 server.mp3|Rename|new.mp3
-#5|PLEIADES|20220102220714
-4.mp3|Rename|4-2.mp3
-#6|SERVER|20220102220812
-2.1.mp3|Modified|
-4-2.mp3|Delete|
-#7|SERVER|20220102220915
-new.mp3|Rename|idk.mp3
-1.m4a|Rename|kokoro.m4a
-2.1.mp3|Rename|mimi1.mp3
-gee.mp3|Rename|mimi2.mp3
-#8|PLEIADES|20220102220915
-2.1.mp3|Modified|
-#9|SERVER|20220102221033
+3
+#0|SERVER|20220103210837
+a foldur\hearbeat.mp3|Add|
+a foldur\calc.mp3|Add|
+mimi1.mp3|Add|
+kokoro.m4a|Add|
 coma.mp3|Add|
-#10|PLEIADES|20220102221034
-mimi2.mp3|Delete|
-#11|SERVER|20220102221133
-a foldur\5.mp3|Rename|a foldur\calc.mp3
-a foldur\6.mp3|Rename|a foldur\hearbeat.mp3
-#12|SERVER|20220102221240
-idk.mp3|Rename|noo.mp3
-#13|SERVER|20220102221318
-noo.mp3|Rename|idk.mp3
-#14|SERVER|20220102221449
-NEWFILE.m4a|Add|
-#15|SERVER|20220102221515
-NEWFILE.m4a|Delete|
+69.mp3|Add|
+#1|SERVER|20220103210837
+69.mp3|Rename|69 server.mp3
+#2|SERVER|20220103211929
+coma.mp3|Delete|
