@@ -211,13 +211,12 @@ namespace SyncTest {
 			//Compare server .data file to server files on disk.
 			Console.WriteLine("\nChecking file changes for server...");
 			SyncEvent serverChanges = GetChangesFromDisk(serverFolder, ref serverData);
-			//UpdateDataWithChange(serverFolder, ref serverData, in serverChanges);
 
 			//if changes are NOT NULL, write to .sync, as a new entry IMMEDIATELY.
 			if (serverChanges != null) {
 				Console.WriteLine("Server changes found!");
 				SyncEventConflictResolver(in serverSyncs, ref serverChanges);
-				FixRenameSwapScenario();
+				FixRenameSwapScenario(ref serverChanges, ref clientRollbacks);
 				AddToServerSyncEvents(ref serverSyncs, ref serverChanges);
 			} else {
 				Console.WriteLine("No server changes found.");
@@ -226,7 +225,6 @@ namespace SyncTest {
 			//Compare client .data file to client files on disk.
 			Console.WriteLine("\nChecking file changes for client...");
 			SyncEvent clientChanges = GetChangesFromDisk(clientFolder, ref clientData);
-			//UpdateDataWithChange(clientFolder, ref clientData, in clientChanges);
 
 			#endregion
 			// ====================== Merging & Conflict Management ===========================
@@ -238,8 +236,8 @@ namespace SyncTest {
 				// Handle any conflicts in the merge.
 				Console.WriteLine("Processing changes to remove conflicts before adding to serverSyncs...");
 				SyncEventConflictResolver(in serverSyncs, ref clientChanges);
-				FixRenameChanges(ref clientChanges, ref clientRollbacks, ref serverChanges, in serverData);
-				FixRenameSwapScenario();
+				FixClientRenameConflict(ref clientChanges, ref clientRollbacks, ref serverChanges, in serverData);
+				FixRenameSwapScenario(ref clientChanges, ref serverRollbacks);
 				//clientChanges is now free of any potential conflicts.
 
 				// Finally, the merged client changes can be appended to server's .sync (but don't write).
@@ -583,7 +581,7 @@ namespace SyncTest {
 				string currName = allEvents[allEventsIndex].rFileName;
 
 				for (int i = allEventsIndex - 1; i >= 0; i--) {
-					//1. 69 -> 69-2
+					//1. 69 -> 69.2
 					//2. 69.2 -> 69.3
 
 					//update any potential renames
@@ -720,10 +718,9 @@ namespace SyncTest {
 
 		//NOTE: Assumes serverChanges has been appended to syncs, but NOT clientChanges.
 		//Fixes a bunch of issues:
-		// 1. SWAPPING file names (Will add a special swapping change to server and client)
-		// 2. Renaming the same file to 2 different names (Server rename takes precedence)
-		// 3. Renaming 2 files to same name (Server rename takes precedence)
-		static void FixRenameChanges(ref SyncEvent clientChanges, ref List<SyncEvent.Change> clientRollbacks, ref SyncEvent serverChanges,
+		// 1. Renaming the same file to 2 different names (Server rename takes precedence)
+		// 2. Renaming 2 files to same name (Server rename takes precedence)
+		static void FixClientRenameConflict(ref SyncEvent clientChanges, ref List<SyncEvent.Change> clientRollbacks, ref SyncEvent serverChanges,
 		in Dictionary<string, string[]> serverData) {
 			//On multiple renames on the same file, GetChangesFromDisk will return something like this:
 			//1. server: 69 -> 69server
@@ -845,38 +842,40 @@ namespace SyncTest {
 			}
 		}
 
-		//adds additional changes to a serverChanges or clientChanges, to account for swapping of names.
+		//adds additional changes to a serverChanges or clientChanges, to account for swapping of names (or multiple swaps).
 		static void FixRenameSwapScenario(ref SyncEvent changes, ref List<SyncEvent.Change> rollbacks) {
-			//Apply the rename swap special changes
 			//rollback structure: 
 			//rollback:	x.mp3 -> x.mp3.rb
-			//client/	y.mp3 -> x.mp3  << clientChanges.changes[i] points to this change
-			//server:	x.mp3.rb -> y.mp3
+			//			x.mp3.rb -> y.mp3
 
-			//First, detect if there is any such cases.
+			//change all rename targets into .rb under rollback (x.mp3 -> x.mp3.rb)
+			//Then set the final rename to use .rb under changes (x.mp3.rb -> y.mp3)
 			for (int i = 0; i < changes.changes.Count; i++) {
 				if (changes.changes[i].changeType != ChangeType.Rename) continue;
 
-				//SyncEventConflictResolver and FixRenameChanges have been done (if any).
-				//
+				//SyncEventConflictResolver and FixClientRenameConflict have been done (if any).
+				//rename rollbacks have been added to the clientRollback list, and offending renames have ben removed from clientChanges so no worries.
+
+				rollbacks.Add(new SyncEvent.Change(changes.changes[i].rFileName,ChangeType.Rename, changes.changes[i].rFileName + ".rb"));
+				changes.ChangeFileName(i, changes.changes[i].rFileName + ".rb");
 			}
-
 		}
-
-
-
 
 		//Adds a new SyncEvent to serverSyncs, after performing parity checks with the rest of the data in serverSyncs.
 		static void AddToServerSyncEvents(ref List<SyncEvent> serverSyncs, ref SyncEvent newSyncEvent) {
 
 			if (newSyncEvent == null || newSyncEvent.changes.Count == 0) return;
 
-			SyncEventConflictResolver(in serverSyncs, ref newSyncEvent);
-
-			if (newSyncEvent == null || newSyncEvent.changes.Count == 0) return;
+			Console.WriteLine("Removing .rb extensions from renamed files before adding to serverSyncs");
+			//clear serverSyncs from having .rb extension during rename.
+			SyncEvent newnewSyncEvent = new SyncEvent(newSyncEvent); //create a new copy or else serverSyncs will have a reference to the original newSyncEvent
+			for (int i = 0; i < newnewSyncEvent.changes.Count; i++) {
+				if (newnewSyncEvent.changes[i].changeType != ChangeType.Rename) continue;
+				newnewSyncEvent.ChangeFileName(i, newnewSyncEvent.changes[i].rFileName.Replace(".rb", ""));
+			}
 
 			Console.WriteLine("Adding a new SyncEvent entry!");
-			serverSyncs.Add(new SyncEvent(newSyncEvent));
+			serverSyncs.Add(newnewSyncEvent);
 			globalNextSENumber++;
 
 			if (debug) {
@@ -1014,8 +1013,6 @@ namespace SyncTest {
 							Console.WriteLine("ERROR: Could not edit entry in .data, entry not found: " + change.rFileName + "\n.data File: " + targetFolder);
 						}
 					}
-
-					
 					break;
 
 				case ChangeType.Modified:

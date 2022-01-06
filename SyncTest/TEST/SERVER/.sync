@@ -1,13 +1,13 @@
 #1.0 Sync File
 
 2
-#0|PLEIADES|20220105183111
+#0|PLEIADES|20220106134736
 a foldur\hearbeat.mp3|Add|
 a foldur\calc.mp3|Add|
+mimi.mp3|Add|
 kokoro.m4a|Add|
-b.mp3|Add|
+coma.mp3|Add|
 a.mp3|Add|
 69 server.mp3|Add|
-#1|SERVER|20220105183132
-a.mp3|Rename|b.mp3
-b.mp3|Rename|a.mp3
+#1|SERVER|20220106134814
+mimi.mp3|Rename|b.mp3
