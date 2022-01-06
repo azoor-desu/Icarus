@@ -44,12 +44,24 @@ namespace SyncTest {
 				SyncButton();
 				Console.WriteLine("================================================================================\n");
 				//rename
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69 client.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69 server.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
+
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
+
+				//Deleting a file, then renaming another to the deleted file
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3");
+
 				SyncButton();
 
 			} catch (Exception e) {
-				Console.WriteLine(e.Message);
+				Console.WriteLine("UNIT TEST: " + e.Message);
 			}
 			//SyncButton();
 		}
@@ -255,6 +267,7 @@ namespace SyncTest {
 				Console.WriteLine("Client changes found!");
 				// Handle any conflicts in the merge.
 				Console.WriteLine("Processing changes to remove conflicts before adding to serverSyncs...");
+				FixClientRepeatedActions(ref serverChanges, ref clientChanges, ref clientRollbacks);
 				SyncEventConflictResolver(in serverSyncs, ref clientChanges);
 				FixClientRenameConflict(ref clientChanges, ref clientRollbacks, ref serverChanges, in serverData);
 				FixRenameSwapScenario(ref clientChanges, ref serverRollbacks);
@@ -282,7 +295,6 @@ namespace SyncTest {
 				}
 				Console.WriteLine("Done!");
 			}
-
 			//Do server file IO.
 			Console.WriteLine("\nDoing Client to Server file IO...");
 			//clientChanges is already the perfect block to directly carry out actions on Client. Just do actions as is.
@@ -291,7 +303,6 @@ namespace SyncTest {
 					PerformFileIO(clientFolder, serverFolder, change, ref serverData);
 				}
 			Console.WriteLine("Done!");
-
 			if (clientRollbacks.Count > 0) {
 				//Do client rollback file IO.
 				Console.WriteLine("\nDoing Client Rollback file IO...");
@@ -301,7 +312,6 @@ namespace SyncTest {
 				Console.WriteLine("Done!");
 			}
 
-
 			//Do client file IO.
 			Console.WriteLine("\nDoing Server to Client file IO...");
 			//serverChanges is already the perfect block to directly carry out actions on Client. Just do actions as is.
@@ -310,7 +320,6 @@ namespace SyncTest {
 					PerformFileIO(serverFolder, clientFolder, change, ref clientData);
 				}
 			Console.WriteLine("Done!");
-
 			#endregion
 			// ====================== Writing .sync & .data files ===================
 			#region Writing .sync & .data files
@@ -636,6 +645,53 @@ namespace SyncTest {
 			}
 		}
 
+		//If client does the same changes as server, discard
+		static void FixClientRepeatedActions(ref SyncEvent serverChanges, ref SyncEvent clientChanges, ref List<SyncEvent.Change> clientRollbacks) {
+			if (serverChanges == null || clientChanges == null) return;
+
+			for (int i = 0; i < clientChanges.changes.Count; i++) {
+				for (int j = 0; j < serverChanges.changes.Count; j++) {
+					if (clientChanges.changes[i].changeType == serverChanges.changes[j].changeType &&
+					clientChanges.changes[i].rFileName == serverChanges.changes[j].rFileName.Replace(".rb","") &&
+					clientChanges.changes[i].renamedRFileName == serverChanges.changes[j].renamedRFileName) {
+						Console.WriteLine("FIXREPEAT: Repeated action already done in server! Discarding this client action: " + 
+						clientChanges.changes[i].rFileName + "|" + clientChanges.changes[i].changeType + "|" + clientChanges.changes[i].renamedRFileName);
+
+						//Discard the change in clientChanges, serverChanges (don't need to update client) and possible related rollbacks in clientRollbacks
+						//Won't affect the .syncs, as the server changes are added to serverSyncs already while serverChanges only affects the actual FileIO operations.
+
+						//Rollback changes include Renames and Modifies
+						for (int k = 0; k < clientRollbacks.Count; k++) {
+							//renames
+							//sv rollback:	a -> a.rb
+							//server:		[a.rb] -> b
+							//cl rollback:	a -> [a.rb]
+							//client:		a.rb -> b
+							if (serverChanges.changes[j].changeType == ChangeType.Rename &&
+							clientRollbacks[k].changeType == ChangeType.Rename &&
+							serverChanges.changes[j].rFileName == clientRollbacks[k].renamedRFileName) {
+								clientRollbacks.RemoveAt(k);
+								break;
+							}
+
+							//Modifies
+							if (serverChanges.changes[j].changeType == ChangeType.Modified &&
+							clientRollbacks[k].changeType == ChangeType.Modified &&
+							serverChanges.changes[j].rFileName == clientRollbacks[k].rFileName) {
+								clientRollbacks.RemoveAt(k);
+								break;
+							}
+						}
+						serverChanges.changes.RemoveAt(j);
+						clientChanges.changes.RemoveAt(i);
+						i--;
+						j--;
+						break;
+					}
+				}
+			}
+		}
+
 		//NOTE: Assumes serverChanges has been appended to syncs, but NOT clientChanges.
 		//Fixes a bunch of issues:
 		// 1. Renaming the same file to 2 different names (Server rename takes precedence)
@@ -679,37 +735,39 @@ namespace SyncTest {
 
 				// 1. check client rename against serverdata and ensure not renaming to existing file.
 				if (serverData.ContainsKey(clientChanges.changes[i].renamedRFileName)) {
-					//if it exists, do one more check to see if the offending file is going to be renamed to something else.
+					//if it exists, do one more check to see if the offending file is going to be renamed to something else, OR deleted
 					//if yes, then allow the change for client.
 					//if no, REMOVE this change from clientChange.
-					bool exists = false;
+					bool allowChange = false;
 
 					//check in clientChange
-					foreach (SyncEvent.Change clientChange in clientChanges.changes) {
+					foreach (SyncEvent.Change toCheck in clientChanges.changes) {
 						// for clientside rename swapping scenario, the changes look abit different:
 						// client:	thisFile -> b >> b exists on server!
 						//			b -> thisFile
 						// hence check if file b is going to be renamed!
-						if (clientChange.changeType != ChangeType.Rename) continue;
-						if (clientChanges.changes[i].renamedRFileName == clientChange.rFileName) {
-							exists = true;
-							break;
+						if (clientChanges.changes[i].renamedRFileName == toCheck.rFileName) {
+							if (toCheck.changeType == ChangeType.Delete || toCheck.changeType == ChangeType.Rename) {
+								allowChange = true;
+								break;
+							}
 						}
 					}
 
 
 					//check in serverChange
-					if (!exists && serverChanges != null)
-						foreach (SyncEvent.Change serverChange in serverChanges.changes) {
-							if (serverChange.changeType != ChangeType.Rename) continue;
-							if (clientChanges.changes[i].rFileName == serverChange.rFileName) {
-								exists = true;
-								break;
+					if (!allowChange && serverChanges != null)
+						foreach (SyncEvent.Change toCheck in serverChanges.changes) {
+							if (clientChanges.changes[i].rFileName == toCheck.rFileName) {
+								if (toCheck.changeType == ChangeType.Delete || toCheck.changeType == ChangeType.Rename) {
+									allowChange = true;
+									break;
+								}
 							}
 						}
 
 
-					if (!exists) {
+					if (!allowChange) {
 						//REMOVE from clientchange
 						if (debug) Console.WriteLine("FixRename: This client file is going to be renamed to an existing file on the server. Rolling back rename for clientChanges." +
 						"\n\tClient File Name: " + clientChanges.changes[i].rFileName + "\n\tRenamed File Name: " + clientChanges.changes[i].renamedRFileName);
@@ -725,11 +783,10 @@ namespace SyncTest {
 				// 2. check client file name against serverChanges file name and ensure client does not rename if server is renaming.
 				// 3. check client rename against serverChanges and ensure not renaming to same rename in serverChanges.
 				if (serverChanges != null) {
+					bool skip = false;
 					foreach (SyncEvent.Change serverChange in serverChanges.changes) {
 
 						if (serverChange.changeType != ChangeType.Rename) continue;
-						Console.WriteLine("SC rFileName: " + serverChange.rFileName + "|Renamed: " + serverChange.renamedRFileName);
-						Console.WriteLine("CC rFileName: " + clientChanges.changes[i].rFileName + "|Renamed: " + clientChanges.changes[i].renamedRFileName);
 						// 2. check client file name against serverChanges file name and ensure client does not rename if server is renaming.
 						//if both are rename and are the same name e.g.
 						//1. server: 69 -> eh1 (69.rb -> eh1)
@@ -746,7 +803,8 @@ namespace SyncTest {
 							//Remove the entry from clientChange
 							clientChanges.changes.RemoveAt(i);
 							i--;
-							continue; //i--, immediately move to next item before doing more logic.
+							skip = true;
+							break; //i--, immediately move to next item before doing more logic.
 						}
 
 						// 3. check client rename against serverChanges and ensure not renaming to same rename in serverChanges.
@@ -762,14 +820,16 @@ namespace SyncTest {
 							//Remove the entry from clientChange
 							clientChanges.changes.RemoveAt(i);
 							i--;
-							continue; //i--, immediately move to next item before doing more logic.
+							skip = true;
+							break; //i--, immediately move to next item before doing more logic.
 						}
 					}
+					if (skip) continue;
 				}
 			}
 		}
 
-		//adds additional changes to a serverChanges or clientChanges, to account for swapping of names (or multiple swaps).
+		//Changes the way renames are handled, so renames won't interfere with each other when swapping names. Temporarily appends a .rb to the end of a rename
 		static void FixRenameSwapScenario(ref SyncEvent changes, ref List<SyncEvent.Change> rollbacks) {
 			//rollback structure: 
 			//rollback:	x.mp3 -> x.mp3.rb
@@ -920,7 +980,7 @@ namespace SyncTest {
 						string fileExt = Path.GetExtension(targetFile);
 						string fileNameNoExt = Path.GetFileNameWithoutExtension(targetFile);
 						string parentDir = Directory.GetParent(targetFile).FullName;
-						string newFileName = Path.Join(parentDir, fileNameNoExt) + " (" + availNum + ")." + fileExt;
+						string newFileName = Path.Join(parentDir, fileNameNoExt) + " (" + availNum + ")" + fileExt;
 						while (File.Exists(newFileName)) {
 							availNum++;
 							newFileName = Path.Join(parentDir, fileNameNoExt) + " (" + availNum + ")." + fileExt;

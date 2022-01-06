@@ -1,6 +1,6 @@
 # Icarus
  
-Playing around with experimental ideas to make a music player that is able to sync music files and playlists across multiple devices without having to rely on Big Company saying "no u can't do that".
+Playing around with experimental ideas to make a music player that is able to sync music files and playlists across multiple devices without having Big Company telling you "no u can't do that".
 
 Have multiple devices that you listen to music with?
 Hate managing your playlists across devices?
@@ -20,3 +20,4 @@ TODO:
 - Utilize popular cloud services for storing data (Dropbox, GDrive)
 - Have the music player actually working instead of just the sync program
 - Android version!
+- Implement SQLite to replace database storage
