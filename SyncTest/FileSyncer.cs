@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using Un4seen.Bass.AddOn.Tags;
 
 namespace SyncTest {
-	class Program {
+	class FileSyncer {
 
 		static void Main(string[] args) {
 			try {
@@ -226,7 +225,7 @@ namespace SyncTest {
 		static int clientNextSENumber = 0; //NEXT number of the client, before this sync!
 		static int serverCurrSENumber = 0; //CURRENT number of the server, before this sync!
 		//Entry point: Sync Button pressed!
-		static void SyncButton() {
+		public static void SyncButton() {
 			// ====================== Check if directories exist. ==============================
 			#region Check Directories Exist
 			if (!Directory.Exists(serverFolder)) {
@@ -462,7 +461,7 @@ namespace SyncTest {
 			Console.WriteLine("\nFiles synchronized!");
 		}
 
-		static void ResetClientSync() {
+		public static void ResetClientSync() {
 			Console.WriteLine("Resetting server .sync!");
 			if (File.Exists(Path.Join(clientFolder, ".sync"))) {
 				File.Delete(Path.Join(clientFolder, ".sync"));
@@ -472,7 +471,7 @@ namespace SyncTest {
 			}
 		}
 
-		static void ResetServerSync() {
+		public static void ResetServerSync() {
 			Console.WriteLine("Resetting client .sync!");
 			if (File.Exists(Path.Join(serverFolder, ".sync"))) {
 				File.Delete(Path.Join(serverFolder, ".sync"));
