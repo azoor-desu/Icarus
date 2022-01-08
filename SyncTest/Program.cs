@@ -73,30 +73,30 @@ namespace SyncTest {
 
 				#region old client test
 				//Updating OLD client.
-				//server: a -> aa, b -> bb, aa -> a1, add newfile
-				//Old client: a -> b, b -> a, add newfile
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3");
-				//SyncButton();
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
-				//SyncButton();
+				//server: 69 -> 692 -> 69, a -> aa -> a1, b -> bb, add newfile, modify 69, modify kokoro
+				//Old client: a -> b, b -> a, add newfile, delete coma, modify 69
+				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3");
+				SyncButton();
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
+				SyncButton();
 
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\bb.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\bb.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
 
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a1.mp3");
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\coma.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\newfile.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a1.mp3");
+				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\coma.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\newfile.mp3");
 
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\coma.mp3");
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\coma.mp3");
+				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
 
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
-				//Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-				//Console.ReadKey();
-				//SyncButton();
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1, modify 69 client + server, modify server kokoro!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				Console.ReadKey();
+				SyncButton();
 				#endregion
 
 
@@ -586,7 +586,13 @@ namespace SyncTest {
 			}
 			//then add new entries
 			foreach (KeyValuePair<string, string[]> add in toAddData) {
-				data.Add(add.Key, add.Value);
+				//if key alr exists, means just update the values with whatever's in toAddData
+				if (!data.ContainsKey(add.Key)) {
+					data.Add(add.Key, add.Value);
+				} else {
+					data[add.Key][0] = add.Value[0];
+					data[add.Key][1] = add.Value[1];
+				}
 			}
 
 			if (debug) {
@@ -820,7 +826,7 @@ namespace SyncTest {
 						if (debug) Console.WriteLine("FIXREPEAT: Repeated action already done in server! Discarding this client action: " +
 						clientChanges.changes[i].rFileName + "|" + clientChanges.changes[i].changeType + "|" + clientChanges.changes[i].renamedRFileName);
 
-						//Discard the change in clientChanges, serverChanges (don't need to update client) and possible related rollbacks in clientRollbacks
+						//Discard the change in clientChanges, serverChanges (don't need to update client, EXCEPT for modify) and possible related rollbacks in clientRollbacks
 						//Won't affect the .syncs, as the server changes are added to serverSyncs already while serverChanges only affects the actual FileIO operations.
 
 						//Discard Rollback changes include Renames and Modifies
@@ -853,7 +859,8 @@ namespace SyncTest {
 							clientRollbacks.Add(new SyncEvent.Change(clientChanges.changes[i].rFileName, ChangeType.Add, ""));
 						}
 
-						serverChanges.changes.RemoveAt(j);
+						//Modifies still need to be carried out from server to client.
+						if (serverChanges.changes[j].changeType != ChangeType.Modified) serverChanges.changes.RemoveAt(j);
 						clientChanges.changes.RemoveAt(i);
 						i--;
 						//j-- is uneeded, break immediately renders index j useless after this.
@@ -887,13 +894,6 @@ namespace SyncTest {
 
 			//make life easier, store serverSyncs changes AND new changes into one giant list.
 			List<SyncEvent.Change> allEvents = new List<SyncEvent.Change>();
-			if (debug) Console.WriteLine("=========ALLEVENTS===========");
-			foreach (SyncEvent ev in serverSyncs) {
-				foreach (SyncEvent.Change ch in ev.changes) {
-					allEvents.Add(ch);
-					if (debug) Console.WriteLine(ch.rFileName + "|" + ch.changeType + "|" + ch.renamedRFileName);
-				}
-			}
 			if (debug) {
 				Console.WriteLine("=========newSyncEvent===========");
 				foreach (SyncEvent.Change ch in newSyncEvent.changes) {
