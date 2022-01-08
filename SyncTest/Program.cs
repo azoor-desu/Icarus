@@ -75,31 +75,80 @@ namespace SyncTest {
 				//Updating OLD client.
 				//server: 69 -> 692 -> 69, a -> aa -> a1, b -> bb, add newfile, modify 69, modify kokoro
 				//Old client: a -> b, b -> a, add newfile, delete coma, modify 69
-				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3");
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3");
+				//SyncButton();
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
+				//SyncButton();
+
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\bb.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
+
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a1.mp3");
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\coma.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\newfile.mp3");
+
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\coma.mp3");
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				//Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1, modify 69 client + server, modify server kokoro!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				//Console.ReadKey();
+				//SyncButton();
+				#endregion
+
+				#region old client modifying test
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
+				//SyncButton();
+
+				//Console.WriteLine("!!!!!!!!!!!!!!Modify newfile client!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				//Console.ReadKey();
+				//SyncButton();
+
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				//Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1, !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				//Console.ReadKey();
+				//SyncButton();
+				#endregion
+
+				#region New Client Join halfway
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3");
+				//SyncButton();
+				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b2.mp3");
+				//SyncButton();
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aiaiaia.mp3");
+				//SyncButton();
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.sync");
+				////client has extra files 
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\oonewclientfile.mp3");
+				////client missing some files
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				////server add new file
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\oonewclientfile.mp3");
+				//SyncButton();
+				#endregion
+
+				#region Server Reset
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3");
 				SyncButton();
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
+				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b2.mp3");
 				SyncButton();
-
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\bb.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
-				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
-
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a1.mp3");
-				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\coma.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\newfile.mp3");
-
-				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\coma.mp3");
-				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
-
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
-				Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1, modify 69 client + server, modify server kokoro!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b-leaf.mp3");
+				SyncButton();
+				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\.data");
+				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\.sync");
+				//client has extra files 
+				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\oonewclientfile.mp3");
+				//client missing some files
+				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
 				Console.ReadKey();
 				SyncButton();
 				#endregion
-
-
 
 			} catch (Exception e) {
 				Console.WriteLine("UNIT TEST: " + e.Message);
@@ -217,7 +266,7 @@ namespace SyncTest {
 				//TODO: Acutally check if .data is parasable. Rebuild if not parsable.
 				//Todo: Maybe attempt a repair on the file?
 				Console.WriteLine("server .sync file not exist, building one!");
-				CreateSyncFile(serverFolder);
+				CreateSyncFile(serverFolder, DateTime.Now.ToString("yyyyMMddHHmmss"));
 
 			}
 
@@ -238,9 +287,29 @@ namespace SyncTest {
 				//TODO: Acutally check if .data is parasable. Rebuild if not parsable.
 				//Todo: Maybe attempt a repair on the file?
 				Console.WriteLine("server .sync file not exist, building one!");
-				CreateSyncFile(clientFolder);
+				CreateSyncFile(clientFolder, DateTime.Now.ToString("yyyyMMddHHmmss"));
 
 			}
+
+			//Used in resetting the server .data and .sync files
+			string serverDateVersionNumber = "";
+			string clientDateVersionNumber = "";
+			LoadSyncDateVersionNumber(serverFolder, ref serverDateVersionNumber);
+			LoadSyncDateVersionNumber(clientFolder, ref clientDateVersionNumber);
+
+			//If client .sync's version does not match with server's, delete the .data and .sync files of client and re-generate.
+			if (serverDateVersionNumber != clientDateVersionNumber) {
+				Console.WriteLine("Server and Client .sync versions do not match. Deleting and regenerating Client .sync and .data files!");
+				if (File.Exists(Path.Join(clientFolder, ".sync"))) {
+					File.Delete(Path.Join(clientFolder, ".sync"));
+				}
+				CreateSyncFile(clientFolder, DateTime.Now.ToString("yyyyMMddHHmmss"));
+				if (File.Exists(Path.Join(clientFolder, ".data"))) {
+					File.Delete(Path.Join(clientFolder, ".data"));
+				}
+				CreateDataFile(clientFolder);
+			}
+
 			#endregion
 			// ====================== Load in from .data and .sync files ==============================
 			#region Load Data
@@ -258,7 +327,6 @@ namespace SyncTest {
 			List<SyncEvent> serverSyncs = new List<SyncEvent>();
 			List<SyncEvent.Change> clientRollbacks = new List<SyncEvent.Change>(); //for rolling back changes as server takes precedence
 			List<SyncEvent.Change> serverRollbacks = new List<SyncEvent.Change>(); //for rolling back changes in case as needed.
-
 
 			LoadDataFile(serverFolder, ref serverData);
 			LoadDataFile(clientFolder, ref clientData);
@@ -378,10 +446,10 @@ namespace SyncTest {
 
 			// Write the entirety of the serverside .sync file into a new .sync file, overwrite.
 			Console.WriteLine("\nWriting server .sync file...");
-			WriteSyncFile(serverFolder, in serverSyncs, globalNextSENumber);
+			WriteSyncFile(serverFolder, in serverSyncs, globalNextSENumber, serverDateVersionNumber);
 			Console.WriteLine("Writing client .sync file...");
 			serverSyncs = null;
-			WriteSyncFile(clientFolder, in serverSyncs, globalNextSENumber);
+			WriteSyncFile(clientFolder, in serverSyncs, globalNextSENumber, serverDateVersionNumber);
 
 			// Write the entirety of .data to both server and client.
 			Console.WriteLine("Writing server .data file...");
@@ -409,10 +477,10 @@ namespace SyncTest {
 		}
 
 		//Takes in target folder path and builds a .sync file right there.
-		static void CreateSyncFile(string path) {
+		static void CreateSyncFile(string path, string dateVersionNumber) {
 			Directory.CreateDirectory(path);
 			using (StreamWriter sw = File.CreateText(Path.Join(path, ".sync"))) {
-				sw.WriteLine("#1.0 Sync File");
+				sw.WriteLine("1.0 Sync File|" + dateVersionNumber);
 				sw.WriteLine("");
 				sw.WriteLine("0"); //Next sync number
 			}
@@ -495,6 +563,20 @@ namespace SyncTest {
 				}
 				//skip everything, go straight to third line, read the number and return.
 				nextSENumber = int.Parse(line);
+				return;
+			}
+		}
+
+		//Reads the Date version number from .sync file, from the 1st line of the file.
+		static void LoadSyncDateVersionNumber(string path, ref string dateVersion) {
+			if (!File.Exists(Path.Join(path, ".sync"))) {
+				Console.WriteLine("ERROR: .sync file not found at path: " + path + ", unable to load. Did program not manage to create file at this path location?");
+				return;
+			}
+			foreach (var line in File.ReadLines(Path.Join(path, ".sync"))) {
+				//Get the dateversion part in the first line.
+				//1.0 Sync File|datetimeversion
+				dateVersion = line.Split('|')[1];
 				return;
 			}
 		}
@@ -620,6 +702,7 @@ namespace SyncTest {
 		//After this, client should be on parity with server BEFORE the current serverChanges.
 		static void UpdateClientOldChanges(in List<SyncEvent> serverSyncs, ref SyncEvent clientChanges, ref List<SyncEvent.Change> clientRollbacks) {
 			//if client is up to date, skip this method. (this method is really big and cursed, loops over and over again because i'm dumb)
+			Console.WriteLine("clientnext: " + clientNextSENumber + " serverCurr: " + serverCurrSENumber);
 			if (clientNextSENumber > serverCurrSENumber) return;
 			Console.WriteLine("OLD CLIENT DETECTED. Updating this client with updates it missed out on.");
 			//First, filter and compress all changes that can be simplified.
@@ -1290,10 +1373,10 @@ namespace SyncTest {
 		}
 
 		//Writes a new sync file to disk. Accepts null sync file. Used to write client .sync
-		static void WriteSyncFile(string path, in List<SyncEvent> syncs, int nextSENumber) {
+		static void WriteSyncFile(string path, in List<SyncEvent> syncs, int nextSENumber, string serverDateVersionNumber) {
 			Directory.CreateDirectory(path);
 			using (StreamWriter sw = File.CreateText(Path.Join(path, ".sync"))) {
-				sw.WriteLine("#1.0 Sync File");
+				sw.WriteLine("1.0 Sync File|" + serverDateVersionNumber);
 				sw.WriteLine("");
 				sw.WriteLine(nextSENumber); //Next sync number
 

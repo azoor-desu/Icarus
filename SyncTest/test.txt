@@ -1,4 +1,4 @@
-#1.0 Sync File
+1.0 Sync File|datetimeversion
 
 13
 #number|MachineID|datetime
