@@ -462,6 +462,26 @@ namespace SyncTest {
 			Console.WriteLine("\nFiles synchronized!");
 		}
 
+		static void ResetClientSync() {
+			Console.WriteLine("Resetting server .sync!");
+			if (File.Exists(Path.Join(clientFolder, ".sync"))) {
+				File.Delete(Path.Join(clientFolder, ".sync"));
+			}
+			if (File.Exists(Path.Join(clientFolder, ".data"))) {
+				File.Delete(Path.Join(clientFolder, ".data"));
+			}
+		}
+
+		static void ResetServerSync() {
+			Console.WriteLine("Resetting client .sync!");
+			if (File.Exists(Path.Join(serverFolder, ".sync"))) {
+				File.Delete(Path.Join(serverFolder, ".sync"));
+			}
+			if (File.Exists(Path.Join(serverFolder, ".data"))) {
+				File.Delete(Path.Join(serverFolder, ".data"));
+			}
+		}
+
 		// ================= Helper Methods ===========================
 
 		#region FileIO Creation/Loader helpers
@@ -702,7 +722,6 @@ namespace SyncTest {
 		//After this, client should be on parity with server BEFORE the current serverChanges.
 		static void UpdateClientOldChanges(in List<SyncEvent> serverSyncs, ref SyncEvent clientChanges, ref List<SyncEvent.Change> clientRollbacks) {
 			//if client is up to date, skip this method. (this method is really big and cursed, loops over and over again because i'm dumb)
-			Console.WriteLine("clientnext: " + clientNextSENumber + " serverCurr: " + serverCurrSENumber);
 			if (clientNextSENumber > serverCurrSENumber) return;
 			Console.WriteLine("OLD CLIENT DETECTED. Updating this client with updates it missed out on.");
 			//First, filter and compress all changes that can be simplified.
