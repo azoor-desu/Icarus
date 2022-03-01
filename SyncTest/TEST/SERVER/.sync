@@ -1,14 +1,34 @@
-1.0 Sync File|20220108172507
+1.0 Sync File|20220109203311
 
-2
-#0|SERVER|20220108172507
+9
+#0|SERVER|20220109203311
 a foldur\hearbeat.mp3|Add|
 a foldur\calc.mp3|Add|
 kokoro.m4a|Add|
 coma.mp3|Add|
-b2.mp3|Add|
-b-leaf.mp3|Add|
+b.mp3|Add|
 a.mp3|Add|
 69.mp3|Add|
-#1|PLEIADES|20220108172507
-oonewclientfile.mp3|Add|
+#1|PLEIADES|20220109203344
+69.mp3|Rename|３４７２８９３４７９２８.mp3
+#2|PLEIADES|20220109203444
+kokoro.m4a|Delete|
+AWWAWAW\３４７２８９３４７９２８.mp3|Add|
+AWWAWAW\NEWFILE.mp3|Add|
+AWWAWAW\coma.mp3|Add|
+AWWAWAW\b.mp3|Add|
+AWWAWAW\a.mp3|Add|
+NEWFILE.mp3|Add|
+#3|PLEIADES|20220109203754
+NEWFILE.mp3|Modified|
+#4|SERVER|20220109203828
+NEWFILE.mp3|Modified|
+#5|PLEIADES|20220109203828
+a.mp3|Rename|b.mp3
+b.mp3|Rename|a.mp3
+#6|SERVER|20220109204048
+NEWFILE.mp3|Rename|NEWFILE2.mp3
+#7|SERVER|20220109204149
+a.mp3|Rename|hi.mp3
+#8|PLEIADES|20220109204550
+hi.mp3|Rename|hihi.mp3

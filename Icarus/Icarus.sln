@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31613.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Icarus", "Icarus.vcxproj", "{070616A1-1FD3-43F0-8944-2DBE93B35F91}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{070616A1-1FD3-43F0-8944-2DBE93B35F91}.Debug|x64.ActiveCfg = Debug|x64
+		{070616A1-1FD3-43F0-8944-2DBE93B35F91}.Debug|x64.Build.0 = Debug|x64
+		{070616A1-1FD3-43F0-8944-2DBE93B35F91}.Debug|x86.ActiveCfg = Debug|Win32
+		{070616A1-1FD3-43F0-8944-2DBE93B35F91}.Debug|x86.Build.0 = Debug|Win32
+		{070616A1-1FD3-43F0-8944-2DBE93B35F91}.Release|x64.ActiveCfg = Release|x64
+		{070616A1-1FD3-43F0-8944-2DBE93B35F91}.Release|x64.Build.0 = Release|x64
+		{070616A1-1FD3-43F0-8944-2DBE93B35F91}.Release|x86.ActiveCfg = Release|Win32
+		{070616A1-1FD3-43F0-8944-2DBE93B35F91}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8392FD09-2F3A-4A59-96DE-2EC7374EECD8}
+	EndGlobalSection
+EndGlobal

@@ -8,151 +8,151 @@ namespace SyncTest {
 
 		static void Main(string[] args) {
 			try {
-				//RESET
-				DirectoryInfo di = new DirectoryInfo(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\");
-				DirectoryInfo dis = new DirectoryInfo(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\");
-				foreach (FileInfo file in di.GetFiles()) {
-					file.Delete();
-				}
-				foreach (DirectoryInfo dir in di.GetDirectories()) {
-					dir.Delete(true);
-				}
-				foreach (FileInfo file in dis.GetFiles()) {
-					file.Delete();
-				}
-				foreach (DirectoryInfo dir in dis.GetDirectories()) {
-					dir.Delete(true);
-				}
-				//COPY OVER CLIENT
-				foreach (string dirPath in Directory.GetDirectories(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", "*", SearchOption.AllDirectories)) {
-					Directory.CreateDirectory(dirPath.Replace(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\"));
-				}
-				foreach (string newPath in Directory.GetFiles(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", "*.*", SearchOption.AllDirectories)) {
-					File.Copy(newPath, newPath.Replace(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\"), true);
-				}
-				//COPY OVER SERVER
-				foreach (string dirPath in Directory.GetDirectories(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", "*", SearchOption.AllDirectories)) {
-					Directory.CreateDirectory(dirPath.Replace(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\"));
-				}
-				foreach (string newPath in Directory.GetFiles(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", "*.*", SearchOption.AllDirectories)) {
-					File.Copy(newPath, newPath.Replace(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\"), true);
-				}
-				//INITIALIZE
-				SyncButton(); //sync 0
-				Console.WriteLine("================================================================================\n");
-				#region Dual Rename Chain client & server
-				//rename, dual chain effect on client + server
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
+				////RESET
+				//DirectoryInfo di = new DirectoryInfo(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\");
+				//DirectoryInfo dis = new DirectoryInfo(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\");
+				//foreach (FileInfo file in di.GetFiles()) {
+				//	file.Delete();
+				//}
+				//foreach (DirectoryInfo dir in di.GetDirectories()) {
+				//	dir.Delete(true);
+				//}
+				//foreach (FileInfo file in dis.GetFiles()) {
+				//	file.Delete();
+				//}
+				//foreach (DirectoryInfo dir in dis.GetDirectories()) {
+				//	dir.Delete(true);
+				//}
+				////COPY OVER CLIENT
+				//foreach (string dirPath in Directory.GetDirectories(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", "*", SearchOption.AllDirectories)) {
+				//	Directory.CreateDirectory(dirPath.Replace(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\"));
+				//}
+				//foreach (string newPath in Directory.GetFiles(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", "*.*", SearchOption.AllDirectories)) {
+				//	File.Copy(newPath, newPath.Replace(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\"), true);
+				//}
+				////COPY OVER SERVER
+				//foreach (string dirPath in Directory.GetDirectories(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", "*", SearchOption.AllDirectories)) {
+				//	Directory.CreateDirectory(dirPath.Replace(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\"));
+				//}
+				//foreach (string newPath in Directory.GetFiles(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", "*.*", SearchOption.AllDirectories)) {
+				//	File.Copy(newPath, newPath.Replace(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\"), true);
+				//}
+				////INITIALIZE
+				//SyncButton(); //sync 0
+				//Console.WriteLine("================================================================================\n");
+				//#region Dual Rename Chain client & server
+				////rename, dual chain effect on client + server
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\69.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
 
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
-				//SyncButton();
-				#endregion
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
+				////SyncButton();
+				//#endregion
 
-				#region Rename same file on server/client to diff names
-				//rename same file to 2 names
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
-				//SyncButton();
-				#endregion
+				//#region Rename same file on server/client to diff names
+				////rename same file to 2 names
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
+				////SyncButton();
+				//#endregion
 
-				#region Drag-drop replacement of a file, on server + client
-				//Replacing file with new one, same name
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3");
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3");
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
-				//SyncButton();
-				#endregion
+				//#region Drag-drop replacement of a file, on server + client
+				////Replacing file with new one, same name
+				////File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3");
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3");
+				////File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				////SyncButton();
+				//#endregion
 
-				#region old client test
-				//Updating OLD client.
-				//server: 69 -> 692 -> 69, a -> aa -> a1, b -> bb, add newfile, modify 69, modify kokoro
-				//Old client: a -> b, b -> a, add newfile, delete coma, modify 69
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3");
-				//SyncButton();
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
-				//SyncButton();
+				//#region old client test
+				////Updating OLD client.
+				////server: 69 -> 692 -> 69, a -> aa -> a1, b -> bb, add newfile, modify 69, modify kokoro
+				////Old client: a -> b, b -> a, add newfile, delete coma, modify 69
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3");
+				////SyncButton();
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\692.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\69.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\bb.mp3");
+				////SyncButton();
 
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\bb.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\b.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\bb.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
 
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a1.mp3");
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\coma.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\newfile.mp3");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aa.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\a1.mp3");
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\coma.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\newfile.mp3");
 
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\coma.mp3");
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				////File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\coma.mp3");
+				////File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
 
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
-				//Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1, modify 69 client + server, modify server kokoro!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-				//Console.ReadKey();
-				//SyncButton();
-				#endregion
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				////Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1, modify 69 client + server, modify server kokoro!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				////Console.ReadKey();
+				////SyncButton();
+				//#endregion
 
-				#region old client modifying test
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
-				//SyncButton();
+				//#region old client modifying test
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy");
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\newfile.mp3");
+				////SyncButton();
 
-				//Console.WriteLine("!!!!!!!!!!!!!!Modify newfile client!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-				//Console.ReadKey();
-				//SyncButton();
+				////Console.WriteLine("!!!!!!!!!!!!!!Modify newfile client!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				////Console.ReadKey();
+				////SyncButton();
 
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
-				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
-				//Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1, !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-				//Console.ReadKey();
-				//SyncButton();
-				#endregion
+				////File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.datacpy", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				////Console.WriteLine("!!!!!!!!!!!!!!Edit Client .sync to 1, !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				////Console.ReadKey();
+				////SyncButton();
+				//#endregion
 
-				#region New Client Join halfway
+				//#region New Client Join halfway
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3");
+				////SyncButton();
+				////File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b2.mp3");
+				////SyncButton();
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aiaiaia.mp3");
+				////SyncButton();
+				////File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
+				////File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.sync");
+				//////client has extra files 
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\oonewclientfile.mp3");
+				//////client missing some files
+				////File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
+				//////server add new file
+				////File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\oonewclientfile.mp3");
+				////SyncButton();
+				//#endregion
+
+				//#region Server Reset
 				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3");
 				//SyncButton();
 				//File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b2.mp3");
 				//SyncButton();
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\aiaiaia.mp3");
+				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b-leaf.mp3");
 				//SyncButton();
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.data");
-				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\.sync");
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\.data");
+				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\.sync");
 				////client has extra files 
 				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\oonewclientfile.mp3");
 				////client missing some files
 				//File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
-				////server add new file
-				//File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\oonewclientfile.mp3");
+				//Console.ReadKey();
 				//SyncButton();
-				#endregion
-
-				#region Server Reset
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3");
-				SyncButton();
-				File.Move(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b1.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b2.mp3");
-				SyncButton();
-				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\b-leaf.mp3");
-				SyncButton();
-				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\.data");
-				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\SERVER\.sync");
-				//client has extra files 
-				File.Copy(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\test\b.mp3", @"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\oonewclientfile.mp3");
-				//client missing some files
-				File.Delete(@"C:\PERSONAL FILES\WORK\APP\Icarus\SyncTest\TEST\CLIENT\a.mp3");
-				Console.ReadKey();
-				SyncButton();
-				#endregion
+				//#endregion
 
 			} catch (Exception e) {
 				Console.WriteLine("UNIT TEST: " + e.Message);
 			}
-			//SyncButton();
+			SyncButton();
 		}
 
 		enum ChangeType { Delete, Add, Rename, Modified }
