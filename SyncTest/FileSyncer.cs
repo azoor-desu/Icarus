@@ -152,7 +152,8 @@ namespace SyncTest {
 			} catch (Exception e) {
 				Console.WriteLine("UNIT TEST: " + e.Message);
 			}
-			SyncButton();
+			//SyncButton();
+			GetUniqueFileID("C:/PERSONAL FILES/WORK/APP/Icarus/SyncTest/TEST/test/a.mp3");
 		}
 
 		enum ChangeType { Delete, Add, Rename, Modified }
@@ -1529,7 +1530,7 @@ namespace SyncTest {
 			fs.Close();
 
 			ulong fileIndex = ((ulong)objectFileInfo.FileIndexHigh << 32) + (ulong)objectFileInfo.FileIndexLow;
-
+			Console.WriteLine("high: " + (ulong)objectFileInfo.FileIndexHigh + "\nHigh bitshift: " + ((ulong)objectFileInfo.FileIndexHigh << 32) + "\nLow: " + (ulong)objectFileInfo.FileIndexLow + "\nIndex: " + fileIndex);
 			return fileIndex.ToString();
 
 		}
